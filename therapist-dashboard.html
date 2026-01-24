@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapist Dashboard - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🧠 MindSpace</a>
+            <ul class="nav-links">
+                <li><a href="therapist-dashboard.html" class="active">Dashboard</a></li>
+                <li><button class="btn-danger" onclick="logout()">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Therapist Dashboard</h1>
+            <h2 id="therapist-name">Loading...</h2>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="total-bookings">0</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pending-bookings">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="confirmed-bookings">0</div>
+                <div class="stat-label">Confirmed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completed-bookings">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <div class="filter-section">
+                <h3>📅 Filter by Date Range</h3>
+                <div class="filter-inputs">
+                    <div class="form-group">
+                        <label>From Date</label>
+                        <input type="date" id="filter-from-date">
+                    </div>
+                    <div class="form-group">
+                        <label>To Date</label>
+                        <input type="date" id="filter-to-date">
+                    </div>
+                    <button class="btn-primary" onclick="applyFilter()">Apply Filter</button>
+                    <button class="btn-secondary" onclick="clearFilter()">Clear Filter</button>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('all')">All Bookings</button>
+                <button class="tab-btn" onclick="switchTab('pending')">Pending</button>
+                <button class="tab-btn" onclick="switchTab('confirmed')">Confirmed</button>
+                <button class="tab-btn" onclick="switchTab('completed')">Completed</button>
+            </div>
+            
+            <div id="all-content" class="tab-content" style="display: block;">
+                <div id="all-bookings-list"></div>
+            </div>
+            <div id="pending-content" class="tab-content">
+                <div id="pending-bookings-list"></div>
+            </div>
+            <div id="confirmed-content" class="tab-content">
+                <div id="confirmed-bookings-list"></div>
+            </div>
+            <div id="completed-content" class="tab-content">
+                <div id="completed-bookings-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let allBookings = [];
+        let filteredBookings = [];
+        let currentTherapistId = null;
+        
+        async function init() {
+            const user = await checkAuth();
+            if (!user) return;
+            
+            await loadTherapistData();
+            await loadBookings();
+        }
+        
+        async function loadTherapistData() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const { data, error } = await supabase
+                    .from('Therapists')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+                    
+                if (data) {
+                    currentTherapistId = data.id;
+                    document.getElementById('therapist-name').textContent = data.Name || 'Therapist';
+                }
+            } catch (err) {
+                console.error('Load therapist error:', err);
+            }
+        }
+        
+        async function loadBookings() {
+            try {
+                const data = await loadTherapistBookings(currentTherapistId);
+                allBookings = data;
+                filteredBookings = data;
+                updateStats();
+                displayBookings();
+            } catch (err) {
+                console.error('Load bookings error:', err);
+            }
+        }
+        
+        function updateStats() {
+            const total = filteredBookings.length;
+            const pending = filteredBookings.filter(b => b.status === 'pending').length;
+            const confirmed = filteredBookings.filter(b => b.status === 'confirmed').length;
+            const completed = filteredBookings.filter(b => b.status === 'completed').length;
+            
+            document.getElementById('total-bookings').textContent = total;
+            document.getElementById('pending-bookings').textContent = pending;
+            document.getElementById('confirmed-bookings').textContent = confirmed;
+            document.getElementById('completed-bookings').textContent = completed;
+        }
+        
+        function displayBookings() {
+            displayBookingsByStatus('all', 'all-bookings-list');
+            displayBookingsByStatus('pending', 'pending-bookings-list');
+            displayBookingsByStatus('confirmed', 'confirmed-bookings-list');
+            displayBookingsByStatus('completed', 'completed-bookings-list');
+        }
+        
+        function displayBookingsByStatus(status, containerId) {
+            const container = document.getElementById(containerId);
+            let bookings = filteredBookings;
+            
+            if (status !== 'all') {
+                bookings = filteredBookings.filter(b => b.status === status);
+            }
+            
+            if (bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No bookings found</h3>
+                        <p>There are no ${status === 'all' ? '' : status} bookings to display.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = bookings.map(booking => `
+                <div class="booking-card">
+                    <div class="booking-header">
+                        <div class="booking-patient">
+                            Patient: ${booking.profiles?.full_name || 'Unknown'}
+                        </div>
+                        <span class="status-badge status-${booking.status}">${booking.status}</span>
+                    </div>
+                    <div class="booking-date">📅 ${formatDate(booking.session_date)}</div>
+                    <div class="booking-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">🕐 ${booking.start_time || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Booking ID</span>
+                            <span class="detail-value">#${booking.id ? booking.id.substring(0, 8) : 'N/A'}</span>
+                        </div>
+                    </div>
+                    ${booking.status === 'pending' ? `
+                    <div class="booking-actions">
+                        <input type="text" 
+                               id="meeting-link-${booking.id}"
+                               class="meeting-link-input" 
+                               placeholder="Enter meeting link (Google Meet, Zoom, etc.)"
+                               value="${booking.meeting_link || ''}">
+                        <button class="btn-success" onclick="confirmBooking('${booking.id}')">
+                            ✓ Confirm
+                        </button>
+                        <button class="btn-danger" onclick="rejectBooking('${booking.id}')">
+                            ✕ Reject
+                        </button>
+                    </div>
+                    ` : ''}
+                    ${booking.status === 'confirmed' && booking.meeting_link ? `
+                    <div class="detail-item" style="margin-top: 10px;">
+                        <span class="detail-label">Meeting Link</span>
+                        <span class="detail-value">
+                            🔗 <a href="${booking.meeting_link}" target="_blank">${booking.meeting_link}</a>
+                        </span>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+        
+        async function confirmBooking(bookingId) {
+            const meetingLink = document.getElementById(`meeting-link-${bookingId}`).value.trim();
+            
+            if (!meetingLink) {
+                alert('Please enter a meeting link');
+                return;
+            }
+            
+            const success = await updateBookingStatus(bookingId, 'confirmed', meetingLink);
+            if (success) {
+                alert('✅ Booking confirmed successfully!');
+                await loadBookings();
+            } else {
+                alert('Error confirming booking');
+            }
+        }
+        
+        async function rejectBooking(bookingId) {
+            if (!confirm('Are you sure you want to reject this booking?')) return;
+            
+            const success = await updateBookingStatus(bookingId, 'rejected');
+            if (success) {
+                alert('✅ Booking rejected successfully!');
+                await loadBookings();
+            } else {
+                alert('Error rejecting booking');
+            }
+        }
+        
+        function applyFilter() {
+            const fromDate = document.getElementById('filter-from-date').value;
+            const toDate = document.getElementById('filter-to-date').value;
+            
+            if (!fromDate || !toDate) {
+                alert('Please select both from and to dates');
+                return;
+            }
+            
+            filteredBookings = allBookings.filter(booking => {
+                const bookingDate = new Date(booking.session_date);
+                return bookingDate >= new Date(fromDate) && bookingDate <= new Date(toDate);
+            });
+            
+            updateStats();
+            displayBookings();
+        }
+        
+        function clearFilter() {
+            document.getElementById('filter-from-date').value = '';
+            document.getElementById('filter-to-date').value = '';
+            filteredBookings = allBookings;
+            updateStats();
+            displayBookings();
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            document.getElementById(`${tab}-content`).style.display = 'block';
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
