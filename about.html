@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Hero Section */
+        .about-hero {
+            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
+            padding: 100px 20px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="white" opacity="0.05" d="M0,0 L100,0 L100,100 Z"/></svg>');
+            pointer-events: none;
+        }
+        
+        .about-hero h1 {
+            font-size: 3.5rem;
+            color: #2C3E50;
+            margin-bottom: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .about-hero p {
+            font-size: 1.25rem;
+            color: #4B5563;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Main Content Container */
+        .about-content {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .about-content {
+                padding: 0 50px;
+            }
+        }
+        
+        /* Section Styling */
+        .about-section {
+            margin-bottom: 80px;
+        }
+        
+        .about-section:last-of-type {
+            margin-bottom: 40px;
+        }
+        
+        .about-section h2 {
+            color: #5A9B8E;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .about-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: #C9E4DE;
+            border-radius: 2px;
+        }
+        
+        .about-section p {
+            color: #4B5563;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .about-section strong {
+            color: #5A9B8E;
+            font-weight: 600;
+        }
+        
+        /* Values Grid */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .value-card {
+            background: #F5F9F8;
+            padding: 35px 30px;
+            border-radius: 16px;
+            border-left: 4px solid #5A9B8E;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(90, 155, 142, 0.1);
+        }
+        
+        .value-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .value-card h3 {
+            color: #2C3E50;
+            font-size: 1.375rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .value-card p {
+            color: #6B7280;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+        
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .team-card {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #E5E7EB;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 30px rgba(90, 155, 142, 0.15);
+            border-color: #C9E4DE;
+        }
+        
+        .team-card .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #2C3E50;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .team-card h3 {
+            color: #2C3E50;
+            font-size: 1.375rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .team-card .role {
+            color: #5A9B8E;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .team-card p {
+            color: #6B7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+        
+        /* Why Choose Us List */
+        .why-list {
+            margin-top: 25px;
+        }
+        
+        .why-list p {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .why-list p::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #5A9B8E;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .about-hero {
+                padding: 80px 20px 60px;
+            }
+            
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .about-hero p {
+                font-size: 1.125rem;
+            }
+            
+            .about-content {
+                margin: 60px auto;
+            }
+            
+            .about-section {
+                margin-bottom: 60px;
+            }
+            
+            .about-section h2 {
+                font-size: 2rem;
+            }
+            
+            .values-grid,
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .value-card,
+            .team-card {
+                padding: 25px 20px;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .about-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .about-section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .about-section:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
+        .about-section:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+        
+        .about-section:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">MindSpace</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+                <li><a href="how-it-works.html">How It Works</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="login.html" class="btn-primary">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="hero-content">
+            <h1>About MindSpace</h1>
+            <p>Connecting you with professional mental health support, anytime, anywhere.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="about-content">
+        <!-- Our Mission -->
+        <section class="about-section">
+            <h2>Our Mission</h2>
+            <p>At MindSpace, we believe that everyone deserves access to quality mental health care. Our mission is to break down barriers and make therapy accessible, affordable, and convenient for all.</p>
+            <p>We connect patients with licensed, experienced therapists through our secure online platform, making it easier than ever to prioritize your mental wellness.</p>
+        </section>
+
+        <!-- Our Story -->
+        <section class="about-section">
+            <h2>Our Story</h2>
+            <p>MindSpace was founded in 2024 with a simple vision: to revolutionize mental healthcare in India. We recognized that traditional therapy had barriers - cost, stigma, accessibility, and time constraints.</p>
+            <p>Today, we're proud to have helped over 500+ individuals on their mental wellness journey, connecting them with 50+ certified therapists across various specializations.</p>
+        </section>
+
+        <!-- Our Values -->
+        <section class="about-section">
+            <h2>Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="icon" aria-hidden="true">🔒</div>
+                    <h3>Privacy First</h3>
+                    <p>Your privacy is sacred. All sessions are confidential and encrypted with bank-level security.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon" aria-hidden="true">❤️</div>
+                    <h3>Compassion</h3>
+                    <p>We approach mental health with empathy, understanding, and care for every individual's journey.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon" aria-hidden="true">⚡</div>
+                    <h3>Accessibility</h3>
+                    <p>Quality mental health care should be available to everyone, regardless of location or background.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon" aria-hidden="true">🎯</div>
+                    <h3>Excellence</h3>
+                    <p>We maintain the highest standards in therapist credentials, care quality, and user experience.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leadership Team -->
+        <section class="about-section">
+            <h2>Meet Our Leadership</h2>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="avatar" aria-hidden="true">👨‍💼</div>
+                    <h3>Rajesh Kumar</h3>
+                    <div class="role">Founder & CEO</div>
+                    <p>10+ years in healthcare technology and digital transformation</p>
+                </div>
+                <div class="team-card">
+                    <div class="avatar" aria-hidden="true">👩‍⚕️</div>
+                    <h3>Dr. Priya Sharma</h3>
+                    <div class="role">Chief Medical Officer</div>
+                    <p>Clinical psychologist with 15+ years of experience and research</p>
+                </div>
+                <div class="team-card">
+                    <div class="avatar" aria-hidden="true">👨‍💻</div>
+                    <h3>Aryan Patel</h3>
+                    <div class="role">Head of Technology</div>
+                    <p>Expertise in building secure, scalable healthcare platforms</p>
+                </div>
+                <div class="team-card">
+                    <div class="avatar" aria-hidden="true">👩‍💼</div>
+                    <h3>Sneha Reddy</h3>
+                    <div class="role">Head of Operations</div>
+                    <p>Ensuring exceptional patient experience and service quality</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us -->
+        <section class="about-section">
+            <h2>Why Choose MindSpace?</h2>
+            <div class="why-list">
+                <p><strong>Licensed Professionals:</strong> All our therapists are certified, experienced, and regularly vetted to ensure you receive the highest quality care.</p>
+                <p><strong>Flexible Scheduling:</strong> Book sessions at times that work for you - evenings, weekends, or anytime you need support.</p>
+                <p><strong>Secure Platform:</strong> Our platform uses bank-level encryption to protect your privacy and personal information.</p>
+                <p><strong>Affordable Care:</strong> Quality mental health care shouldn't break the bank. We offer transparent, competitive pricing with various plans.</p>
+                <p><strong>Holistic Approach:</strong> We provide diverse therapy options including individual, couple, and family counseling across multiple specializations.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3 class="footer-logo">MindSpace</h3>
+                <p>Your mental wellness journey starts here.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="how-it-works.html">How It Works</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="cookies.html">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p>Email: support@mindspace.com</p>
+                <p>Phone: +91 98765 43210</p>
+                <p>Hours: 9 AM - 9 PM, 7 days a week</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MindSpace. All rights reserved.</p>
+            <p class="disclaimer">MindSpace provides access to licensed therapists but is not a substitute for emergency medical care. If you're in crisis, please contact emergency services immediately.</p>
+        </div>
+    </footer>
+</body>
+</html>
