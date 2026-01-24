@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Hero Section */
+        .contact-hero {
+            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
+            padding: 100px 20px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="white" opacity="0.05" d="M0,0 L100,0 L100,100 Z"/></svg>');
+            pointer-events: none;
+        }
+        
+        .contact-hero h1 {
+            font-size: 3.5rem;
+            color: #2C3E50;
+            margin-bottom: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .contact-hero p {
+            font-size: 1.25rem;
+            color: #4B5563;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Contact Container */
+        .contact-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 60px;
+        }
+        
+        @media (min-width: 992px) {
+            .contact-container {
+                grid-template-columns: 1fr 1fr;
+                padding: 0 50px;
+            }
+        }
+        
+        /* Contact Information Section */
+        .contact-info h2 {
+            color: #5A9B8E;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .contact-info h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: #C9E4DE;
+            border-radius: 2px;
+        }
+        
+        .contact-item {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .contact-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .contact-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            color: #5A9B8E;
+        }
+        
+        .contact-item h3 {
+            color: #2C3E50;
+            font-size: 1.375rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .contact-item p {
+            color: #6B7280;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        
+        .contact-item a {
+            color: #5A9B8E;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            display: inline-block;
+            padding: 2px 0;
+            border-bottom: 1px solid transparent;
+        }
+        
+        .contact-item a:hover {
+            color: #4A8B7E;
+            border-bottom-color: #5A9B8E;
+        }
+        
+        .contact-item .phone-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+        
+        /* Contact Form Section */
+        .contact-form {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5E7EB;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .contact-form:hover {
+            box-shadow: 0 8px 30px rgba(90, 155, 142, 0.1);
+        }
+        
+        @media (min-width: 768px) {
+            .contact-form {
+                padding: 50px 40px;
+            }
+        }
+        
+        .contact-form h2 {
+            color: #5A9B8E;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .contact-form h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: #C9E4DE;
+            border-radius: 2px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #2C3E50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group label .required {
+            color: #EF4444;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background: #F9FAFB;
+            color: #2C3E50;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
+        }
+        
+        .form-group input.error,
+        .form-group textarea.error,
+        .form-group select.error {
+            border-color: #EF4444;
+        }
+        
+        .form-group textarea {
+            min-height: 180px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235A9B8E' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+        .error-message {
+            color: #EF4444;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .form-group.error .error-message {
+            display: block;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(90, 155, 142, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .submit-btn:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .form-success {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: #F0F9F5;
+            border-radius: 10px;
+            border: 1px solid #A7F3D0;
+            margin-top: 20px;
+        }
+        
+        .form-success .icon {
+            font-size: 3rem;
+            color: #10B981;
+            margin-bottom: 20px;
+        }
+        
+        .form-success h3 {
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+        
+        /* Map Section */
+        .map-section {
+            margin: 80px auto;
+            padding: 0 20px;
+            max-width: 1200px;
+        }
+        
+        @media (min-width: 768px) {
+            .map-section {
+                padding: 0 50px;
+            }
+        }
+        
+        .map-section h2 {
+            color: #5A9B8E;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .map-container {
+            width: 100%;
+            height: 400px;
+            background: #F5F9F8;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #E5E7EB;
+        }
+        
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: #5A9B8E;
+            background: linear-gradient(135deg, #F5F9F8 0%, #E8F3EF 100%);
+        }
+        
+        .map-placeholder p {
+            font-size: 1.125rem;
+            color: #6B7280;
+            margin-top: 20px;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        /* FAQ/Additional Info */
+        .faq-section {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .faq-section {
+                padding: 0 50px;
+            }
+        }
+        
+        .faq-section h2 {
+            color: #5A9B8E;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .faq-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .faq-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .faq-item {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5E7EB;
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(90, 155, 142, 0.1);
+        }
+        
+        .faq-item h3 {
+            color: #2C3E50;
+            font-size: 1.125rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .faq-item p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .contact-hero {
+                padding: 80px 20px 60px;
+            }
+            
+            .contact-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .contact-hero p {
+                font-size: 1.125rem;
+            }
+            
+            .contact-container {
+                margin: 60px auto;
+                gap: 40px;
+            }
+            
+            .contact-info h2,
+            .contact-form h2,
+            .map-section h2,
+            .faq-section h2 {
+                font-size: 2rem;
+            }
+            
+            .contact-form {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">MindSpace</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="how-it-works.html">How It Works</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+                <li><a href="login.html" class="btn-primary">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="contact-hero">
+        <div class="hero-content">
+            <h1>Get in Touch</h1>
+            <p>Have questions? We're here to help you on your mental wellness journey.</p>
+        </div>
+    </section>
+
+    <!-- Contact Container -->
+    <div class="contact-container">
+        <!-- Contact Information -->
+        <div class="contact-info">
+            <h2>Contact Information</h2>
+
+            <div class="contact-item">
+                <div class="icon" aria-hidden="true">📧</div>
+                <h3>Email Us</h3>
+                <p>General inquiries: <a href="mailto:hello@mindspace.com">hello@mindspace.com</a></p>
+                <p>Support team: <a href="mailto:support@mindspace.com">support@mindspace.com</a></p>
+                <p>Therapist applications: <a href="mailto:careers@mindspace.com">careers@mindspace.com</a></p>
+            </div>
+
+            <div class="contact-item">
+                <div class="icon" aria-hidden="true">📞</div>
+                <h3>Call Us</h3>
+                <p>Main line: <a href="tel:+919876543210" class="phone-number">+91 98765 43210</a></p>
+                <p>Emergency support: <a href="tel:+911234567890" class="phone-number">+91 12345 67890</a></p>
+                <p>Available: Monday - Saturday, 9:00 AM - 7:00 PM IST</p>
+            </div>
+
+            <div class="contact-item">
+                <div class="icon" aria-hidden="true">📍</div>
+                <h3>Visit Our Office</h3>
+                <p><strong>MindSpace Healthcare Pvt. Ltd.</strong><br>
+                123, Wellness Tower, MG Road<br>
+                Bengaluru, Karnataka 560001<br>
+                India</p>
+                <p><small>Visits by appointment only</small></p>
+            </div>
+
+            <div class="contact-item">
+                <div class="icon" aria-hidden="true">⏰</div>
+                <h3>Business Hours</h3>
+                <p><strong>Monday - Friday:</strong> 9:00 AM - 7:00 PM</p>
+                <p><strong>Saturday:</strong> 10:00 AM - 5:00 PM</p>
+                <p><strong>Sunday:</strong> Closed for appointments<br>
+                <em>Emergency support available 24/7</em></p>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form">
+            <h2>Send Us a Message</h2>
+            <form id="contactForm" novalidate>
+                <div class="form-group">
+                    <label for="name">Your Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    <div class="error-message">Please enter your name</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                    <div class="error-message">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210">
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject" name="subject">
+                        <option value="">Select a subject</option>
+                        <option value="general">General Inquiry</option>
+                        <option value="support">Technical Support</option>
+                        <option value="appointment">Appointment Booking</option>
+                        <option value="billing">Billing Question</option>
+                        <option value="therapist">Therapist Application</option>
+                        <option value="feedback">Feedback</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message <span class="required">*</span></label>
+                    <textarea id="message" name="message" required placeholder="How can we help you? Please provide details so we can assist you better."></textarea>
+                    <div class="error-message">Please enter your message</div>
+                </div>
+                
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+            
+            <div class="form-success" id="successMessage">
+                <div class="icon">✅</div>
+                <h3>Message Sent Successfully!</h3>
+                <p>Thank you for contacting MindSpace. We've received your message and will get back to you within 24 hours.</p>
+                <p><small>For urgent matters, please call our support line.</small></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Section -->
+    <section class="map-section">
+        <h2>Find Us</h2>
+        <div class="map-container">
+            <div class="map-placeholder">
+                🗺️
+                <p>Interactive map showing our Bengaluru location</p>
+                <p><small>123, Wellness Tower, MG Road, Bengaluru</small></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>How quickly will I get a response?</h3>
+                <p>We aim to respond to all inquiries within 24 hours during business days. For urgent matters, please call our support line.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Is my information secure?</h3>
+                <p>Yes, all your information is encrypted and protected. We follow strict privacy protocols to ensure confidentiality.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Can I schedule an appointment via email?</h3>
+                <p>Yes, but for faster scheduling, please use our online booking system or call our appointment desk.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Do you provide emergency support?</h3>
+                <p>Yes, we offer 24/7 emergency support. Call our emergency line for immediate assistance.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3 class="footer-logo">MindSpace</h3>
+                <p>Your mental wellness journey starts here.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook">📘</a>
+                    <a href="#" aria-label="Twitter">🐦</a>
+                    <a href="#" aria-label="Instagram">📷</a>
+                    <a href="#" aria-label="LinkedIn">💼</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="how-it-works.html">How It Works</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="cookies.html">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Emergency Resources</h4>
+                <p>If you're in crisis, contact:</p>
+                <p><strong>National Helpline:</strong> 1800-599-0019</p>
+                <p><strong>Emergency:</strong> 112</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MindSpace. All rights reserved.</p>
+            <p class="disclaimer">MindSpace provides access to licensed therapists but is not a substitute for emergency medical care.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Form validation and submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contactForm');
+            const successMessage = document.getElementById('successMessage');
+            const submitBtn = form.querySelector('.submit-btn');
+            const formGroups = form.querySelectorAll('.form-group');
+            
+            // Validation functions
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            function validatePhone(phone) {
+                if (!phone) return true; // Phone is optional
+                const re = /^[\d\s\+\-\(\)]{10,}$/;
+                return re.test(phone);
+            }
+            
+            function validateField(field) {
+                const formGroup = field.closest('.form-group');
+                const errorMessage = formGroup.querySelector('.error-message');
+                let isValid = true;
+                
+                // Reset field
+                field.classList.remove('error');
+                formGroup.classList.remove('error');
+                
+                // Check required fields
+                if (field.required && !field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error');
+                    formGroup.classList.add('error');
+                }
+                
+                // Email validation
+                if (field.type === 'email' && field.value.trim()) {
+                    if (!validateEmail(field.value)) {
+                        isValid = false;
+                        field.classList.add('error');
+                        formGroup.classList.add('error');
+                        errorMessage.textContent = 'Please enter a valid email address';
+                    }
+                }
+                
+                // Phone validation
+                if (field.type === 'tel' && field.value.trim()) {
+                    if (!validatePhone(field.value)) {
+                        isValid = false;
+                        field.classList.add('error');
+                        formGroup.classList.add('error');
+                        errorMessage.textContent = 'Please enter a valid phone number';
+                    }
+                }
+                
+                return isValid;
+            }
+            
+            // Real-time validation
+            form.querySelectorAll('input, textarea, select').forEach(field => {
+                field.addEventListener('blur', () => validateField(field));
+                field.addEventListener('input', () => {
+                    const formGroup = field.closest('.form-group');
+                    field.classList.remove('error');
+                    formGroup.classList.remove('error');
+                });
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all fields
+                let formIsValid = true;
+                const requiredFields = form.querySelectorAll('[required]');
+                
+                requiredFields.forEach(field => {
+                    if (!validateField(field)) {
+                        formIsValid = false;
+                    }
+                });
+                
+                // Validate optional fields that have values
+                const optionalFields = form.querySelectorAll('input:not([required]), textarea:not([required])');
+                optionalFields.forEach(field => {
+                    if (field.value.trim()) {
+                        if (!validateField(field)) {
+                            formIsValid = false;
+                        }
+                    }
+                });
+                
+                if (formIsValid) {
+                    // Disable submit button and show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Sending...';
+                    
+                    // Simulate API call
+                    setTimeout(() => {
+                        // In production, this would send to your backend
+                        const formData = {
+                            name: document.getElementById('name').value,
+                            email: document.getElementById('email').value,
+                            phone: document.getElementById('phone').value,
+                            subject: document.getElementById('subject').value,
+                            message: document.getElementById('message').value
+                        };
+                        
+                        console.log('Form submitted:', formData);
+                        
+                        // Show success message
+                        form.style.display = 'none';
+                        successMessage.style.display = 'block';
+                        
+                        // Reset form
+                        form.reset();
+                        
+                        // Re-enable button after 5 seconds
+                        setTimeout(() => {
+                            form.style.display = 'block';
+                            successMessage.style.display = 'none';
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Send Message';
+                        }, 5000);
+                        
+                    }, 1500); // Simulate network delay
+                } else {
+                    // Scroll to first error
+                    const firstError = form.querySelector('.error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
