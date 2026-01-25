@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapist Dashboard - MindSpace</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2C3E50;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid #E5E7EB;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .therapist-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .therapist-info h1 {
+            color: #5A9B8E;
+            font-size: 1.75rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .therapist-info h2 {
+            color: #4B5563;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Stats Container */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border: 1px solid #E5E7EB;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(90, 155, 142, 0.1);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #5A9B8E;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2C3E50;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #6B7280;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: #F5F9F8;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #5A9B8E;
+        }
+
+        .filter-section h3 {
+            color: #5A9B8E;
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-inputs {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            color: #4B5563;
+            font-weight: 600;
+        }
+
+        .filter-group input {
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group input:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .apply-filter-btn {
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            color: white;
+        }
+
+        .apply-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(90, 155, 142, 0.3);
+        }
+
+        .clear-filter-btn {
+            background: #6B7280;
+            color: white;
+        }
+
+        .clear-filter-btn:hover {
+            background: #4B5563;
+            transform: translateY(-2px);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #E5E7EB;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 15px 25px;
+            border: none;
+            background: transparent;
+            color: #6B7280;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: #5A9B8E;
+            background: #F5F9F8;
+        }
+
+        .tab-btn.active {
+            color: #5A9B8E;
+            border-bottom-color: #5A9B8E;
+            background: #F5F9F8;
+        }
+
+        .tab-btn .badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #5A9B8E;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Booking Cards */
+        .bookings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .booking-card {
+            background: #F5F9F8;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #5A9B8E;
+            transition: transform 0.3s ease;
+        }
+
+        .booking-card:hover {
+            transform: translateX(5px);
+        }
+
+        .booking-card.pending {
+            border-left-color: #FFC107;
+        }
+
+        .booking-card.confirmed {
+            border-left-color: #28A745;
+        }
+
+        .booking-card.completed {
+            border-left-color: #6C757D;
+        }
+
+        .booking-card.cancelled {
+            border-left-color: #DC3545;
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .booking-patient {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .patient-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+
+        .patient-info h4 {
+            font-size: 1.125rem;
+            color: #2C3E50;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .patient-info p {
+            color: #6B7280;
+            font-size: 0.875rem;
+        }
+
+        .booking-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: #FFF3CD;
+            color: #856404;
+            border: 1px solid #FFEAA7;
+        }
+
+        .status-confirmed {
+            background: #D4EDDA;
+            color: #155724;
+            border: 1px solid #C3E6CB;
+        }
+
+        .status-completed {
+            background: #D1ECF1;
+            color: #0C5460;
+            border: 1px solid #BEE5EB;
+        }
+
+        .status-cancelled {
+            background: #F8D7DA;
+            color: #721C24;
+            border: 1px solid #F5C6CB;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 0.95rem;
+            color: #2C3E50;
+            font-weight: 600;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #28A745 0%, #218838 100%);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .reject-btn {
+            background: linear-gradient(135deg, #DC3545 0%, #C82333 100%);
+            color: white;
+        }
+
+        .reject-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .meeting-link-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            min-width: 250px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .meeting-link-input:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
+        }
+
+        .meeting-link-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .meeting-link-container a {
+            color: #5A9B8E;
+            text-decoration: none;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .meeting-link-container a:hover {
+            text-decoration: underline;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #C9E4DE;
+        }
+
+        .empty-state h3 {
+            color: #2C3E50;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            max-width: 400px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        /* Loading State */
+        .loading-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5A9B8E;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5E7EB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(90, 155, 142, 0.1);
+            border-color: #5A9B8E;
+        }
+
+        .action-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #5A9B8E;
+        }
+
+        .action-card h3 {
+            color: #2C3E50;
+            font-size: 1.125rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .action-card p {
+            color: #6B7280;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .logout-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-inputs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                min-width: auto;
+            }
+
+            .booking-details {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-actions {
+                flex-direction: column;
+            }
+
+            .action-card {
+                min-width: 100%;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .tab-btn {
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-info h4 {
+                font-size: 1rem;
+            }
+
+            .booking-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Calendar View */
+        .calendar-view {
+            margin-top: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .calendar-header h3 {
+            color: #5A9B8E;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav-btn {
+            background: #F5F9F8;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #4B5563;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav-btn:hover {
+            background: #E8F3EF;
+            border-color: #5A9B8E;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+            color: #5A9B8E;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: #F5F9F8;
+            border-color: #5A9B8E;
+        }
+
+        .calendar-day.has-booking::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #5A9B8E;
+            border-radius: 50%;
+        }
+
+        .calendar-day.today {
+            background: #E8F3EF;
+            border-color: #5A9B8E;
+        }
+
+        .calendar-day-number {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+
+        /* Session Notes */
+        .session-notes {
+            background: #F5F9F8;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .session-notes h4 {
+            color: #5A9B8E;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: vertical;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-left">
+            <div class="therapist-avatar" id="therapistAvatar">D</div>
+            <div class="therapist-info">
+                <h1 id="therapist-name">Therapist Dashboard</h1>
+                <h2 id="therapist-specialization">Loading...</h2>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">
+            <span class="icon">🚪</span>
+            Logout
+        </button>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="action-card" onclick="refreshDashboard()">
+            <div class="icon">🔄</div>
+            <h3>Refresh Dashboard</h3>
+            <p>Update all statistics and booking information</p>
+        </div>
+        <div class="action-card" onclick="showTodaySessions()">
+            <div class="icon">📅</div>
+            <h3>Today's Sessions</h3>
+            <p>View all sessions scheduled for today</p>
+        </div>
+        <div class="action-card" onclick="showAvailability()">
+            <div class="icon">⏰</div>
+            <h3>Set Availability</h3>
+            <p>Update your working hours and availability</p>
+        </div>
+        <div class="action-card" onclick="showEarnings()">
+            <div class="icon">💰</div>
+            <h3>View Earnings</h3>
+            <p>Check your earnings and payment history</p>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="icon">📅</div>
+            <div class="stat-number" id="total-bookings">0</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">⏳</div>
+            <div class="stat-number" id="pending-bookings">0</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">✅</div>
+            <div class="stat-number" id="confirmed-bookings">0</div>
+            <div class="stat-label">Confirmed</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">📊</div>
+            <div class="stat-number" id="completed-bookings">0</div>
+            <div class="stat-label">Completed</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">💰</div>
+            <div class="stat-number" id="total-earnings">₹0</div>
+            <div class="stat-label">Total Earnings</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">⭐</div>
+            <div class="stat-number" id="average-rating">0.0</div>
+            <div class="stat-label">Avg Rating</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3><span class="icon">🔍</span> Filter Bookings</h3>
+            <div class="filter-inputs">
+                <div class="filter-group">
+                    <label for="filter-from-date">From Date</label>
+                    <input type="date" id="filter-from-date" class="date-input">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-to-date">To Date</label>
+                    <input type="date" id="filter-to-date" class="date-input">
+                </div>
+                <button class="filter-btn apply-filter-btn" onclick="applyFilter()">
+                    <span class="icon">✅</span>
+                    Apply Filter
+                </button>
+                <button class="filter-btn clear-filter-btn" onclick="clearFilter()">
+                    <span class="icon">🔄</span>
+                    Clear Filter
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="all">
+                All Bookings
+                <span class="badge" id="all-count">0</span>
+            </button>
+            <button class="tab-btn" data-tab="pending">
+                Pending
+                <span class="badge" id="pending-count">0</span>
+            </button>
+            <button class="tab-btn" data-tab="confirmed">
+                Confirmed
+                <span class="badge" id="confirmed-count">0</span>
+            </button>
+            <button class="tab-btn" data-tab="completed">
+                Completed
+                <span class="badge" id="completed-count">0</span>
+            </button>
+            <button class="tab-btn" data-tab="today">
+                Today's Sessions
+                <span class="badge" id="today-count">0</span>
+            </button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="all-bookings-content" class="tab-content" style="display: block;">
+            <div id="all-bookings-list" class="bookings-list">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>Loading bookings...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="pending-content" class="tab-content">
+            <div id="pending-bookings-list" class="bookings-list"></div>
+        </div>
+
+        <div id="confirmed-content" class="tab-content">
+            <div id="confirmed-bookings-list" class="bookings-list"></div>
+        </div>
+
+        <div id="completed-content" class="tab-content">
+            <div id="completed-bookings-list" class="bookings-list"></div>
+        </div>
+
+        <div id="today-content" class="tab-content">
+            <div id="today-bookings-list" class="bookings-list"></div>
+        </div>
+
+        <!-- Calendar View -->
+        <div class="calendar-view">
+            <div class="calendar-header">
+                <h3><span class="icon">📅</span> Upcoming Sessions Calendar</h3>
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="prevMonth()">← Previous</button>
+                    <span id="current-month" style="font-weight: 600; color: #2C3E50;"></span>
+                    <button class="calendar-nav-btn" onclick="nextMonth()">Next →</button>
+                </div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Calendar will be generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Application State
+        const state = {
+            currentTherapist: null,
+            allBookings: [],
+            filteredBookings: [],
+            currentMonth: new Date().getMonth(),
+            currentYear: new Date().getFullYear(),
+            calendarBookings: {},
+            isLoading: true
+        };
+
+        // Check authentication and initialize dashboard
+        async function initDashboard() {
+            try {
+                // Check if user is authenticated
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                
+                if (authError || !user) {
+                    console.error('Authentication error:', authError);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Load therapist data
+                await loadTherapistData(user.id);
+                
+                // Load bookings
+                await loadBookings();
+                
+                // Initialize calendar
+                initCalendar();
+                
+                // Update UI
+                updateUI();
+
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                showNotification('Error loading dashboard. Please try refreshing.', 'error');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Load therapist data
+        async function loadTherapistData(userId) {
+            try {
+                const { data, error } = await supabase
+                    .from('Therapists')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .single();
+
+                if (error) {
+                    console.error('Error loading therapist data:', error);
+                    return;
+                }
+
+                state.currentTherapist = data;
+                
+                // Update UI with therapist info
+                const therapistName = document.getElementById('therapist-name');
+                const therapistAvatar = document.getElementById('therapistAvatar');
+                const therapistSpecialization = document.getElementById('therapist-specialization');
+                
+                if (data.Name) {
+                    therapistName.textContent = `Dr. ${data.Name}`;
+                    therapistAvatar.textContent = data.Name.charAt(0).toUpperCase();
+                }
+                
+                if (data.Specialization) {
+                    therapistSpecialization.textContent = data.Specialization;
+                }
+
+            } catch (error) {
+                console.error('Error loading therapist:', error);
+            }
+        }
+
+        // Load all bookings for the therapist
+        async function loadBookings() {
+            if (!state.currentTherapist) return;
+
+            try {
+                state.isLoading = true;
+                showLoading('all-bookings-list');
+
+                const { data, error } = await supabase
+                    .from('Bookings')
+                    .select(`
+                        *,
+                        profiles:user_id (
+                            full_name,
+                            email,
+                            phone
+                        )
+                    `)
+                    .eq('therapist_id', state.currentTherapist.id)
+                    .order('session_date', { ascending: false })
+                    .order('start_time', { ascending: true });
+
+                if (error) throw error;
+
+                state.allBookings = data || [];
+                state.filteredBookings = [...state.allBookings];
+                
+                // Process bookings for calendar
+                processCalendarBookings();
+                
+                // Update statistics
+                updateStatistics();
+                
+                // Display bookings
+                displayBookings();
+
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                showError('all-bookings-list', 'Failed to load bookings. Please try refreshing.');
+                showNotification('Error loading bookings', 'error');
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalBookings = state.filteredBookings.length;
+            const pendingBookings = state.filteredBookings.filter(b => b.status === 'pending').length;
+            const confirmedBookings = state.filteredBookings.filter(b => b.status === 'confirmed').length;
+            const completedBookings = state.filteredBookings.filter(b => b.status === 'completed').length;
+            
+            // Calculate today's bookings
+            const today = new Date().toISOString().split('T')[0];
+            const todayBookings = state.filteredBookings.filter(b => 
+                b.session_date === today && (b.status === 'confirmed' || b.status === 'pending')
+            ).length;
+            
+            // Calculate earnings (assuming ₹500 per completed session)
+            const earnings = state.filteredBookings
+                .filter(b => b.status === 'completed')
+                .reduce((sum, booking) => sum + (booking.amount || 500), 0);
+
+            // Update DOM
+            document.getElementById('total-bookings').textContent = totalBookings;
+            document.getElementById('pending-bookings').textContent = pendingBookings;
+            document.getElementById('confirmed-bookings').textContent = confirmedBookings;
+            document.getElementById('completed-bookings').textContent = completedBookings;
+            document.getElementById('total-earnings').textContent = `₹${earnings.toLocaleString('en-IN')}`;
+            
+            // Update tab badges
+            document.getElementById('all-count').textContent = totalBookings;
+            document.getElementById('pending-count').textContent = pendingBookings;
+            document.getElementById('confirmed-count').textContent = confirmedBookings;
+            document.getElementById('completed-count').textContent = completedBookings;
+            document.getElementById('today-count').textContent = todayBookings;
+        }
+
+        // Display bookings
+        function displayBookings() {
+            displayBookingsByStatus('all', 'all-bookings-list');
+            displayBookingsByStatus('pending', 'pending-bookings-list');
+            displayBookingsByStatus('confirmed', 'confirmed-bookings-list');
+            displayBookingsByStatus('completed', 'completed-bookings-list');
+            displayTodayBookings();
+        }
+
+        // Display bookings by status
+        function displayBookingsByStatus(status, containerId) {
+            const container = document.getElementById(containerId);
+            let bookings = state.filteredBookings;
+
+            if (status === 'pending' || status === 'confirmed' || status === 'completed') {
+                bookings = state.filteredBookings.filter(b => b.status === status);
+            }
+
+            if (bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No ${status === 'all' ? '' : status} bookings</h3>
+                        <p>There are no ${status === 'all' ? '' : status} bookings to display.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = bookings.map(booking => {
+                const patient = booking.profiles || {};
+                const date = new Date(booking.session_date).toLocaleDateString('en-IN', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                const time = formatTime(booking.start_time);
+                const createdAt = new Date(booking.created_at).toLocaleDateString('en-IN');
+
+                return `
+                    <div class="booking-card ${booking.status}" data-booking-id="${booking.id}">
+                        <div class="booking-header">
+                            <div class="booking-patient">
+                                <div class="patient-avatar">
+                                    ${patient.full_name ? patient.full_name.charAt(0).toUpperCase() : 'P'}
+                                </div>
+                                <div class="patient-info">
+                                    <h4>${patient.full_name || 'Patient'}</h4>
+                                    <p>${patient.email || ''}</p>
+                                </div>
+                            </div>
+                            <span class="booking-status status-${booking.status}">
+                                ${booking.status.toUpperCase()}
+                            </span>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Date</span>
+                                <span class="detail-value">📅 ${date}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Time</span>
+                                <span class="detail-value">⏰ ${time}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Duration</span>
+                                <span class="detail-value">⏱️ 60 minutes</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Amount</span>
+                                <span class="detail-value">💰 ₹${booking.amount || '500'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Booked On</span>
+                                <span class="detail-value">📝 ${createdAt}</span>
+                            </div>
+                        </div>
+                        
+                        ${booking.status === 'pending' ? `
+                            <div class="booking-actions">
+                                <input type="text" 
+                                       id="meeting-link-${booking.id}" 
+                                       class="meeting-link-input" 
+                                       placeholder="Enter meeting link (Google Meet, Zoom, etc.)"
+                                       value="${booking.meeting_link || ''}">
+                                <button class="action-btn confirm-btn" onclick="confirmBooking('${booking.id}')">
+                                    <span class="icon">✅</span>
+                                    Confirm Booking
+                                </button>
+                                <button class="action-btn reject-btn" onclick="rejectBooking('${booking.id}')">
+                                    <span class="icon">❌</span>
+                                    Reject Booking
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        ${booking.status === 'confirmed' ? `
+                            <div class="meeting-link-container">
+                                <span class="detail-label">Meeting Link:</span>
+                                ${booking.meeting_link ? `
+                                    <a href="${booking.meeting_link}" target="_blank">${booking.meeting_link}</a>
+                                ` : `
+                                    <span style="color: #6B7280;">No meeting link provided</span>
+                                `}
+                            </div>
+                            <div class="booking-actions">
+                                <button class="action-btn confirm-btn" onclick="markAsCompleted('${booking.id}')">
+                                    <span class="icon">✓</span>
+                                    Mark as Completed
+                                </button>
+                                <button class="action-btn reject-btn" onclick="cancelBooking('${booking.id}')">
+                                    <span class="icon">✕</span>
+                                    Cancel Session
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        ${booking.status === 'completed' ? `
+                            <div class="session-notes">
+                                <h4>Session Notes</h4>
+                                <textarea 
+                                    id="notes-${booking.id}" 
+                                    class="notes-textarea" 
+                                    placeholder="Add session notes here...">${booking.notes || ''}</textarea>
+                                <div class="booking-actions">
+                                    <button class="action-btn confirm-btn" onclick="saveNotes('${booking.id}')">
+                                        <span class="icon">💾</span>
+                                        Save Notes
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Display today's bookings
+        function displayTodayBookings() {
+            const container = document.getElementById('today-bookings-list');
+            const today = new Date().toISOString().split('T')[0];
+            
+            const todayBookings = state.filteredBookings.filter(b => 
+                b.session_date === today && (b.status === 'confirmed' || b.status === 'pending')
+            );
+
+            if (todayBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎉</div>
+                        <h3>No Sessions Today</h3>
+                        <p>You have no scheduled sessions for today.</p>
+                        <p><small>Enjoy your day off!</small></p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = todayBookings.map(booking => {
+                const patient = booking.profiles || {};
+                const time = formatTime(booking.start_time);
+
+                return `
+                    <div class="booking-card ${booking.status}" data-booking-id="${booking.id}">
+                        <div class="booking-header">
+                            <div class="booking-patient">
+                                <div class="patient-avatar">
+                                    ${patient.full_name ? patient.full_name.charAt(0).toUpperCase() : 'P'}
+                                </div>
+                                <div class="patient-info">
+                                    <h4>${patient.full_name || 'Patient'}</h4>
+                                    <p>Session at ${time}</p>
+                                </div>
+                            </div>
+                            <span class="booking-status status-${booking.status}">
+                                ${booking.status.toUpperCase()}
+                            </span>
+                        </div>
+                        
+                        ${booking.status === 'confirmed' && booking.meeting_link ? `
+                            <div class="booking-actions">
+                                <a href="${booking.meeting_link}" target="_blank" class="action-btn confirm-btn" style="text-decoration: none;">
+                                    <span class="icon">🎥</span>
+                                    Join Session
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Format time
+        function formatTime(timeString) {
+            if (!timeString) return 'N/A';
+            
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours, 10);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const formattedHour = hour % 12 || 12;
+            return `${formattedHour}:${minutes} ${ampm}`;
+        }
+
+        // Confirm booking
+        async function confirmBooking(bookingId) {
+            const meetingLink = document.getElementById(`meeting-link-${bookingId}`)?.value.trim();
+            
+            if (!meetingLink) {
+                showNotification('Please enter a meeting link before confirming', 'error');
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('Bookings')
+                    .update({ 
+                        status: 'confirmed',
+                        meeting_link: meetingLink,
+                        confirmed_at: new Date().toISOString()
+                    })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                showNotification('✅ Booking confirmed successfully!', 'success');
+                await loadBookings();
+
+            } catch (error) {
+                console.error('Error confirming booking:', error);
+                showNotification('Error confirming booking', 'error');
+            }
+        }
+
+        // Reject booking
+        async function rejectBooking(bookingId) {
+            if (!confirm('Are you sure you want to reject this booking?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('Bookings')
+                    .update({ 
+                        status: 'cancelled',
+                        cancelled_at: new Date().toISOString(),
+                        cancellation_reason: 'Rejected by therapist'
+                    })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                showNotification('✅ Booking rejected', 'info');
+                await loadBookings();
+
+            } catch (error) {
+                console.error('Error rejecting booking:', error);
+                showNotification('Error rejecting booking', 'error');
+            }
+        }
+
+        // Cancel booking
+        async function cancelBooking(bookingId) {
+            if (!confirm('Are you sure you want to cancel this session?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('Bookings')
+                    .update({ 
+                        status: 'cancelled',
+                        cancelled_at: new Date().toISOString()
+                    })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                showNotification('✅ Session cancelled', 'info');
+                await loadBookings();
+
+            } catch (error) {
+                console.error('Error cancelling booking:', error);
+                showNotification('Error cancelling booking', 'error');
+            }
+        }
+
+        // Mark booking as completed
+        async function markAsCompleted(bookingId) {
+            if (!confirm('Mark this session as completed?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('Bookings')
+                    .update({ 
+                        status: 'completed',
+                        completed_at: new Date().toISOString()
+                    })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                showNotification('✅ Session marked as completed', 'success');
+                await loadBookings();
+
+            } catch (error) {
+                console.error('Error marking as completed:', error);
+                showNotification('Error updating session status', 'error');
+            }
+        }
+
+        // Save session notes
+        async function saveNotes(bookingId) {
+            const notes = document.getElementById(`notes-${bookingId}`)?.value.trim();
+
+            try {
+                const { error } = await supabase
+                    .from('Bookings')
+                    .update({ 
+                        notes: notes || null
+                    })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                showNotification('✅ Notes saved successfully', 'success');
+
+            } catch (error) {
+                console.error('Error saving notes:', error);
+                showNotification('Error saving notes', 'error');
+            }
+        }
+
+        // Apply date filter
+        function applyFilter() {
+            const fromDate = document.getElementById('filter-from-date').value;
+            const toDate = document.getElementById('filter-to-date').value;
+
+            if (!fromDate || !toDate) {
+                showNotification('Please select both from and to dates', 'error');
+                return;
+            }
+
+            const from = new Date(fromDate);
+            const to = new Date(toDate);
+
+            if (from > to) {
+                showNotification('From date cannot be after to date', 'error');
+                return;
+            }
+
+            state.filteredBookings = state.allBookings.filter(booking => {
+                const bookingDate = new Date(booking.session_date);
+                return bookingDate >= from && bookingDate <= to;
+            });
+
+            updateStatistics();
+            displayBookings();
+            showNotification(`Showing bookings from ${fromDate} to ${toDate}`, 'info');
+        }
+
+        // Clear filter
+        function clearFilter() {
+            document.getElementById('filter-from-date').value = '';
+            document.getElementById('filter-to-date').value = '';
+            state.filteredBookings = [...state.allBookings];
+            updateStatistics();
+            displayBookings();
+            showNotification('Filter cleared', 'info');
+        }
+
+        // Tab switching
+        function initTabSwitching() {
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+
+                    const tab = this.getAttribute('data-tab');
+                    const contentMap = {
+                        'all': 'all-bookings-content',
+                        'pending': 'pending-content',
+                        'confirmed': 'confirmed-content',
+                        'completed': 'completed-content',
+                        'today': 'today-content'
+                    };
+
+                    const contentId = contentMap[tab];
+                    if (contentId) {
+                        document.getElementById(contentId).style.display = 'block';
+                    }
+                });
+            });
+        }
+
+        // Calendar functionality
+        function initCalendar() {
+            updateCalendar();
+        }
+
+        function processCalendarBookings() {
+            state.calendarBookings = {};
+            
+            state.allBookings.forEach(booking => {
+                if (booking.status === 'confirmed' || booking.status === 'pending') {
+                    const date = new Date(booking.session_date);
+                    const dateString = date.toISOString().split('T')[0];
+                    
+                    if (!state.calendarBookings[dateString]) {
+                        state.calendarBookings[dateString] = 0;
+                    }
+                    state.calendarBookings[dateString]++;
+                }
+            });
+        }
+
+        function updateCalendar() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            document.getElementById('current-month').textContent = 
+                `${monthNames[state.currentMonth]} ${state.currentYear}`;
+            
+            const firstDay = new Date(state.currentYear, state.currentMonth, 1);
+            const lastDay = new Date(state.currentYear, state.currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+            
+            const calendarGrid = document.getElementById('calendar-grid');
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            let html = '';
+            
+            // Day headers
+            dayNames.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+            
+            // Empty cells for days before the first day of the month
+            for (let i = 0; i < startingDay; i++) {
+                html += '<div class="calendar-day"></div>';
+            }
+            
+            // Days of the month
+            const today = new Date();
+            const isCurrentMonth = today.getMonth() === state.currentMonth && 
+                                 today.getFullYear() === state.currentYear;
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(state.currentYear, state.currentMonth, day);
+                const dateString = date.toISOString().split('T')[0];
+                const hasBooking = state.calendarBookings[dateString] > 0;
+                const isToday = isCurrentMonth && day === today.getDate();
+                
+                let className = 'calendar-day';
+                if (isToday) className += ' today';
+                if (hasBooking) className += ' has-booking';
+                
+                html += `
+                    <div class="${className}" onclick="viewDayBookings('${dateString}')">
+                        <div class="calendar-day-number">${day}</div>
+                        ${hasBooking ? `
+                            <div style="font-size: 0.75rem; color: #5A9B8E; margin-top: 5px;">
+                                ${state.calendarBookings[dateString]} session${state.calendarBookings[dateString] > 1 ? 's' : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            calendarGrid.innerHTML = html;
+        }
+
+        function prevMonth() {
+            if (state.currentMonth === 0) {
+                state.currentMonth = 11;
+                state.currentYear--;
+            } else {
+                state.currentMonth--;
+            }
+            updateCalendar();
+        }
+
+        function nextMonth() {
+            if (state.currentMonth === 11) {
+                state.currentMonth = 0;
+                state.currentYear++;
+            } else {
+                state.currentMonth++;
+            }
+            updateCalendar();
+        }
+
+        function viewDayBookings(dateString) {
+            // Switch to "All Bookings" tab and filter by date
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.tab-btn[data-tab="all"]').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById('all-bookings-content').style.display = 'block';
+            
+            // Set filter dates
+            document.getElementById('filter-from-date').value = dateString;
+            document.getElementById('filter-to-date').value = dateString;
+            applyFilter();
+            
+            showNotification(`Showing bookings for ${new Date(dateString).toLocaleDateString('en-IN')}`, 'info');
+        }
+
+        // Utility functions
+        function showLoading(containerId) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p>Loading...</p>
+                    </div>
+                `;
+            }
+        }
+
+        function showError(containerId, message) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>Error Loading Data</h3>
+                        <p>${message}</p>
+                        <button onclick="refreshDashboard()" style="
+                            background: #5A9B8E;
+                            color: white;
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 8px;
+                            margin-top: 15px;
+                            cursor: pointer;
+                        ">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'};
+                color: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                font-weight: 600;
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Update UI
+        function updateUI() {
+            initTabSwitching();
+        }
+
+        // Quick action functions
+        function refreshDashboard() {
+            loadBookings();
+            showNotification('Dashboard refreshed', 'success');
+        }
+
+        function showTodaySessions() {
+            document.querySelector('.tab-btn[data-tab="today"]').click();
+        }
+
+        function showAvailability() {
+            showNotification('Availability management coming soon!', 'info');
+        }
+
+        function showEarnings() {
+            showNotification('Earnings dashboard coming soon!', 'info');
+        }
+
+        // Logout
+        async function handleLogout() {
+            if (!confirm('Are you sure you want to logout?')) return;
+            
+            try {
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                showNotification('Error during logout', 'error');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Therapist Dashboard initializing...');
+            initDashboard();
+        });
+    </script>
+</body>
+</html>
