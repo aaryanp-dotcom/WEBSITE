@@ -5,38 +5,753 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Dashboard - MindSpace</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* Dashboard styles - keep your existing styles */
-        /* ... your existing dashboard styles ... */
-    </style>
 </head>
 <body>
-    <!-- Your existing HTML structure -->
-    
-    <!-- Load Supabase FIRST -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Then load auth.js -->
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🧠 MindSpace</a>
+            <ul class="nav-links">
+                <li><a href="user-dashboard.html" class="active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a></li>
+                <li><a href="index.html">
+                    <i class="fas fa-home"></i> Home
+                </a></li>
+                <li>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Content -->
+    <main class="dashboard-container">
+        <!-- Dashboard Header -->
+        <section class="dashboard-header">
+            <div class="header-content">
+                <h1 class="welcome-title">Welcome back! <span class="wave">👋</span></h1>
+                <p class="user-info" id="userInfo">Loading user information...</p>
+                <div class="current-date" id="currentDate"></div>
+            </div>
+            <div class="header-actions">
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalBookings">0</span>
+                        <span class="stat-label">Total Bookings</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="upcomingSessions">0</span>
+                        <span class="stat-label">Upcoming</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Book a Session Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-plus"></i> Book a Session
+                    </h2>
+                    <p class="section-subtitle">Select a therapist and schedule your session</p>
+                </div>
+                <div class="section-body">
+                    <div id="therapist-list">
+                        <!-- Loading state -->
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>Loading available therapists...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Bookings Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-check"></i> My Bookings
+                    </h2>
+                    <p class="section-subtitle">Manage your scheduled sessions</p>
+                </div>
+                <div class="section-body">
+                    <div class="booking-filters">
+                        <button class="filter-btn active" onclick="filterBookings('all')">All</button>
+                        <button class="filter-btn" onclick="filterBookings('upcoming')">Upcoming</button>
+                        <button class="filter-btn" onclick="filterBookings('pending')">Pending</button>
+                        <button class="filter-btn" onclick="filterBookings('completed')">Completed</button>
+                    </div>
+                    <div id="booking-list">
+                        <!-- Loading state -->
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>Loading your bookings...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Additional Resources Section -->
+        <section class="dashboard-section resources-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-hands-helping"></i> Resources & Support
+                </h2>
+            </div>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>Session Notes</h3>
+                    <p>Access and review notes from your previous sessions</p>
+                    <button class="btn-secondary btn-small">View Notes</button>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Wellness Tools</h3>
+                    <p>Access guided meditations and wellness exercises</p>
+                    <button class="btn-secondary btn-small">Explore Tools</button>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3>Help Center</h3>
+                    <p>Get help with booking, payments, or technical issues</p>
+                    <button class="btn-secondary btn-small">Get Help</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Booking</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Are you sure you want to book this session?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="auth.js"></script>
-    
     <script>
-        // SIMPLE Supabase initialization - NO DUPLICATE DECLARATIONS
-        let supabase = null;
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
         
         // Initialize Supabase client
-        function initSupabase() {
-            if (window.supabase && !supabase) {
-                const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
-                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
-                
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            }
-            return supabase;
-        }
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        // Rest of your dashboard JavaScript...
-        // ... using `supabase` variable instead of `client`
+        // Global variables
+        let currentUserId = null;
+        let currentBookings = [];
+        let pendingConfirmation = null;
+
+        // Initialize dashboard
+        async function initDashboard() {
+            try {
+                // Check authentication
+                const { data: { session }, error: sessionError } = await client.auth.getSession();
+
+                if (!session || sessionError) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUserId = session.user.id;
+                
+                // Update UI with user info
+                await updateUserInfo();
+                
+                // Set current date
+                updateCurrentDate();
+                
+                // Load data
+                await Promise.all([
+                    loadTherapists(),
+                    loadBookings()
+                ]);
+                
+                // Set up auto-refresh for bookings
+                setInterval(loadBookings, 30000); // Refresh every 30 seconds
+                
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                showNotification('Error loading dashboard. Please try again.', 'error');
+                setTimeout(() => window.location.href = 'login.html', 3000);
+            }
+        }
+
+        // Update user information
+        async function updateUserInfo() {
+            try {
+                const { data: profile, error } = await client
+                    .from('profiles')
+                    .select('full_name, email, created_at')
+                    .eq('id', currentUserId)
+                    .single();
+
+                if (error) throw error;
+
+                const displayName = profile.full_name || profile.email || 'User';
+                const joinDate = new Date(profile.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long'
+                });
+                
+                document.getElementById('userInfo').innerHTML = `
+                    <strong>${displayName}</strong> • Member since ${joinDate}
+                `;
+                
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                document.getElementById('userInfo').textContent = 'Welcome back!';
+            }
+        }
+
+        // Update current date display
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Load available therapists
+        async function loadTherapists() {
+            try {
+                const { data: therapists, error } = await client
+                    .from('Therapists')
+                    .select('*')
+                    .eq('Active', true)
+                    .eq('approval_status', 'approved')
+                    .order('Name', { ascending: true });
+
+                if (error) throw error;
+
+                displayTherapists(therapists);
+                
+            } catch (error) {
+                console.error('Error loading therapists:', error);
+                document.getElementById('therapist-list').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Unable to load therapists</h3>
+                        <p>Please try again later</p>
+                        <button class="btn-primary btn-small" onclick="loadTherapists()">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Display therapists
+        function displayTherapists(therapists) {
+            const container = document.getElementById('therapist-list');
+            
+            if (!therapists || therapists.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-md"></i>
+                        <h3>No therapists available</h3>
+                        <p>All therapists are currently busy. Please check back soon.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="therapists-grid">';
+            
+            therapists.forEach(therapist => {
+                const today = new Date().toISOString().split('T')[0];
+                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                
+                html += `
+                    <article class="therapist-card">
+                        <div class="therapist-header">
+                            <div class="therapist-avatar">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="therapist-info">
+                                <h3 class="therapist-name">${therapist.Name}</h3>
+                                ${therapist.Specialization ? `
+                                    <div class="therapist-specialization">
+                                        <i class="fas fa-star"></i> ${therapist.Specialization}
+                                    </div>
+                                ` : ''}
+                                ${therapist.Bio ? `
+                                    <p class="therapist-bio">${therapist.Bio.substring(0, 100)}${therapist.Bio.length > 100 ? '...' : ''}</p>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <form class="booking-form" id="form-${therapist.id}" onsubmit="event.preventDefault(); confirmBooking('${therapist.id}')">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="date-${therapist.id}">
+                                        <i class="far fa-calendar"></i> Date
+                                    </label>
+                                    <input type="date" 
+                                           id="date-${therapist.id}" 
+                                           min="${today}"
+                                           required
+                                           onchange="updateAvailableTimes('${therapist.id}')">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="time-${therapist.id}">
+                                        <i class="far fa-clock"></i> Time
+                                    </label>
+                                    <select id="time-${therapist.id}" required>
+                                        <option value="">Select time</option>
+                                        <option value="09:00">09:00 AM</option>
+                                        <option value="10:00">10:00 AM</option>
+                                        <option value="11:00">11:00 AM</option>
+                                        <option value="14:00">02:00 PM</option>
+                                        <option value="15:00">03:00 PM</option>
+                                        <option value="16:00">04:00 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn-book">
+                                <i class="fas fa-calendar-check"></i> Book Session
+                            </button>
+                        </form>
+                    </article>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            
+            // Set default date to tomorrow for all forms
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                input.value = tomorrow;
+            });
+        }
+
+        // Confirm booking (shows modal)
+        function confirmBooking(therapistId) {
+            const dateInput = document.getElementById(`date-${therapistId}`);
+            const timeInput = document.getElementById(`time-${therapistId}`);
+            const therapistName = document.querySelector(`#form-${therapistId} .therapist-name`).textContent;
+            
+            if (!dateInput.value || !timeInput.value) {
+                showNotification('Please select both date and time', 'warning');
+                return;
+            }
+            
+            pendingConfirmation = {
+                therapistId,
+                therapistName,
+                date: dateInput.value,
+                time: timeInput.value
+            };
+            
+            const formattedDate = new Date(dateInput.value).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            document.getElementById('modalMessage').innerHTML = `
+                Confirm booking with <strong>${therapistName}</strong>?<br><br>
+                <strong>Date:</strong> ${formattedDate}<br>
+                <strong>Time:</strong> ${timeInput.value}
+            `;
+            
+            document.getElementById('confirmActionBtn').onclick = () => createBooking(therapistId);
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        // Create booking in database
+        async function createBooking(therapistId) {
+            closeModal();
+            
+            const dateInput = document.getElementById(`date-${therapistId}`);
+            const timeInput = document.getElementById(`time-${therapistId}`);
+            
+            try {
+                const bookingData = {
+                    user_id: currentUserId,
+                    therapist_id: therapistId,
+                    session_date: dateInput.value,
+                    start_time: timeInput.value,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                };
+
+                const { data, error } = await client
+                    .from('Bookings')
+                    .insert([bookingData])
+                    .select()
+                    .single();
+
+                if (error) {
+                    if (error.code === '23505') {
+                        showNotification('You already have a booking on this date. Please choose another.', 'error');
+                    } else if (error.code === '42501') {
+                        showNotification('Permission denied. Please contact support.', 'error');
+                    } else {
+                        throw error;
+                    }
+                    return;
+                }
+
+                // Reset form
+                dateInput.value = '';
+                timeInput.value = '';
+                
+                // Show success message
+                showNotification('Booking created successfully! You will receive a confirmation soon.', 'success');
+                
+                // Reload bookings
+                await loadBookings();
+                
+            } catch (error) {
+                console.error('Booking error:', error);
+                showNotification('Error creating booking. Please try again.', 'error');
+            }
+        }
+
+        // Load user bookings
+        async function loadBookings() {
+            try {
+                const { data: bookings, error } = await client
+                    .from('Bookings')
+                    .select(`
+                        *,
+                        Therapists (
+                            Name,
+                            Specialization
+                        )
+                    `)
+                    .eq('user_id', currentUserId)
+                    .order('session_date', { ascending: true })
+                    .order('start_time', { ascending: true });
+
+                if (error) throw error;
+
+                currentBookings = bookings || [];
+                displayBookings(currentBookings);
+                updateStats(currentBookings);
+                
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                document.getElementById('booking-list').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Unable to load bookings</h3>
+                        <p>Please try again later</p>
+                        <button class="btn-primary btn-small" onclick="loadBookings()">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Display bookings
+        function displayBookings(bookings) {
+            const container = document.getElementById('booking-list');
+            
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>No bookings yet</h3>
+                        <p>Book your first session to get started on your wellness journey.</p>
+                        <button class="btn-primary" onclick="document.querySelector('.therapists-grid').scrollIntoView({ behavior: 'smooth' })">
+                            <i class="fas fa-calendar-plus"></i> Book Now
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="bookings-list">';
+            
+            bookings.forEach(booking => {
+                const therapist = booking.Therapists || {};
+                const date = new Date(booking.session_date);
+                const now = new Date();
+                const isPast = date < now;
+                const isToday = date.toDateString() === now.toDateString();
+                
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                const statusClass = `status-${booking.status}`;
+                const statusIcon = getStatusIcon(booking.status);
+                
+                html += `
+                    <article class="booking-card ${isPast ? 'past-booking' : ''}">
+                        <div class="booking-header">
+                            <div class="booking-main">
+                                <h3 class="booking-therapist">
+                                    <i class="fas fa-user-md"></i> ${therapist.Name || 'Unknown Therapist'}
+                                </h3>
+                                <div class="booking-date-time">
+                                    <span class="date-badge ${isToday ? 'today' : ''}">
+                                        <i class="far fa-calendar"></i> ${formattedDate}
+                                    </span>
+                                    <span class="time-badge">
+                                        <i class="far fa-clock"></i> ${booking.start_time}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge ${statusClass}">
+                                    ${statusIcon} ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <i class="fas fa-user-md"></i> Specialist
+                                </span>
+                                <span class="detail-value">${therapist.Specialization || 'General Counseling'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <i class="fas fa-clock"></i> Duration
+                                </span>
+                                <span class="detail-value">60 minutes</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <i class="fas fa-calendar-alt"></i> Booked On
+                                </span>
+                                <span class="detail-value">
+                                    ${new Date(booking.created_at).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                    })}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        ${booking.meeting_link ? `
+                            <div class="meeting-section">
+                                <h4><i class="fas fa-video"></i> Meeting Link</h4>
+                                <a href="${booking.meeting_link}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   class="meeting-link">
+                                    <i class="fas fa-external-link-alt"></i> ${booking.meeting_link}
+                                </a>
+                                <small class="meeting-note">
+                                    <i class="fas fa-info-circle"></i> Join 5 minutes before your scheduled time
+                                </small>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="booking-actions">
+                            ${booking.status === 'pending' ? `
+                                <button class="btn-cancel" onclick="cancelBooking('${booking.id}')">
+                                    <i class="fas fa-times"></i> Cancel Booking
+                                </button>
+                            ` : ''}
+                            
+                            ${booking.status === 'confirmed' && !isPast ? `
+                                <button class="btn-primary btn-small" onclick="joinSession('${booking.meeting_link}')">
+                                    <i class="fas fa-video"></i> Join Session
+                                </button>
+                            ` : ''}
+                            
+                            ${isPast ? `
+                                <button class="btn-secondary btn-small">
+                                    <i class="fas fa-file-alt"></i> View Notes
+                                </button>
+                            ` : ''}
+                        </div>
+                    </article>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Filter bookings
+        function filterBookings(filter) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let filtered = [];
+            
+            switch(filter) {
+                case 'upcoming':
+                    filtered = currentBookings.filter(b => {
+                        const date = new Date(b.session_date);
+                        return date >= new Date() && b.status !== 'completed';
+                    });
+                    break;
+                case 'pending':
+                    filtered = currentBookings.filter(b => b.status === 'pending');
+                    break;
+                case 'completed':
+                    filtered = currentBookings.filter(b => b.status === 'completed');
+                    break;
+                default:
+                    filtered = currentBookings;
+            }
+            
+            displayBookings(filtered);
+        }
+
+        // Update statistics
+        function updateStats(bookings) {
+            const total = bookings.length;
+            const upcoming = bookings.filter(b => {
+                const date = new Date(b.session_date);
+                return date >= new Date() && b.status !== 'completed';
+            }).length;
+            
+            document.getElementById('totalBookings').textContent = total;
+            document.getElementById('upcomingSessions').textContent = upcoming;
+        }
+
+        // Cancel booking
+        async function cancelBooking(bookingId) {
+            if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const { error } = await client
+                    .from('Bookings')
+                    .delete()
+                    .eq('id', bookingId)
+                    .eq('user_id', currentUserId);
+
+                if (error) throw error;
+
+                showNotification('Booking cancelled successfully', 'success');
+                await loadBookings();
+                
+            } catch (error) {
+                console.error('Cancel booking error:', error);
+                showNotification('Error cancelling booking. Please try again.', 'error');
+            }
+        }
+
+        // Join session
+        function joinSession(meetingLink) {
+            if (meetingLink) {
+                window.open(meetingLink, '_blank', 'noopener,noreferrer');
+            } else {
+                showNotification('Meeting link not available yet. Please wait for confirmation.', 'warning');
+            }
+        }
+
+        // Modal functions
+        function closeModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            pendingConfirmation = null;
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Helper functions
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'confirmed': return '<i class="fas fa-check-circle"></i>';
+                case 'pending': return '<i class="fas fa-clock"></i>';
+                case 'completed': return '<i class="fas fa-flag-checkered"></i>';
+                case 'cancelled': return '<i class="fas fa-times-circle"></i>';
+                default: return '<i class="fas fa-circle"></i>';
+            }
+        }
+
+        // Logout function (from auth.js)
+        async function logout() {
+            try {
+                const { error } = await client.auth.signOut();
+                if (error) throw error;
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                showNotification('Error during logout. Please try again.', 'error');
+            }
+        }
+
+        // Initialize dashboard on load
+        window.addEventListener('DOMContentLoaded', initDashboard);
+
+        // Close modal on outside click
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('confirmationModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
