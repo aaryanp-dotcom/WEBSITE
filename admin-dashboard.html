@@ -575,7 +575,14 @@
                 </a>
                 <ul class="nav-links">
                     <li><a href="admin-dashboard.html" class="active">Admin Dashboard</a></li>
-                    <li><button class="btn-logout" onclick="logout()">
+                    async function logout() {
+    if (!confirm('Are you sure you want to logout?')) return;
+    
+    await supabase.auth.signOut();
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+}
+
                         <span class="icon">🚪</span>
                         Logout
                     </button></li>
