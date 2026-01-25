@@ -1034,7 +1034,7 @@
                         return;
                     }
 
-                    // Store user data in localStorage (align with admin-dashboard.html expectations)
+                    // Store user data in localStorage
                     const userData = {
                         id: profile.id,
                         email: profile.email,
@@ -1044,7 +1044,7 @@
                     };
                     localStorage.setItem('user', JSON.stringify(userData));
 
-                    // Redirect based on role (FIXED)
+                    // Redirect based on role
                     redirectBasedOnRole(profile.role);
                 }
             } catch (error) {
@@ -1153,7 +1153,7 @@
             input.classList.remove('error');
         }
         
-        // Handle Login (FIXED therapist check + localStorage keys)
+        // Handle Login (FIXED: therapist check uses correct column)
         async function handleLogin(event) {
             event.preventDefault();
             
@@ -1207,13 +1207,12 @@
                     throw profileError;
                 }
 
-                // Therapist approval check (FIXED to match admin-dashboard.html style)
+                // Therapist approval check (FIXED: using 'id' not 'userid')
                 if (profile.role === 'therapist') {
-                    // In your admin-dashboard.html, therapists are identified by Therapists.id and field approvalstatus
                     const { data: therapist, error: therapistError } = await supabase
                         .from('Therapists')
                         .select('approvalstatus')
-                        .eq('id', profile.id)
+                        .eq('id', profile.id)  // FIXED: was 'userid'
                         .single();
                     
                     if (therapistError) {
@@ -1226,7 +1225,7 @@
                     }
                 }
                 
-                // Store user data in localStorage (FIXED keys to match admin-dashboard usage)
+                // Store user data in localStorage
                 const userData = {
                     id: profile.id,
                     email: profile.email,
@@ -1266,7 +1265,7 @@
             }
         }
         
-        // Redirect Based on Role (FIXED: removed dashboard.html)
+        // Redirect Based on Role (FIXED: correct dashboard URLs)
         async function redirectBasedOnRole(role) {
             let redirectUrl = 'index.html';
             
@@ -1275,10 +1274,10 @@
                     redirectUrl = 'admin-dashboard.html';
                     break;
                 case 'therapist':
-                    redirectUrl = 'therapist-dashboard.html';
+                    redirectUrl = 'therapist-dashboard.html';  // FIXED: was 'dashboard.html'
                     break;
                 case 'user':
-                    redirectUrl = 'user-dashboard.html';
+                    redirectUrl = 'user-dashboard.html';  // FIXED: was 'dashboard.html'
                     break;
                 default:
                     console.error('Unknown user role:', role);
