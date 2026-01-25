@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply as Therapist - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
+            min-height: 100vh;
+            color: #2C3E50;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #5A9B8E;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4B5563;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #5A9B8E;
+        }
+        
+        .btn-nav-login {
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-nav-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(90, 155, 142, 0.3);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 120px 20px 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        /* Application Container */
+        .application-container {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+        
+        @media (max-width: 900px) {
+            .application-container {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+            }
+        }
+        
+        /* Application Info */
+        .application-info {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+        }
+        
+        .application-info h2 {
+            font-size: 2.2rem;
+            color: #2C3E50;
+            margin-bottom: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2C3E50 0%, #5A9B8E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .application-info p {
+            color: #4B5563;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+        
+        .benefits-list {
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .benefit-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(90, 155, 142, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #5A9B8E;
+            flex-shrink: 0;
+        }
+        
+        .benefit-text h4 {
+            color: #2C3E50;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .benefit-text p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        
+        .process-timeline {
+            background: #F5F9F8;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 40px;
+            border-left: 4px solid #5A9B8E;
+        }
+        
+        .process-timeline h3 {
+            color: #2C3E50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .process-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+        }
+        
+        .process-step:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            color: #2C3E50;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .step-content p {
+            color: #6B7280;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        /* Application Form */
+        .application-form-container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .application-form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #5A9B8E 0%, #A8D5BA 100%);
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .form-header h1 {
+            font-size: 2.5rem;
+            color: #2C3E50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .form-header p {
+            color: #6B7280;
+            font-size: 1.1rem;
+        }
+        
+        /* Form Styles */
+        #therapistForm {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2C3E50;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .label-icon {
+            color: #5A9B8E;
+            font-size: 1rem;
+        }
+        
+        .required-mark {
+            color: #EF4444;
+            margin-left: 4px;
+        }
+        
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #F9FAFB;
+            color: #2C3E50;
+            font-family: inherit;
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.5;
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235A9B8E' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 16px;
+            padding-right: 50px;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(90, 155, 142, 0.1);
+        }
+        
+        .form-input.error,
+        .form-textarea.error,
+        .form-select.error {
+            border-color: #EF4444;
+            background: #FEF2F2;
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6B7280;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+        }
+        
+        .password-toggle:hover {
+            color: #5A9B8E;
+        }
+        
+        /* Error Message */
+        .error-message {
+            color: #EF4444;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .form-group.error .error-message {
+            display: block;
+        }
+        
+        /* Strength Indicator */
+        .password-strength {
+            margin-top: 8px;
+            display: flex;
+            gap: 5px;
+            height: 4px;
+        }
+        
+        .strength-bar {
+            flex: 1;
+            background: #E5E7EB;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .strength-bar.active {
+            background: #10B981;
+        }
+        
+        .strength-text {
+            font-size: 0.8rem;
+            color: #6B7280;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(90, 155, 142, 0.3);
+        }
+        
+        .btn-submit:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .btn-submit:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-submit .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Form Footer */
+        .form-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #E5E7EB;
+        }
+        
+        .form-footer p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        
+        .form-footer a {
+            color: #5A9B8E;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .form-footer a:hover {
+            color: #4A8B7E;
+            text-decoration: underline;
+        }
+        
+        .login-link {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        /* Requirements Panel */
+        .requirements-panel {
+            background: #F5F9F8;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border-left: 4px solid #5A9B8E;
+        }
+        
+        .requirements-panel h4 {
+            color: #2C3E50;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .requirements-list {
+            list-style: none;
+        }
+        
+        .requirements-list li {
+            color: #6B7280;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .requirements-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #5A9B8E;
+            font-weight: bold;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 400px;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #10B981;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #EF4444;
+        }
+        
+        .notification.info {
+            border-left: 4px solid #3B82F6;
+        }
+        
+        .notification .icon {
+            font-size: 1.5rem;
+        }
+        
+        .notification.success .icon {
+            color: #10B981;
+        }
+        
+        .notification.error .icon {
+            color: #EF4444;
+        }
+        
+        .notification.info .icon {
+            color: #3B82F6;
+        }
+        
+        .notification .message {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .notification .close-btn {
+            background: none;
+            border: none;
+            color: #6B7280;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.8);
+            color: #2C3E50;
+            padding: 30px 20px 20px;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(229, 231, 235, 0.8);
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #5A9B8E;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: #6B7280;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #5A9B8E;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(229, 231, 235, 0.8);
+            color: #9CA3AF;
+            font-size: 0.85rem;
+            max-width: 1200px;
+            margin: 20px auto 0;
+        }
+        
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #5A9B8E;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .application-info,
+            .application-form-container {
+                padding: 30px 25px;
+            }
+            
+            .form-header h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .application-info h2 {
+                font-size: 1.8rem;
+            }
+            
+            .form-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+        
+        /* Specializations */
+        .specialization-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .specialization-tag {
+            background: rgba(90, 155, 142, 0.1);
+            color: #5A9B8E;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .specialization-tag:hover {
+            background: rgba(90, 155, 142, 0.2);
+        }
+        
+        .specialization-tag.active {
+            background: #5A9B8E;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">MindSpace</span>
+            </a>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="how-it-works.html">How It Works</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="login.html" class="btn-nav-login">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="application-container">
+            <!-- Application Information -->
+            <div class="application-info">
+                <h2>Join Our Network of Mental Health Professionals</h2>
+                <p>At MindSpace, we're looking for passionate, licensed therapists to join our mission of making mental wellness accessible to everyone. If you're committed to providing quality care, we'd love to welcome you to our community.</p>
+                
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">💼</div>
+                        <div class="benefit-text">
+                            <h4>Flexible Practice</h4>
+                            <p>Set your own schedule and work from anywhere. No commute, no office overhead.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon">💰</div>
+                        <div class="benefit-text">
+                            <h4>Competitive Compensation</h4>
+                            <p>Earn competitive rates with transparent pricing and regular payouts.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🛡️</div>
+                        <div class="benefit-text">
+                            <h4>Professional Support</h4>
+                            <p>Access to our support team, secure platform, and administrative assistance.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🌱</div>
+                        <div class="benefit-text">
+                            <h4>Continuing Education</h4>
+                            <p>Access to training resources, workshops, and professional development opportunities.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Requirements Panel -->
+                <div class="requirements-panel">
+                    <h4><i class="fas fa-clipboard-check"></i> Application Requirements</h4>
+                    <ul class="requirements-list">
+                        <li>Valid license to practice therapy in your state/country</li>
+                        <li>Minimum 2 years of clinical experience</li>
+                        <li>Professional liability insurance</li>
+                        <li>Master's degree or higher in relevant field</li>
+                        <li>Commitment to ethical practice and confidentiality</li>
+                        <li>Reliable internet connection and quiet workspace</li>
+                    </ul>
+                </div>
+                
+                <!-- Process Timeline -->
+                <div class="process-timeline">
+                    <h3>Application Process</h3>
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Submit Application</h4>
+                            <p>Complete the form with your professional details and credentials.</p>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Document Verification</h4>
+                            <p>Our team will verify your licenses and qualifications.</p>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Platform Orientation</h4>
+                            <p>Complete our onboarding process and platform training.</p>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Start Practicing</h4>
+                            <p>Begin accepting clients and making a difference in people's lives.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Application Form -->
+            <div class="application-form-container">
+                <div class="form-header">
+                    <h1>Therapist Application</h1>
+                    <p>Complete the form below to join our network. We'll review your application within 24-48 hours.</p>
+                </div>
+                
+                <form id="therapistForm" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">
+                                <span class="label-icon">👤</span>
+                                Full Name
+                                <span class="required-mark">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="fullName" 
+                                class="form-input"
+                                placeholder="Dr. John Doe"
+                                required
+                                autocomplete="name"
+                            >
+                            <div class="error-message">Please enter your full name</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">
+                                <span class="label-icon">📧</span>
+                                Email Address
+                                <span class="required-mark">*</span>
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                class="form-input"
+                                placeholder="your.email@example.com"
+                                required
+                                autocomplete="email"
+                            >
+                            <div class="error-message">Please enter a valid email address</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">
+                                <span class="label-icon">📱</span>
+                                Phone Number
+                                <span class="required-mark">*</span>
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                class="form-input"
+                                placeholder="+91 98765 43210"
+                                required
+                                autocomplete="tel"
+                            >
+                            <div class="error-message">Please enter a valid phone number</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="experience">
+                                <span class="label-icon">📅</span>
+                                Years of Experience
+                                <span class="required-mark">*</span>
+                            </label>
+                            <select id="experience" class="form-select" required>
+                                <option value="">Select years of experience</option>
+                                <option value="1-2">1-2 years</option>
+                                <option value="3-5">3-5 years</option>
+                                <option value="6-10">6-10 years</option>
+                                <option value="10+">10+ years</option>
+                            </select>
+                            <div class="error-message">Please select your years of experience</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="specialization">
+                            <span class="label-icon">🎯</span>
+                            Specialization
+                            <span class="required-mark">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="specialization" 
+                            class="form-input"
+                            placeholder="e.g., Anxiety, Depression, Relationship Counseling"
+                            required
+                        >
+                        <div class="error-message">Please enter your specialization</div>
+                        <div class="specialization-tags">
+                            <span class="specialization-tag" onclick="selectSpecialization('Anxiety')">Anxiety</span>
+                            <span class="specialization-tag" onclick="selectSpecialization('Depression')">Depression</span>
+                            <span class="specialization-tag" onclick="selectSpecialization('Stress Management')">Stress</span>
+                            <span class="specialization-tag" onclick="selectSpecialization('Relationship Counseling')">Relationships</span>
+                            <span class="specialization-tag" onclick="selectSpecialization('Trauma Therapy')">Trauma</span>
+                            <span class="specialization-tag" onclick="selectSpecialization('Cognitive Behavioral Therapy')">CBT</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qualifications">
+                            <span class="label-icon">🎓</span>
+                            Qualifications & Certifications
+                            <span class="required-mark">*</span>
+                        </label>
+                        <textarea 
+                            id="qualifications" 
+                            class="form-textarea"
+                            placeholder="List your degrees, certifications, and relevant training (e.g., MA in Clinical Psychology, Licensed Professional Counselor, CBT Certification)"
+                            required
+                            rows="4"
+                        ></textarea>
+                        <div class="error-message">Please enter your qualifications</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bio">
+                            <span class="label-icon">📝</span>
+                            Professional Bio
+                            <span class="required-mark">*</span>
+                        </label>
+                        <textarea 
+                            id="bio" 
+                            class="form-textarea"
+                            placeholder="Tell us about your therapeutic approach, experience, and what makes you passionate about mental health care. (200-500 words)"
+                            required
+                            rows="6"
+                        ></textarea>
+                        <div class="error-message">Please write a professional bio</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">
+                                <span class="label-icon">🔒</span>
+                                Password
+                                <span class="required-mark">*</span>
+                            </label>
+                            <div class="password-wrapper">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    class="form-input"
+                                    placeholder="Minimum 8 characters"
+                                    minlength="8"
+                                    required
+                                    autocomplete="new-password"
+                                >
+                                <button type="button" class="password-toggle" id="passwordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength">
+                                <div class="strength-bar"></div>
+                                <div class="strength-bar"></div>
+                                <div class="strength-bar"></div>
+                                <div class="strength-bar"></div>
+                            </div>
+                            <div class="error-message" id="passwordError">Password must be at least 8 characters with letters and numbers</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">
+                                <span class="label-icon">🔒</span>
+                                Confirm Password
+                                <span class="required-mark">*</span>
+                            </label>
+                            <div class="password-wrapper">
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    class="form-input"
+                                    placeholder="Re-enter your password"
+                                    minlength="8"
+                                    required
+                                    autocomplete="new-password"
+                                >
+                                <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="termsAgreement" required>
+                            <label for="termsAgreement">
+                                I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>
+                                <span class="required-mark">*</span>
+                            </label>
+                        </div>
+                        <div class="error-message">You must agree to the terms and conditions</div>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span id="btnText">Submit Application</span>
+                        <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+                    </button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>Already have an account? <a href="login.html">Login here</a></p>
+                    <p class="login-link">Looking for therapy? <a href="signup-user.html">Sign up as a patient</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">MindSpace</span>
+            </div>
+            <ul class="footer-links">
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MindSpace Healthcare Pvt. Ltd. All rights reserved.</p>
+            <p>If you're in crisis, please contact emergency services immediately.</p>
+        </div>
+    </footer>
+
+    <!-- Supabase Configuration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Application State
+        let isLoading = false;
+        
+        // DOM Elements
+        const therapistForm = document.getElementById('therapistForm');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const experienceSelect = document.getElementById('experience');
+        const specializationInput = document.getElementById('specialization');
+        const qualificationsInput = document.getElementById('qualifications');
+        const bioInput = document.getElementById('bio');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const termsAgreement = document.getElementById('termsAgreement');
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize event listeners
+            initEventListeners();
+            
+            // Add animation to form
+            setTimeout(() => {
+                document.querySelector('.application-form-container').style.opacity = '1';
+                document.querySelector('.application-form-container').style.transform = 'translateY(0)';
+            }, 300);
+        });
+        
+        // Initialize Event Listeners
+        function initEventListeners() {
+            // Password toggles
+            passwordToggle.addEventListener('click', () => togglePasswordVisibility(passwordInput, passwordToggle));
+            confirmPasswordToggle.addEventListener('click', () => togglePasswordVisibility(confirmPasswordInput, confirmPasswordToggle));
+            
+            // Password strength indicator
+            passwordInput.addEventListener('input', updatePasswordStrength);
+            
+            // Form submission
+            therapistForm.addEventListener('submit', handleTherapistSignup);
+            
+            // Form validation
+            fullNameInput.addEventListener('blur', validateFullName);
+            emailInput.addEventListener('blur', validateEmail);
+            phoneInput.addEventListener('blur', validatePhone);
+            specializationInput.addEventListener('blur', validateSpecialization);
+            qualificationsInput.addEventListener('blur', validateQualifications);
+            bioInput.addEventListener('blur', validateBio);
+            passwordInput.addEventListener('blur', validatePassword);
+            confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
+            
+            // Real-time validation
+            const inputs = [fullNameInput, emailInput, phoneInput, specializationInput, qualificationsInput, bioInput, passwordInput, confirmPasswordInput];
+            inputs.forEach(input => {
+                input.addEventListener('input', clearError);
+            });
+            
+            // Mobile menu toggle
+            if (menuToggle) {
+                menuToggle.addEventListener('click', toggleMobileMenu);
+            }
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', closeMobileMenu);
+        }
+        
+        // Toggle Password Visibility
+        function togglePasswordVisibility(inputElement, toggleButton) {
+            const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
+            inputElement.setAttribute('type', type);
+            toggleButton.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        }
+        
+        // Update Password Strength
+        function updatePasswordStrength() {
+            const password = passwordInput.value;
+            const bars = passwordStrength.querySelectorAll('.strength-bar');
+            const strengthText = document.getElementById('passwordError');
+            
+            // Reset all bars
+            bars.forEach(bar => bar.classList.remove('active'));
+            
+            if (password.length === 0) {
+                strengthText.textContent = '';
+                return;
+            }
+            
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            
+            // Complexity checks
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            // Cap at 4
+            strength = Math.min(strength, 4);
+            
+            // Update bars
+            for (let i = 0; i < strength; i++) {
+                bars[i].classList.add('active');
+            }
+            
+            // Update strength text
+            if (strength < 2) {
+                strengthText.textContent = 'Weak password';
+            } else if (strength < 4) {
+                strengthText.textContent = 'Medium password';
+            } else {
+                strengthText.textContent = 'Strong password';
+            }
+        }
+        
+        // Form Validation
+        function validateFullName() {
+            const name = fullNameInput.value.trim();
+            
+            if (!name) {
+                showError(fullNameInput, 'Full name is required');
+                return false;
+            }
+            
+            if (name.length < 2) {
+                showError(fullNameInput, 'Name must be at least 2 characters');
+                return false;
+            }
+            
+            clearError(fullNameInput);
+            return true;
+        }
+        
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!email) {
+                showError(emailInput, 'Email is required');
+                return false;
+            }
+            
+            if (!emailRegex.test(email)) {
+                showError(emailInput, 'Please enter a valid email address');
+                return false;
+            }
+            
+            clearError(emailInput);
+            return true;
+        }
+        
+        function validatePhone() {
+            const phone = phoneInput.value.trim();
+            const phoneRegex = /^[\d\s\+\-\(\)]{10,}$/;
+            
+            if (!phone) {
+                showError(phoneInput, 'Phone number is required');
+                return false;
+            }
+            
+            if (!phoneRegex.test(phone)) {
+                showError(phoneInput, 'Please enter a valid phone number');
+                return false;
+            }
+            
+            clearError(phoneInput);
+            return true;
+        }
+        
+        function validateSpecialization() {
+            const specialization = specializationInput.value.trim();
+            
+            if (!specialization) {
+                showError(specializationInput, 'Specialization is required');
+                return false;
+            }
+            
+            if (specialization.length < 3) {
+                showError(specializationInput, 'Please enter a valid specialization');
+                return false;
+            }
+            
+            clearError(specializationInput);
+            return true;
+        }
+        
+        function validateQualifications() {
+            const qualifications = qualificationsInput.value.trim();
+            
+            if (!qualifications) {
+                showError(qualificationsInput, 'Qualifications are required');
+                return false;
+            }
+            
+            if (qualifications.length < 20) {
+                showError(qualificationsInput, 'Please provide detailed qualifications (minimum 20 characters)');
+                return false;
+            }
+            
+            clearError(qualificationsInput);
+            return true;
+        }
+        
+        function validateBio() {
+            const bio = bioInput.value.trim();
+            
+            if (!bio) {
+                showError(bioInput, 'Professional bio is required');
+                return false;
+            }
+            
+            if (bio.length < 100) {
+                showError(bioInput, 'Please write a more detailed bio (minimum 100 characters)');
+                return false;
+            }
+            
+            if (bio.length > 2000) {
+                showError(bioInput, 'Bio is too long (maximum 2000 characters)');
+                return false;
+            }
+            
+            clearError(bioInput);
+            return true;
+        }
+        
+        function validatePassword() {
+            const password = passwordInput.value;
+            
+            if (!password) {
+                showError(passwordInput, 'Password is required');
+                return false;
+            }
+            
+            if (password.length < 8) {
+                showError(passwordInput, 'Password must be at least 8 characters');
+                return false;
+            }
+            
+            if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+                showError(passwordInput, 'Password must contain letters and numbers');
+                return false;
+            }
+            
+            clearError(passwordInput);
+            return true;
+        }
+        
+        function validateConfirmPassword() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (!confirmPassword) {
+                showError(confirmPasswordInput, 'Please confirm your password');
+                return false;
+            }
+            
+            if (password !== confirmPassword) {
+                showError(confirmPasswordInput, 'Passwords do not match');
+                return false;
+            }
+            
+            clearError(confirmPasswordInput);
+            return true;
+        }
+        
+        // Error Handling
+        function showError(input, message) {
+            const formGroup = input.closest('.form-group');
+            const errorElement = formGroup.querySelector('.error-message');
+            
+            formGroup.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            input.classList.add('error');
+        }
+        
+        function clearError(input) {
+            const formGroup = input.closest('.form-group');
+            const errorElement = formGroup.querySelector('.error-message');
+            
+            formGroup.classList.remove('error');
+            errorElement.style.display = 'none';
+            input.classList.remove('error');
+        }
+        
+        // Handle Therapist Signup
+        async function handleTherapistSignup(event) {
+            event.preventDefault();
+            
+            // Validate all fields
+            const validations = [
+                validateFullName(),
+                validateEmail(),
+                validatePhone(),
+                validateSpecialization(),
+                validateQualifications(),
+                validateBio(),
+                validatePassword(),
+                validateConfirmPassword()
+            ];
+            
+            // Check terms agreement
+            if (!termsAgreement.checked) {
+                showNotification('You must agree to the terms and conditions', 'error');
+                return;
+            }
+            
+            if (validations.includes(false)) {
+                showNotification('Please fix the errors in the form', 'error');
+                return;
+            }
+            
+            // Set loading state
+            isLoading = true;
+            submitBtn.disabled = true;
+            btnText.textContent = 'Submitting Application...';
+            loadingSpinner.style.display = 'block';
+            
+            // Get form data
+            const formData = {
+                fullName: fullNameInput.value.trim(),
+                email: emailInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                experience: experienceSelect.value,
+                specialization: specializationInput.value.trim(),
+                qualifications: qualificationsInput.value.trim(),
+                bio: bioInput.value.trim(),
+                password: passwordInput.value
+            };
+            
+            try {
+                // Sign up with Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: formData.email,
+                    password: formData.password,
+                    options: {
+                        data: {
+                            full_name: formData.fullName,
+                            phone: formData.phone,
+                            role: 'therapist'
+                        }
+                    }
+                });
+                
+                if (authError) {
+                    if (authError.message.includes('already registered')) {
+                        throw new Error('This email is already registered. Please try logging in.');
+                    }
+                    throw authError;
+                }
+                
+                // Create profile in profiles table
+                if (authData.user) {
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([
+                            {
+                                id: authData.user.id,
+                                email: formData.email,
+                                full_name: formData.fullName,
+                                phone: formData.phone,
+                                role: 'therapist',
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+                    
+                    if (profileError) {
+                        console.error('Profile creation error:', profileError);
+                    }
+                }
+                
+                // Create therapist record in Therapists table
+                const { error: therapistError } = await supabase
+                    .from('Therapists')
+                    .insert([
+                        {
+                            user_id: authData.user.id,
+                            Name: formData.fullName,
+                            email: formData.email,
+                            phone: formData.phone,
+                            Specialization: formData.specialization,
+                            experience: formData.experience,
+                            qualifications: formData.qualifications,
+                            bio: formData.bio,
+                            approval_status: 'pending',
+                            Active: false,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+                
+                if (therapistError) {
+                    throw therapistError;
+                }
+                
+                // Show success message
+                showNotification('✅ Application submitted successfully! Our team will review it within 24-48 hours.', 'success');
+                
+                // Clear form (optional)
+                setTimeout(() => {
+                    therapistForm.reset();
+                    resetFormState();
+                    
+                    // Redirect to login page after successful submission
+                    window.location.href = 'login.html?message=application_submitted';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Application error:', error);
+                
+                // Show appropriate error message
+                let errorMessage = 'Application failed. Please try again.';
+                
+                if (error.message.includes('already registered')) {
+                    errorMessage = error.message;
+                } else if (error.message.includes('network')) {
+                    errorMessage = 'Network error. Please check your connection and try again.';
+                }
+                
+                showNotification(errorMessage, 'error');
+                
+                // Reset form state
+                resetFormState();
+            }
+        }
+        
+        // Reset Form State
+        function resetFormState() {
+            isLoading = false;
+            submitBtn.disabled = false;
+            btnText.textContent = 'Submit Application';
+            loadingSpinner.style.display = 'none';
+        }
+        
+        // Show Notification
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="icon">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+                </div>
+                <div class="message">${message}</div>
+                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Select Specialization
+        function selectSpecialization(specialization) {
+            const currentValue = specializationInput.value.trim();
+            const specializations = currentValue ? currentValue.split(',').map(s => s.trim()) : [];
+            
+            // Toggle selection
+            const index = specializations.indexOf(specialization);
+            if (index > -1) {
+                specializations.splice(index, 1);
+            } else {
+                specializations.push(specialization);
+            }
+            
+            // Update input
+            specializationInput.value = specializations.join(', ');
+            
+            // Update tag styles
+            const tags = document.querySelectorAll('.specialization-tag');
+            tags.forEach(tag => {
+                if (tag.textContent === specialization) {
+                    tag.classList.toggle('active');
+                }
+            });
+        }
+        
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            navLinks.classList.toggle('active');
+            menuToggle.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        }
+        
+        function closeMobileMenu(event) {
+            if (!navLinks.contains(event.target) && !menuToggle.contains(event.target) && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        }
+        
+        // Add some CSS for initial animation
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .application-form-container {
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: opacity 0.5s ease, transform 0.5s ease;
+                }
+                
+                .benefit-item {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                    transition: opacity 0.5s ease, transform 0.5s ease;
+                }
+                
+                .benefit-item:nth-child(1) { transition-delay: 0.1s; }
+                .benefit-item:nth-child(2) { transition-delay: 0.2s; }
+                .benefit-item:nth-child(3) { transition-delay: 0.3s; }
+                .benefit-item:nth-child(4) { transition-delay: 0.4s; }
+                
+                .loaded .application-form-container {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                
+                .loaded .benefit-item {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            </style>
+        `);
+        
+        // Add loaded class after page load
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+    </script>
+</body>
+</html>
