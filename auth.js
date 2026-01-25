@@ -1,289 +1,200 @@
 /**
- * MindSpace - Authentication Module
- * Handles all authentication-related functionality
+ * MindSpace - Simple Authentication Module
+ * No complex dependencies - Just works
  */
 
-(function() {
-    'use strict';
+// Global variables
+let supabaseClient = null;
+let currentUser = null;
 
-    // Wait for Supabase client to be available
-    function waitForSupabase() {
-        return new Promise((resolve, reject) => {
-            let attempts = 0;
-            const maxAttempts = 50; // 5 seconds max wait
-            
-            const checkInterval = setInterval(() => {
-                attempts++;
-                
-                if (window.supabaseClient) {
-                    clearInterval(checkInterval);
-                    resolve(window.supabaseClient);
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(checkInterval);
-                    reject(new Error('Supabase client not available after timeout'));
-                }
-            }, 100);
+// Initialize Supabase
+function initSupabase() {
+    if (window.supabase && !supabaseClient) {
+        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
+        
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase initialized successfully');
+            return supabaseClient;
+        } catch (error) {
+            console.error('Failed to initialize Supabase:', error);
+            return null;
+        }
+    }
+    return supabaseClient;
+}
+
+// Check if user is logged in
+async function checkAuth() {
+    const client = initSupabase();
+    if (!client) return false;
+    
+    try {
+        const { data, error } = await client.auth.getSession();
+        if (error) throw error;
+        
+        if (data.session) {
+            currentUser = data.session.user;
+            localStorage.setItem('userLoggedIn', 'true');
+            localStorage.setItem('userEmail', currentUser.email);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        return false;
+    }
+}
+
+// Login function
+async function loginUser(email, password) {
+    const client = initSupabase();
+    if (!client) {
+        throw new Error('Authentication service unavailable');
+    }
+    
+    try {
+        const { data, error } = await client.auth.signInWithPassword({
+            email: email,
+            password: password
         });
+        
+        if (error) throw error;
+        
+        currentUser = data.user;
+        localStorage.setItem('userLoggedIn', 'true');
+        localStorage.setItem('userEmail', data.user.email);
+        localStorage.setItem('userId', data.user.id);
+        
+        return {
+            success: true,
+            user: data.user
+        };
+    } catch (error) {
+        console.error('Login error:', error);
+        return {
+            success: false,
+            error: getErrorMessage(error)
+        };
     }
+}
 
-    // Authentication Class
-    class MindSpaceAuth {
-        constructor() {
-            this.client = null;
-            this.currentUser = null;
-            this.initialized = false;
-            this.init();
-        }
-
-        async init() {
-            try {
-                this.client = await waitForSupabase();
-                await this.checkExistingSession();
-                this.initialized = true;
-                console.log('Auth module initialized');
-            } catch (error) {
-                console.error('Auth initialization failed:', error);
-                this.showError('Authentication system failed to initialize. Please refresh the page.');
-            }
-        }
-
-        async checkExistingSession() {
-            try {
-                const { data: { session }, error } = await this.client.auth.getSession();
-                
-                if (error) throw error;
-                
-                if (session) {
-                    this.currentUser = session.user;
-                    this.dispatchAuthEvent('session_restored', session);
-                    
-                    // Redirect to dashboard if not already there
-                    if (!window.location.pathname.includes('dashboard')) {
-                        setTimeout(() => {
-                            window.location.href = 'user-dashboard.html';
-                        }, 100);
-                    }
-                }
-            } catch (error) {
-                console.error('Session check failed:', error);
-            }
-        }
-
-        async signIn(email, password) {
-            try {
-                this.validateEmail(email);
-                this.validatePassword(password);
-
-                const { data, error } = await this.client.auth.signInWithPassword({
-                    email: email.trim(),
-                    password: password
-                });
-
-                if (error) throw error;
-
-                this.currentUser = data.user;
-                this.dispatchAuthEvent('signin', data);
-                
-                return {
-                    success: true,
-                    user: data.user,
-                    session: data.session
-                };
-
-            } catch (error) {
-                console.error('Sign in error:', error);
-                return {
-                    success: false,
-                    error: this.getErrorMessage(error)
-                };
-            }
-        }
-
-        async signUp(email, password, fullName) {
-            try {
-                this.validateEmail(email);
-                this.validatePassword(password);
-                this.validateName(fullName);
-
-                const { data, error } = await this.client.auth.signUp({
-                    email: email.trim(),
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: fullName.trim(),
-                            created_at: new Date().toISOString()
-                        }
-                    }
-                });
-
-                if (error) throw error;
-
-                // Create user profile
-                if (data.user) {
-                    const { error: profileError } = await this.client
-                        .from('profiles')
-                        .insert([
-                            {
-                                id: data.user.id,
-                                email: email.trim(),
-                                full_name: fullName.trim(),
-                                created_at: new Date().toISOString(),
-                                updated_at: new Date().toISOString()
-                            }
-                        ]);
-
-                    if (profileError) {
-                        console.error('Profile creation failed:', profileError);
-                        // Continue anyway - profile can be created later
-                    }
-                }
-
-                return {
-                    success: true,
-                    user: data.user,
-                    needsConfirmation: !data.session
-                };
-
-            } catch (error) {
-                console.error('Sign up error:', error);
-                return {
-                    success: false,
-                    error: this.getErrorMessage(error)
-                };
-            }
-        }
-
-        async signOut() {
-            try {
-                const { error } = await this.client.auth.signOut();
-                
-                if (error) throw error;
-
-                this.currentUser = null;
-                this.dispatchAuthEvent('signout');
-                
-                return { success: true };
-            } catch (error) {
-                console.error('Sign out error:', error);
-                return {
-                    success: false,
-                    error: this.getErrorMessage(error)
-                };
-            }
-        }
-
-        getCurrentUser() {
-            return this.currentUser;
-        }
-
-        isAuthenticated() {
-            return !!this.currentUser;
-        }
-
-        // Validation methods
-        validateEmail(email) {
-            if (!email || typeof email !== 'string') {
-                throw new Error('Email is required');
-            }
-
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.trim())) {
-                throw new Error('Please enter a valid email address');
-            }
-        }
-
-        validatePassword(password) {
-            if (!password || typeof password !== 'string') {
-                throw new Error('Password is required');
-            }
-
-            if (password.length < 6) {
-                throw new Error('Password must be at least 6 characters');
-            }
-        }
-
-        validateName(name) {
-            if (!name || typeof name !== 'string' || name.trim().length < 2) {
-                throw new Error('Full name must be at least 2 characters');
-            }
-        }
-
-        // Error handling
-        getErrorMessage(error) {
-            const messages = {
-                'Invalid login credentials': 'Invalid email or password. Please try again.',
-                'Email not confirmed': 'Please confirm your email address before logging in.',
-                'User not found': 'No account found with this email. Please sign up first.',
-                'Email rate limit exceeded': 'Too many attempts. Please try again later.',
-                'Weak password': 'Password is too weak. Please use a stronger password.',
-                'User already registered': 'An account with this email already exists.'
-            };
-
-            return messages[error.message] || 
-                   error.message || 
-                   'An unexpected error occurred. Please try again.';
-        }
-
-        // Event dispatching
-        dispatchAuthEvent(type, data = null) {
-            const event = new CustomEvent('mindsapce:auth', {
-                detail: { type, data, timestamp: new Date() }
-            });
-            document.dispatchEvent(event);
-        }
-
-        // Utility methods
-        showError(message, elementId = 'authError') {
-            const errorElement = document.getElementById(elementId);
-            if (errorElement) {
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-                
-                setTimeout(() => {
-                    errorElement.style.display = 'none';
-                }, 5000);
-            }
-        }
-
-        showSuccess(message, elementId = 'authSuccess') {
-            const successElement = document.getElementById(elementId);
-            if (successElement) {
-                successElement.textContent = message;
-                successElement.style.display = 'block';
-                
-                setTimeout(() => {
-                    successElement.style.display = 'none';
-                }, 5000);
-            }
-        }
+// Signup function
+async function signupUser(email, password, fullName) {
+    const client = initSupabase();
+    if (!client) {
+        throw new Error('Authentication service unavailable');
     }
+    
+    try {
+        const { data, error } = await client.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: fullName
+                }
+            }
+        });
+        
+        if (error) throw error;
+        
+        // Create profile if signup successful
+        if (data.user) {
+            const { error: profileError } = await client
+                .from('profiles')
+                .insert([
+                    {
+                        id: data.user.id,
+                        email: email,
+                        full_name: fullName,
+                        created_at: new Date().toISOString()
+                    }
+                ]);
+            
+            if (profileError) {
+                console.warn('Profile creation warning:', profileError);
+            }
+        }
+        
+        return {
+            success: true,
+            needsConfirmation: !data.session
+        };
+    } catch (error) {
+        console.error('Signup error:', error);
+        return {
+            success: false,
+            error: getErrorMessage(error)
+        };
+    }
+}
 
-    // Initialize and expose globally
-    window.MindSpaceAuth = new MindSpaceAuth();
+// Logout function
+async function logoutUser() {
+    const client = initSupabase();
+    if (!client) return false;
+    
+    try {
+        const { error } = await client.auth.signOut();
+        if (error) throw error;
+        
+        currentUser = null;
+        localStorage.removeItem('userLoggedIn');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userId');
+        
+        return true;
+    } catch (error) {
+        console.error('Logout error:', error);
+        return false;
+    }
+}
 
-    // Expose utility functions
-    window.logout = async function() {
-        const result = await window.MindSpaceAuth.signOut();
-        if (result.success) {
+// Get current user
+function getCurrentUser() {
+    return currentUser;
+}
+
+// Error message helper
+function getErrorMessage(error) {
+    if (error.message.includes('Invalid login credentials')) {
+        return 'Invalid email or password. Please try again.';
+    } else if (error.message.includes('User not found')) {
+        return 'No account found with this email.';
+    } else if (error.message.includes('Email not confirmed')) {
+        return 'Please confirm your email before logging in.';
+    } else if (error.message.includes('Email rate limit exceeded')) {
+        return 'Too many attempts. Please try again later.';
+    } else {
+        return 'An error occurred. Please try again.';
+    }
+}
+
+// Auto-check auth on page load
+document.addEventListener('DOMContentLoaded', async function() {
+    // Only run on pages that need auth check
+    const authPages = ['user-dashboard.html', 'login.html', 'signup.html'];
+    const currentPage = window.location.pathname;
+    
+    if (authPages.some(page => currentPage.includes(page))) {
+        const isAuthenticated = await checkAuth();
+        
+        // Redirect logic
+        if (isAuthenticated && currentPage.includes('login.html')) {
+            window.location.href = 'user-dashboard.html';
+        } else if (isAuthenticated && currentPage.includes('signup.html')) {
+            window.location.href = 'user-dashboard.html';
+        } else if (!isAuthenticated && currentPage.includes('user-dashboard.html')) {
             window.location.href = 'login.html';
-        } else {
-            alert('Logout failed: ' + result.error);
         }
-    };
+    }
+});
 
-    // Auto-redirect if authenticated and on login/signup pages
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(() => {
-            const auth = window.MindSpaceAuth;
-            if (auth.isAuthenticated()) {
-                const currentPage = window.location.pathname;
-                const authPages = ['login.html', 'signup.html', 'index.html'];
-                
-                if (authPages.some(page => currentPage.includes(page))) {
-                    window.location.href = 'user-dashboard.html';
-                }
-            }
-        }, 100);
-    });
-
-})();
+// Export functions to global scope
+window.loginUser = loginUser;
+window.signupUser = signupUser;
+window.logoutUser = logoutUser;
+window.getCurrentUser = getCurrentUser;
+window.checkAuth = checkAuth;
