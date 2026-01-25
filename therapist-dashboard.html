@@ -1,1186 +1,660 @@
-/* ========================================
-   MINDSPACE - GLOBAL STYLESHEET
-   Mental Health Platform with Calming Theme
-   Version: 1.1.0 - Professional Refinement
-   ======================================== */
-
-/* === RESET & BASE === */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #F5F9F8;
-    color: #2C3E50;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 50px;
-    width: 100%;
-}
-
-/* === NAVIGATION === */
-.navbar {
-    background: #FFFFFF;
-    padding: 20px 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 28px;
-    font-weight: 700;
-    color: #5A9B8E;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.logo:hover {
-    color: #4A8B7E;
-}
-
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 30px;
-    align-items: center;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: #2C3E50;
-    font-weight: 500;
-    font-size: 16px;
-    transition: color 0.3s ease;
-    padding: 8px 0;
-    position: relative;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-    color: #5A9B8E;
-}
-
-.btn-nav-login {
-    background: #C9E4DE !important;
-    padding: 10px 25px !important;
-    border-radius: 8px !important;
-    color: #2C3E50 !important;
-    font-weight: 600 !important;
-    border: none !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-}
-
-.btn-nav-login:hover {
-    background: #A8D5CC !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* === BUTTONS === */
-.btn-primary {
-    background: #5A9B8E;
-    color: #FFFFFF;
-    padding: 14px 32px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    cursor: pointer;
-    font-family: inherit;
-}
-
-.btn-primary:hover {
-    background: #4A8B7E;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(90, 155, 142, 0.3);
-}
-
-.btn-primary:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.2);
-}
-
-.btn-secondary {
-    background: #FFFFFF;
-    color: #5A9B8E;
-    padding: 14px 32px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    border: 2px solid #C9E4DE;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    font-family: inherit;
-}
-
-.btn-secondary:hover {
-    background: #C9E4DE;
-    transform: translateY(-3px);
-}
-
-.btn-secondary:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(201, 228, 222, 0.3);
-}
-
-.btn-large {
-    padding: 16px 40px;
-    font-size: 18px;
-}
-
-.btn-full {
-    width: 100%;
-}
-
-/* === HERO SECTION === */
-.hero {
-    padding: 80px 0;
-    overflow: hidden;
-}
-
-.hero-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 50px;
-    display: flex;
-    align-items: center;
-    gap: 60px;
-}
-
-.hero-content {
-    flex: 1;
-}
-
-.hero h1 {
-    font-size: 56px;
-    color: #2C3E50;
-    margin-bottom: 20px;
-    line-height: 1.2;
-    font-weight: 700;
-}
-
-.hero h1 .highlight {
-    color: #5A9B8E;
-}
-
-.hero-subtitle {
-    font-size: 20px;
-    color: #6B7280;
-    margin-bottom: 40px;
-    line-height: 1.8;
-    max-width: 90%;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.hero-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.floating-card {
-    background: #C9E4DE;
-    border-radius: 20px;
-    padding: 60px;
-    text-align: center;
-    min-height: 400px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    transition: transform 0.4s ease;
-}
-
-.floating-card:hover {
-    transform: translateY(-10px);
-}
-
-.floating-card svg {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-}
-
-.card-text {
-    margin-top: 30px;
-    font-size: 18px;
-    color: #2C3E50;
-    font-weight: 600;
-}
-
-/* === STATS SECTION === */
-.stats-section {
-    padding: 60px 0;
-    background: #F5F9F8;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-}
-
-.stat-box {
-    background: #FFFFFF;
-    padding: 40px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-}
-
-.stat-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    border-color: #C9E4DE;
-}
-
-.stat-number {
-    font-size: 48px;
-    font-weight: 700;
-    color: #5A9B8E;
-    margin-bottom: 10px;
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 18px;
-    color: #6B7280;
-    font-weight: 500;
-}
-
-/* === FEATURES SECTION === */
-.features-section {
-    padding: 100px 0;
-    background: #F5F9F8;
-}
-
-.section-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.section-header h2 {
-    font-size: 42px;
-    color: #2C3E50;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.section-header p {
-    font-size: 20px;
-    color: #6B7280;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-}
-
-.feature-card {
-    background: #FFFFFF;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    height: 100%;
-}
-
-.feature-card:hover {
-    border-color: #C9E4DE;
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
-
-.feature-icon {
-    width: 60px;
-    height: 60px;
-    background: #C9E4DE;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin-bottom: 20px;
-    color: #5A9B8E;
-}
-
-.feature-card h3 {
-    font-size: 22px;
-    color: #2C3E50;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.feature-card p {
-    font-size: 16px;
-    color: #6B7280;
-    line-height: 1.7;
-    margin: 0;
-}
-
-/* === CTA SECTION === */
-.cta-section {
-    padding: 80px 0;
-    background: linear-gradient(135deg, #C9E4DE 0%, #A8D5CC 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-.cta-content {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-}
-
-.cta-content h2 {
-    font-size: 42px;
-    color: #2C3E50;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.cta-content p {
-    font-size: 20px;
-    color: #2C3E50;
-    margin-bottom: 30px;
-    opacity: 0.9;
-}
-
-/* === FOOTER === */
-.footer {
-    background: #FFFFFF;
-    padding: 50px 0 30px;
-    border-top: 1px solid #E5E7EB;
-}
-
-.footer-content {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-    margin-bottom: 30px;
-}
-
-.footer-section h4 {
-    color: #2C3E50;
-    margin-bottom: 20px;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.footer-section p {
-    color: #6B7280;
-    font-size: 14px;
-    line-height: 1.8;
-    margin: 0 0 15px 0;
-}
-
-.footer-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.footer-section ul li {
-    margin-bottom: 12px;
-}
-
-.footer-section ul li:last-child {
-    margin-bottom: 0;
-}
-
-.footer-section ul li a {
-    color: #6B7280;
-    text-decoration: none;
-    transition: color 0.3s ease;
-    font-size: 14px;
-}
-
-.footer-section ul li a:hover {
-    color: #5A9B8E;
-}
-
-.footer-bottom {
-    text-align: center;
-    padding-top: 30px;
-    border-top: 1px solid #E5E7EB;
-}
-
-.footer-bottom p {
-    color: #6B7280;
-    font-size: 14px;
-    margin: 0;
-}
-
-/* === PAGE HERO === */
-.page-hero {
-    background: linear-gradient(135deg, #C9E4DE 0%, #A8D5CC 100%);
-    padding: 80px 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.page-hero h1 {
-    font-size: 48px;
-    color: #2C3E50;
-    margin-bottom: 15px;
-    font-weight: 700;
-    position: relative;
-    z-index: 1;
-}
-
-.page-hero p {
-    font-size: 20px;
-    color: #2C3E50;
-    opacity: 0.9;
-    max-width: 700px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-}
-
-/* === CONTENT SECTIONS === */
-.content-section {
-    padding: 80px 0;
-    background: #F5F9F8;
-}
-
-.content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-}
-
-.content-text h2 {
-    font-size: 36px;
-    color: #2C3E50;
-    margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.content-text p {
-    font-size: 18px;
-    color: #6B7280;
-    margin-bottom: 20px;
-    line-height: 1.8;
-}
-
-.content-text p:last-child {
-    margin-bottom: 0;
-}
-
-.feature-list {
-    list-style: none;
-    margin-bottom: 30px;
-    padding: 0;
-}
-
-.feature-list li {
-    font-size: 18px;
-    color: #2C3E50;
-    margin-bottom: 15px;
-    padding-left: 0;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.feature-list li::before {
-    content: '✓';
-    color: #5A9B8E;
-    font-weight: bold;
-    flex-shrink: 0;
-}
-
-.feature-list li:last-child {
-    margin-bottom: 0;
-}
-
-/* === VALUES & TEAM === */
-.values-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
-}
-
-.value-card {
-    background: #FFFFFF;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
-}
-
-.value-card:hover {
-    transform: translateY(-5px);
-}
-
-.value-icon {
-    font-size: 48px;
-    margin-bottom: 20px;
-    color: #5A9B8E;
-}
-
-.value-card h3 {
-    font-size: 24px;
-    color: #2C3E50;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.value-card p {
-    font-size: 16px;
-    color: #6B7280;
-    line-height: 1.7;
-    margin: 0;
-}
-
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-}
-
-.team-card {
-    background: #FFFFFF;
-    padding: 30px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.team-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
-
-.team-photo {
-    width: 120px;
-    height: 120px;
-    background: #C9E4DE;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    font-size: 48px;
-    color: #5A9B8E;
-}
-
-.team-card h3 {
-    font-size: 20px;
-    color: #2C3E50;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.team-role {
-    color: #5A9B8E;
-    font-weight: 600;
-    margin-bottom: 15px;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.team-card p {
-    font-size: 14px;
-    color: #6B7280;
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* === CONTACT PAGE === */
-.contact-wrapper {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 60px;
-}
-
-.contact-form-section h2,
-.contact-info-section h2 {
-    font-size: 32px;
-    color: #2C3E50;
-    margin-bottom: 30px;
-    font-weight: 700;
-}
-
-.contact-form {
-    background: #FFFFFF;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group:last-child {
-    margin-bottom: 0;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #2C3E50;
-    font-size: 15px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #E5E7EB;
-    border-radius: 8px;
-    font-size: 15px;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    background: #F5F9F8;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #5A9B8E;
-    box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 150px;
-}
-
-.contact-info-card {
-    display: flex;
-    gap: 20px;
-    background: #FFFFFF;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
-    align-items: flex-start;
-}
-
-.contact-info-card:hover {
-    transform: translateY(-3px);
-}
-
-.contact-info-card:last-child {
-    margin-bottom: 0;
-}
-
-.info-icon {
-    font-size: 32px;
-    flex-shrink: 0;
-    color: #5A9B8E;
-}
-
-.contact-info-card h4 {
-    color: #2C3E50;
-    margin-bottom: 8px;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.contact-info-card p {
-    color: #6B7280;
-    font-size: 15px;
-    line-height: 1.6;
-    margin: 0;
-}
-
-.faq-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
-}
-
-.faq-card {
-    background: #FFFFFF;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
-}
-
-.faq-card:hover {
-    transform: translateY(-3px);
-}
-
-.faq-card h3 {
-    color: #2C3E50;
-    font-size: 18px;
-    margin-bottom: 12px;
-    font-weight: 600;
-}
-
-.faq-card p {
-    color: #6B7280;
-    font-size: 15px;
-    line-height: 1.7;
-    margin: 0;
-}
-
-/* === STEPS (HOW IT WORKS) === */
-.steps-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-}
-
-.step-card {
-    background: #FFFFFF;
-    padding: 40px 30px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.step-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
-
-.step-number {
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    background: #5A9B8E;
-    color: #FFFFFF;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 18px;
-    z-index: 1;
-}
-
-.step-icon {
-    font-size: 48px;
-    margin: 20px 0;
-    color: #5A9B8E;
-}
-
-.step-card h3 {
-    font-size: 20px;
-    color: #2C3E50;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.step-card p {
-    font-size: 15px;
-    color: #6B7280;
-    line-height: 1.7;
-    margin: 0;
-}
-
-/* === AUTH PAGES === */
-.auth-page {
-    background: #F5F9F8;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-}
-
-.auth-section {
-    padding: 80px 0;
-    width: 100%;
-}
-
-.auth-container {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.auth-card {
-    background: #FFFFFF;
-    padding: 50px;
-    border-radius: 16px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
-.auth-card h1 {
-    text-align: center;
-    color: #2C3E50;
-    font-size: 32px;
-    margin-bottom: 10px;
-    font-weight: 700;
-}
-
-.auth-subtitle {
-    text-align: center;
-    color: #6B7280;
-    margin-bottom: 40px;
-    font-size: 16px;
-}
-
-.auth-form {
-    margin-bottom: 30px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.auth-footer {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #E5E7EB;
-}
-
-.auth-footer p {
-    color: #6B7280;
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-.auth-footer p:last-child {
-    margin-bottom: 0;
-}
-
-.auth-footer a {
-    color: #5A9B8E;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-}
-
-.auth-footer a:hover {
-    text-decoration: underline;
-    color: #4A8B7E;
-}
-
-/* === RESPONSIVE DESIGN === */
-@media (max-width: 1200px) {
-    .container,
-    .nav-container,
-    .hero-container {
-        max-width: 100%;
-    }
-    
-    .team-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 992px) {
-    .hero h1 {
-        font-size: 48px;
-    }
-    
-    .section-header h2,
-    .cta-content h2 {
-        font-size: 36px;
-    }
-    
-    .features-grid,
-    .stats-grid,
-    .team-grid,
-    .steps-grid,
-    .faq-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .footer-content {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .hero-container {
-        gap: 40px;
-    }
-}
-
-@media (max-width: 768px) {
-    .container,
-    .nav-container {
-        padding: 0 20px;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Therapist Dashboard - MindSpace</title>
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    .dashboard-wrapper {
+      min-height: 100vh;
+      background: #F5F9F8;
+      padding-top: 80px;
     }
 
-    .hero-container {
-        flex-direction: column;
-        padding: 0 20px;
-        gap: 40px;
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
     }
 
-    .hero h1 {
-        font-size: 36px;
+    .dash-header {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
     }
 
-    .hero-buttons {
-        flex-direction: column;
-        width: 100%;
+    .therapist-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    
-    .hero-buttons .btn-primary,
-    .hero-buttons .btn-secondary {
-        width: 100%;
-        text-align: center;
+
+    .therapist-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .therapist-meta h1 {
+      margin: 0;
+      color: #5A9B8E;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+
+    .therapist-meta p {
+      margin: 6px 0 0;
+      color: #6B7280;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .btn-logout {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(220, 53, 69, 0.25);
     }
 
     .stats-grid {
-        grid-template-columns: 1fr;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 22px;
     }
 
-    .features-grid {
-        grid-template-columns: 1fr;
+    @media (max-width: 992px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .content-grid,
-    .content-grid-reverse {
-        grid-template-columns: 1fr;
-        gap: 40px;
+    @media (max-width: 576px) {
+      .stats-grid { grid-template-columns: 1fr; }
     }
 
-    .values-grid {
-        grid-template-columns: 1fr;
+    .stat-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
-    .team-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .stat-label {
+      color: #6B7280;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .steps-grid {
-        grid-template-columns: 1fr;
+    .stat-value {
+      margin-top: 8px;
+      font-size: 30px;
+      font-weight: 900;
+      color: #2C3E50;
+      line-height: 1;
     }
 
-    .contact-wrapper {
-        grid-template-columns: 1fr;
-        gap: 40px;
+    .panel {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      margin-bottom: 22px;
     }
 
-    .faq-grid {
-        grid-template-columns: 1fr;
+    .panel-title {
+      margin: 0 0 16px;
+      color: #2C3E50;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .footer-content {
-        grid-template-columns: repeat(2, 1fr);
+    .booking-row {
+      padding: 14px 0;
+      border-top: 1px solid #E5E7EB;
     }
 
-    .nav-links {
-        flex-wrap: wrap;
-        gap: 15px;
+    .booking-row:first-child {
+      border-top: none;
+      padding-top: 0;
     }
 
-    .form-row {
-        grid-template-columns: 1fr;
+    .booking-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    
-    .floating-card {
-        padding: 40px;
-        min-height: 300px;
-    }
-    
-    .auth-card {
-        padding: 30px;
-    }
-}
 
-@media (max-width: 576px) {
-    .hero h1 {
-        font-size: 32px;
+    .booking-status.pending {
+      background: #FFF3CD;
+      color: #856404;
     }
-    
-    .section-header h2,
-    .cta-content h2,
-    .page-hero h1 {
-        font-size: 28px;
-    }
-    
-    .section-header p,
-    .cta-content p,
-    .page-hero p {
-        font-size: 18px;
-    }
-    
-    .footer-content {
-        grid-template-columns: 1fr;
-    }
-    
-    .nav-container {
-        flex-direction: column;
-        gap: 20px;
-    }
-    
-    .nav-links {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .stat-number {
-        font-size: 36px;
-    }
-    
-    .feature-card,
-    .stat-box,
-    .value-card {
-        padding: 25px;
-    }
-    
-    .team-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .features-grid,
-    .stats-grid {
-        gap: 20px;
-    }
-}
 
-/* === UTILITY CLASSES === */
-.text-center {
-    text-align: center;
-}
-
-.text-left {
-    text-align: left;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.mt-0 { margin-top: 0 !important; }
-.mb-0 { margin-bottom: 0 !important; }
-.mt-1 { margin-top: 8px !important; }
-.mb-1 { margin-bottom: 8px !important; }
-.mt-2 { margin-top: 16px !important; }
-.mb-2 { margin-bottom: 16px !important; }
-.mt-3 { margin-top: 24px !important; }
-.mb-3 { margin-bottom: 24px !important; }
-.mt-4 { margin-top: 32px !important; }
-.mb-4 { margin-bottom: 32px !important; }
-
-/* === ACCESSIBILITY === */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
+    .booking-status.confirmed {
+      background: #D4EDDA;
+      color: #155724;
     }
-}
 
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
+    .booking-status.completed {
+      background: #D1ECF1;
+      color: #0C5460;
+    }
 
-/* === FOCUS STATES FOR ACCESSIBILITY === */
-a:focus,
-button:focus,
-input:focus,
-textarea:focus,
-select:focus {
-    outline: 2px solid #5A9B8E;
-    outline-offset: 2px;
-}
+    .booking-status.cancelled {
+      background: #F8D7DA;
+      color: #721C24;
+    }
 
-/* === PRINT STYLES === */
-@media print {
-    .navbar,
-    .footer,
-    .hero-buttons,
-    .btn-primary,
-    .btn-secondary {
-        display: none !important;
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6B7280;
     }
-    
-    body {
-        background: #FFFFFF !important;
-        color: #000000 !important;
-        font-size: 12pt !important;
+
+    .empty-state i {
+      font-size: 48px;
+      color: #C9E4DE;
+      margin-bottom: 16px;
     }
-    
-    .container {
-        max-width: 100% !important;
-        padding: 0 !important;
+
+    .loading-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6B7280;
     }
-    
-    a {
-        color: #000000 !important;
-        text-decoration: underline !important;
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
     }
-    
-    .hero,
-    .content-section,
-    .features-section,
-    .stats-section {
-        padding: 20px 0 !important;
+
+    .btn-action {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s ease;
     }
-    
-    .feature-card,
-    .stat-box,
-    .value-card {
-        box-shadow: none !important;
-        border: 1px solid #E5E7EB !important;
+
+    .btn-approve {
+      background: #4caf50;
+      color: white;
     }
-}
+
+    .btn-approve:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+
+    .btn-reject {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-reject:hover {
+      background: #d32f2f;
+      transform: translateY(-2px);
+    }
+
+    .btn-complete {
+      background: #2196F3;
+      color: white;
+    }
+
+    .btn-complete:hover {
+      background: #1976D2;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-wrapper">
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="index.html" class="logo">
+          <span class="logo-icon">🧠</span>
+          <span class="logo-text">MindSpace</span>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="therapist-dashboard.html" class="active">Dashboard</a></li>
+          <li><a href="index.html">Home</a></li>
+          <li><button class="btn-nav-login" id="navLogoutBtn" type="button">Logout</button></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <main class="dashboard-container">
+      <!-- Dashboard Header -->
+      <section class="dash-header">
+        <div class="therapist-left">
+          <div class="therapist-avatar" id="therapistAvatar">T</div>
+          <div class="therapist-meta">
+            <h1 id="therapistName">Therapist Dashboard</h1>
+            <p id="therapistSpecialization">Loading...</p>
+          </div>
+        </div>
+        <button class="btn-logout" id="logoutBtn" type="button">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </section>
+
+      <!-- Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">
+            <i class="fas fa-calendar-check"></i> Total Bookings
+          </div>
+          <div class="stat-value" id="totalBookings">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <i class="fas fa-clock"></i> Pending
+          </div>
+          <div class="stat-value" id="pendingBookings">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <i class="fas fa-check-circle"></i> Confirmed
+          </div>
+          <div class="stat-value" id="confirmedBookings">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <i class="fas fa-star"></i> Completed
+          </div>
+          <div class="stat-value" id="completedBookings">0</div>
+        </div>
+      </section>
+
+      <!-- Pending Bookings -->
+      <section class="panel">
+        <h2 class="panel-title">
+          <i class="fas fa-hourglass-half"></i> Pending Booking Requests
+        </h2>
+        <div id="pendingBookingsList">
+          <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading pending requests...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- All Bookings -->
+      <section class="panel">
+        <h2 class="panel-title">
+          <i class="fas fa-list"></i> All Bookings
+        </h2>
+        <div id="allBookingsList">
+          <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading bookings...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentTherapist = null;
+    let allBookings = [];
+
+    async function init() {
+      try {
+        // Check authentication
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Get profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, role, fullname, email')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError || !profile || profile.role !== 'therapist') {
+          alert('Access denied. Therapist role required.');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Get therapist details (FIXED: using id, not userid)
+        const { data: therapist, error: therapistError } = await supabase
+          .from('Therapists')
+          .select('*')
+          .eq('id', profile.id)
+          .single();
+
+        if (therapistError) {
+          console.error('Therapist fetch error:', therapistError);
+          alert('Error loading therapist profile.');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Check approval status
+        if (therapist.approvalstatus !== 'approved') {
+          await supabase.auth.signOut();
+          alert('Your therapist account is pending approval. Please wait for admin approval.');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        currentTherapist = therapist;
+
+        // Update UI
+        updateHeader(therapist);
+        
+        // Load bookings
+        await loadBookings();
+
+      } catch (error) {
+        console.error('Initialization error:', error);
+        alert('Error loading dashboard. Please try again.');
+        window.location.href = 'login.html';
+      }
+    }
+
+    function updateHeader(therapist) {
+      const nameEl = document.getElementById('therapistName');
+      const specEl = document.getElementById('therapistSpecialization');
+      const avatarEl = document.getElementById('therapistAvatar');
+
+      const displayName = therapist.Name ? `Dr. ${therapist.Name}` : 'Therapist Dashboard';
+      nameEl.textContent = displayName;
+      specEl.textContent = therapist.Specialization || 'General Therapy';
+      avatarEl.textContent = (therapist.Name || 'T').charAt(0).toUpperCase();
+    }
+
+    async function loadBookings() {
+      try {
+        const { data: bookings, error } = await supabase
+          .from('Bookings')
+          .select('*')
+          .eq('therapistid', currentTherapist.id)
+          .order('sessiondate', { ascending: false });
+
+        if (error) throw error;
+
+        allBookings = bookings || [];
+
+        // Update stats
+        updateStats(allBookings);
+
+        // Display bookings
+        displayPendingBookings(allBookings.filter(b => b.status === 'pending'));
+        displayAllBookings(allBookings);
+
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+        document.getElementById('pendingBookingsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error loading bookings</p></div>';
+        document.getElementById('allBookingsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error loading bookings</p></div>';
+      }
+    }
+
+    function updateStats(bookings) {
+      document.getElementById('totalBookings').textContent = bookings.length;
+      document.getElementById('pendingBookings').textContent = bookings.filter(b => b.status === 'pending').length;
+      document.getElementById('confirmedBookings').textContent = bookings.filter(b => b.status === 'confirmed').length;
+      document.getElementById('completedBookings').textContent = bookings.filter(b => b.status === 'completed').length;
+    }
+
+    async function displayPendingBookings(bookings) {
+      const container = document.getElementById('pendingBookingsList');
+
+      if (!bookings.length) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending booking requests</p></div>';
+        return;
+      }
+
+      // Get user names
+      const userIds = [...new Set(bookings.map(b => b.userid))];
+      const { data: users } = await supabase
+        .from('profiles')
+        .select('id, fullname')
+        .in('id', userIds);
+
+      container.innerHTML = bookings.map(booking => {
+        const user = users?.find(u => u.id === booking.userid);
+        const date = new Date(booking.sessiondate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+
+        return `
+          <div class="booking-row">
+            <div>
+              <div style="font-weight:700;color:#2C3E50;margin-bottom:6px;">
+                <span class="booking-status pending">PENDING</span>
+                ${user?.fullname || 'Patient'} • ${date} • ${booking.starttime || 'Not set'}
+              </div>
+              <div style="color:#6B7280;font-size:13px;">
+                Booking ID: ${String(booking.id).slice(0, 8)} • Duration: ${booking.duration || 60} mins • Amount: ₹${booking.amount || 500}
+              </div>
+              <div class="action-buttons">
+                <button class="btn-action btn-approve" onclick="approveBooking('${booking.id}')">
+                  <i class="fas fa-check"></i> Accept
+                </button>
+                <button class="btn-action btn-reject" onclick="rejectBooking('${booking.id}')">
+                  <i class="fas fa-times"></i> Decline
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function displayAllBookings(bookings) {
+      const container = document.getElementById('allBookingsList');
+
+      if (!bookings.length) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>No bookings yet</p></div>';
+        return;
+      }
+
+      // Get user names
+      const userIds = [...new Set(bookings.map(b => b.userid))];
+      const { data: users } = await supabase
+        .from('profiles')
+        .select('id, fullname')
+        .in('id', userIds);
+
+      container.innerHTML = bookings.map(booking => {
+        const user = users?.find(u => u.id === booking.userid);
+        const date = new Date(booking.sessiondate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        const status = booking.status || 'pending';
+
+        return `
+          <div class="booking-row">
+            <div>
+              <div style="font-weight:700;color:#2C3E50;margin-bottom:6px;">
+                <span class="booking-status ${status}">${status.toUpperCase()}</span>
+                ${user?.fullname || 'Patient'} • ${date} • ${booking.starttime || 'Not set'}
+              </div>
+              <div style="color:#6B7280;font-size:13px;">
+                Booking ID: ${String(booking.id).slice(0, 8)} • Duration: ${booking.duration || 60} mins • Amount: ₹${booking.amount || 500}
+              </div>
+              ${status === 'confirmed' ? `
+                <div class="action-buttons">
+                  <button class="btn-action btn-complete" onclick="completeBooking('${booking.id}')">
+                    <i class="fas fa-check-double"></i> Mark Complete
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function approveBooking(bookingId) {
+      if (!confirm('Accept this booking request?')) return;
+
+      try {
+        const { error } = await supabase
+          .from('Bookings')
+          .update({ status: 'confirmed' })
+          .eq('id', bookingId);
+
+        if (error) throw error;
+
+        showNotification('Booking accepted successfully!', 'success');
+        await loadBookings();
+      } catch (error) {
+        console.error('Error approving booking:', error);
+        showNotification('Error accepting booking', 'error');
+      }
+    }
+
+    async function rejectBooking(bookingId) {
+      const reason = prompt('Reason for declining (optional):');
+      if (reason === null) return;
+
+      try {
+        const { error } = await supabase
+          .from('Bookings')
+          .update({ 
+            status: 'cancelled',
+            cancellationreason: reason || 'Declined by therapist'
+          })
+          .eq('id', bookingId);
+
+        if (error) throw error;
+
+        showNotification('Booking declined', 'info');
+        await loadBookings();
+      } catch (error) {
+        console.error('Error rejecting booking:', error);
+        showNotification('Error declining booking', 'error');
+      }
+    }
+
+    async function completeBooking(bookingId) {
+      if (!confirm('Mark this session as completed?')) return;
+
+      try {
+        const { error } = await supabase
+          .from('Bookings')
+          .update({ status: 'completed' })
+          .eq('id', bookingId);
+
+        if (error) throw error;
+
+        showNotification('Session marked as completed!', 'success');
+        await loadBookings();
+      } catch (error) {
+        console.error('Error completing booking:', error);
+        showNotification('Error completing session', 'error');
+      }
+    }
+
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        padding: 16px 24px;
+        background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-weight: 600;
+        animation: slideIn 0.3s ease;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    async function logout() {
+      if (!confirm('Are you sure you want to logout?')) return;
+      
+      await supabase.auth.signOut();
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('navLogoutBtn').addEventListener('click', logout);
+
+    // Add animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    init();
+  </script>
+</body>
+</html>
