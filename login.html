@@ -6,12 +6,782 @@
     <title>Login - MindSpace</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            color: #2C3E50;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #5A9B8E;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4B5563;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #5A9B8E;
+        }
+        
+        .nav-links a.active {
+            color: #5A9B8E;
+            font-weight: 600;
+        }
+        
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #5A9B8E 0%, #A8D5BA 100%);
+            border-radius: 2px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 20px 60px;
+            width: 100%;
+        }
+        
+        /* Login Container */
+        .login-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        @media (max-width: 992px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+            }
+        }
+        
+        /* Login Info */
+        .login-info {
+            text-align: center;
+        }
+        
+        .login-info h1 {
+            font-size: 3rem;
+            color: #2C3E50;
+            margin-bottom: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #2C3E50 0%, #5A9B8E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .login-info p {
+            font-size: 1.1rem;
+            color: #4B5563;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .login-features {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(90, 155, 142, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #5A9B8E;
+            flex-shrink: 0;
+        }
+        
+        .feature-text h3 {
+            color: #2C3E50;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .feature-text p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        
+        /* Login Form Container */
+        .login-container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #5A9B8E 0%, #A8D5BA 100%);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-header h2 {
+            font-size: 2rem;
+            color: #2C3E50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .login-header p {
+            color: #6B7280;
+            font-size: 1rem;
+        }
+        
+        /* Form Styles */
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2C3E50;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .label-icon {
+            color: #5A9B8E;
+            font-size: 1rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #F9FAFB;
+            color: #2C3E50;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(90, 155, 142, 0.1);
+        }
+        
+        .form-input.error {
+            border-color: #EF4444;
+            background: #FEF2F2;
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6B7280;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+        }
+        
+        .password-toggle:hover {
+            color: #5A9B8E;
+        }
+        
+        /* Error Message */
+        .error-message {
+            color: #EF4444;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .form-group.error .error-message {
+            display: block;
+        }
+        
+        /* Remember Me & Forgot Password */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #5A9B8E;
+            cursor: pointer;
+        }
+        
+        .remember-me label {
+            color: #6B7280;
+            font-size: 0.9rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .forgot-password {
+            color: #5A9B8E;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .forgot-password:hover {
+            color: #4A8B7E;
+            text-decoration: underline;
+        }
+        
+        /* Submit Button */
+        .btn-login {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(90, 155, 142, 0.3);
+        }
+        
+        .btn-login:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .btn-login:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-login .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #E5E7EB;
+            z-index: 1;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Sign Up Links */
+        .signup-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 576px) {
+            .signup-links {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .btn-signup {
+            padding: 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #2C3E50;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-signup:hover {
+            background: #F5F9F8;
+            border-color: #5A9B8E;
+            transform: translateY(-2px);
+        }
+        
+        .btn-signup .icon {
+            font-size: 1.5rem;
+            color: #5A9B8E;
+        }
+        
+        .btn-signup .title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .btn-signup .subtitle {
+            font-size: 0.85rem;
+            color: #6B7280;
+        }
+        
+        /* Back Link */
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+        
+        .back-link a {
+            color: #5A9B8E;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-link a:hover {
+            color: #4A8B7E;
+            text-decoration: underline;
+        }
+        
+        /* Demo Accounts */
+        .demo-accounts {
+            background: #F5F9F8;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            border-left: 4px solid #5A9B8E;
+        }
+        
+        .demo-accounts h4 {
+            color: #2C3E50;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .demo-account {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #E5E7EB;
+        }
+        
+        .demo-account:last-child {
+            margin-bottom: 0;
+        }
+        
+        .demo-account .role {
+            font-weight: 600;
+            color: #2C3E50;
+        }
+        
+        .demo-account .credentials {
+            font-size: 0.9rem;
+            color: #6B7280;
+        }
+        
+        .demo-account .copy-btn {
+            background: #E8F3EF;
+            color: #5A9B8E;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-account .copy-btn:hover {
+            background: #5A9B8E;
+            color: white;
+        }
+        
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.8);
+            color: #2C3E50;
+            padding: 30px 20px 20px;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(229, 231, 235, 0.8);
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #5A9B8E;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: #6B7280;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #5A9B8E;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(229, 231, 235, 0.8);
+            color: #9CA3AF;
+            font-size: 0.85rem;
+            max-width: 1200px;
+            margin: 20px auto 0;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 400px;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #10B981;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #EF4444;
+        }
+        
+        .notification.info {
+            border-left: 4px solid #3B82F6;
+        }
+        
+        .notification .icon {
+            font-size: 1.5rem;
+        }
+        
+        .notification.success .icon {
+            color: #10B981;
+        }
+        
+        .notification.error .icon {
+            color: #EF4444;
+        }
+        
+        .notification.info .icon {
+            color: #3B82F6;
+        }
+        
+        .notification .message {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .notification .close-btn {
+            background: none;
+            border: none;
+            color: #6B7280;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-wrapper {
+                gap: 40px;
+            }
+            
+            .login-info h1 {
+                font-size: 2.5rem;
+            }
+            
+            .login-container {
+                padding: 40px 30px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .login-info h1 {
+                font-size: 2rem;
+            }
+            
+            .login-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .login-container {
+                padding: 30px 25px;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .feature-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #5A9B8E;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="logo">🧠 MindSpace</a>
-            <ul class="nav-links">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">MindSpace</span>
+            </a>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="how-it-works.html">How It Works</a></li>
@@ -21,87 +791,587 @@
         </div>
     </nav>
 
-    <div class="main-content">
-        <div class="auth-container">
-            <h1>Welcome Back</h1>
-            <p class="auth-subtitle">Sign in to your MindSpace account</p>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="email" placeholder="your@email.com" required>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="login-wrapper">
+            <!-- Login Information -->
+            <div class="login-info">
+                <h1>Welcome Back</h1>
+                <p>Sign in to continue your mental wellness journey with MindSpace. Access your dashboard, connect with your therapist, and track your progress.</p>
+                
+                <div class="login-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-text">
+                            <h3>Secure & Private</h3>
+                            <p>Bank-level encryption protects all your data and conversations</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">👨‍⚕️</div>
+                        <div class="feature-text">
+                            <h3>Professional Care</h3>
+                            <p>Connect with certified therapists and mental health experts</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-text">
+                            <h3>Access Anywhere</h3>
+                            <p>Access your sessions and resources from any device, anywhere</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
+                <!-- Demo Accounts (for testing purposes) -->
+                <div class="demo-accounts">
+                    <h4><i class="fas fa-vial"></i> Demo Accounts (For Testing)</h4>
+                    <div class="demo-account">
+                        <div>
+                            <div class="role">Patient Account</div>
+                            <div class="credentials">user@mindspace.com | password123</div>
+                        </div>
+                        <button class="copy-btn" onclick="copyCredentials('user@mindspace.com', 'password123')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="demo-account">
+                        <div>
+                            <div class="role">Therapist Account</div>
+                            <div class="credentials">therapist@mindspace.com | password123</div>
+                        </div>
+                        <button class="copy-btn" onclick="copyCredentials('therapist@mindspace.com', 'password123')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="demo-account">
+                        <div>
+                            <div class="role">Admin Account</div>
+                            <div class="credentials">admin@mindspace.com | password123</div>
+                        </div>
+                        <button class="copy-btn" onclick="copyCredentials('admin@mindspace.com', 'password123')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>Sign In to Your Account</h2>
+                    <p>Enter your credentials to access your dashboard</p>
                 </div>
                 
-                <button type="submit" class="btn-primary btn-full">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
-            </form>
-            
-            <div class="auth-footer">
-                <p>Don't have an account? 
-                    <a href="signup-user.html">Sign up as Patient</a> | 
-                    <a href="signup-therapist.html">Apply as Therapist</a>
-                </p>
-                <p><a href="index.html">← Back to Home</a></p>
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="label-icon">📧</span>
+                            Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            class="form-input"
+                            placeholder="you@example.com"
+                            required
+                            autocomplete="email"
+                        >
+                        <div class="error-message">Please enter a valid email address</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">
+                            <span class="label-icon">🔒</span>
+                            Password
+                        </label>
+                        <div class="password-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                class="form-input"
+                                placeholder="Enter your password"
+                                required
+                                autocomplete="current-password"
+                                minlength="6"
+                            >
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="error-message">Password must be at least 6 characters</div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="forgot-password.html" class="forgot-password">
+                            Forgot Password?
+                        </a>
+                    </div>
+                    
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <span id="btnText">Sign In</span>
+                        <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+                    </button>
+                </form>
+                
+                <div class="divider">
+                    <span>New to MindSpace?</span>
+                </div>
+                
+                <div class="signup-links">
+                    <a href="signup-user.html" class="btn-signup">
+                        <div class="icon">👤</div>
+                        <div class="title">Sign Up as Patient</div>
+                        <div class="subtitle">Find support for your mental wellness journey</div>
+                    </a>
+                    
+                    <a href="signup-therapist.html" class="btn-signup">
+                        <div class="icon">👨‍⚕️</div>
+                        <div class="title">Apply as Therapist</div>
+                        <div class="subtitle">Join our network of mental health professionals</div>
+                    </a>
+                </div>
+                
+                <div class="back-link">
+                    <a href="index.html">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Homepage
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
-            <div class="footer-section">
-                <h3>MindSpace</h3>
-                <p>Your mental wellness journey starts here.</p>
+            <div class="footer-logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">MindSpace</span>
             </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="how-it-works.html">How It Works</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="privacy.html">Privacy Policy</a></li>
-                    <li><a href="terms.html">Terms of Service</a></li>
-                </ul>
-            </div>
+            <ul class="footer-links">
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+            </ul>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 MindSpace. All rights reserved.</p>
+            <p>&copy; 2026 MindSpace Healthcare Pvt. Ltd. All rights reserved.</p>
+            <p>If you're in crisis, please contact emergency services immediately.</p>
         </div>
     </footer>
 
-    <script src="app.js"></script>
+    <!-- Supabase Configuration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Application State
+        let isLoading = false;
+        
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const loginBtn = document.getElementById('loginBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const rememberMe = document.getElementById('rememberMe');
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            checkExistingSession();
             
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const button = this.querySelector('button');
+            // Load saved credentials if "Remember me" was checked
+            loadSavedCredentials();
             
-            if (!email || !password) {
-                alert('Please enter both email and password');
+            // Initialize event listeners
+            initEventListeners();
+            
+            // Add animation to form
+            setTimeout(() => {
+                document.querySelector('.login-container').style.opacity = '1';
+                document.querySelector('.login-container').style.transform = 'translateY(0)';
+            }, 300);
+        });
+        
+        // Check Existing Session
+        async function checkExistingSession() {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('Session check error:', error);
+                    return;
+                }
+                
+                if (session) {
+                    // User is already logged in, redirect to appropriate dashboard
+                    await redirectBasedOnRole(session.user.id);
+                }
+            } catch (error) {
+                console.error('Error checking session:', error);
+            }
+        }
+        
+        // Load Saved Credentials
+        function loadSavedCredentials() {
+            const savedEmail = localStorage.getItem('mindspace_saved_email');
+            const savedRemember = localStorage.getItem('mindspace_remember_me');
+            
+            if (savedEmail && savedRemember === 'true') {
+                emailInput.value = savedEmail;
+                rememberMe.checked = true;
+            }
+        }
+        
+        // Initialize Event Listeners
+        function initEventListeners() {
+            // Password toggle
+            passwordToggle.addEventListener('click', togglePasswordVisibility);
+            
+            // Form submission
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Form validation
+            emailInput.addEventListener('blur', validateEmail);
+            passwordInput.addEventListener('blur', validatePassword);
+            
+            // Real-time validation
+            emailInput.addEventListener('input', clearError);
+            passwordInput.addEventListener('input', clearError);
+            
+            // Mobile menu toggle
+            if (menuToggle) {
+                menuToggle.addEventListener('click', toggleMobileMenu);
+            }
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', closeMobileMenu);
+        }
+        
+        // Toggle Password Visibility
+        function togglePasswordVisibility() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            passwordToggle.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        }
+        
+        // Form Validation
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!email) {
+                showError(emailInput, 'Email is required');
+                return false;
+            }
+            
+            if (!emailRegex.test(email)) {
+                showError(emailInput, 'Please enter a valid email address');
+                return false;
+            }
+            
+            clearError(emailInput);
+            return true;
+        }
+        
+        function validatePassword() {
+            const password = passwordInput.value;
+            
+            if (!password) {
+                showError(passwordInput, 'Password is required');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                showError(passwordInput, 'Password must be at least 6 characters');
+                return false;
+            }
+            
+            clearError(passwordInput);
+            return true;
+        }
+        
+        // Error Handling
+        function showError(input, message) {
+            const formGroup = input.closest('.form-group');
+            const errorElement = formGroup.querySelector('.error-message');
+            
+            formGroup.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            input.classList.add('error');
+        }
+        
+        function clearError(input) {
+            const formGroup = input.closest('.form-group');
+            const errorElement = formGroup.querySelector('.error-message');
+            
+            formGroup.classList.remove('error');
+            errorElement.style.display = 'none';
+            input.classList.remove('error');
+        }
+        
+        // Handle Login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            // Validate form
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            
+            if (!isEmailValid || !isPasswordValid) {
+                showNotification('Please fix the errors in the form', 'error');
                 return;
             }
             
-            // Disable button
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            // Set loading state
+            isLoading = true;
+            loginBtn.disabled = true;
+            btnText.textContent = 'Signing In...';
+            loadingSpinner.style.display = 'block';
             
-            await login(email, password);
+            // Get form data
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
             
-            // Re-enable button
-            button.disabled = false;
-            button.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            try {
+                // Save credentials if "Remember me" is checked
+                if (rememberMe.checked) {
+                    localStorage.setItem('mindspace_saved_email', email);
+                    localStorage.setItem('mindspace_remember_me', 'true');
+                } else {
+                    localStorage.removeItem('mindspace_saved_email');
+                    localStorage.removeItem('mindspace_remember_me');
+                }
+                
+                // Sign in with Supabase
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (authError) {
+                    throw authError;
+                }
+                
+                // Get user profile
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', authData.user.id)
+                    .single();
+                
+                if (profileError) {
+                    throw profileError;
+                }
+                
+                // Check therapist approval status
+                if (profile.role === 'therapist') {
+                    const { data: therapist, error: therapistError } = await supabase
+                        .from('Therapists')
+                        .select('approval_status')
+                        .eq('user_id', profile.id)
+                        .single();
+                    
+                    if (therapistError) {
+                        throw therapistError;
+                    }
+                    
+                    if (therapist.approval_status !== 'approved') {
+                        await supabase.auth.signOut();
+                        throw new Error('Your therapist account is pending approval. Please wait for admin approval.');
+                    }
+                }
+                
+                // Store user data in localStorage
+                const userData = {
+                    id: profile.id,
+                    email: profile.email,
+                    full_name: profile.full_name,
+                    role: profile.role,
+                    last_login: new Date().toISOString()
+                };
+                
+                localStorage.setItem('user', JSON.stringify(userData));
+                
+                // Show success message
+                showNotification(`Welcome back, ${profile.full_name || 'User'}!`, 'success');
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    redirectBasedOnRole(profile.role);
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Show appropriate error message
+                let errorMessage = 'Login failed. Please try again.';
+                
+                if (error.message.includes('Invalid login credentials')) {
+                    errorMessage = 'Invalid email or password. Please try again.';
+                } else if (error.message.includes('Email not confirmed')) {
+                    errorMessage = 'Please verify your email address before logging in.';
+                } else if (error.message.includes('pending approval')) {
+                    errorMessage = error.message;
+                }
+                
+                showNotification(errorMessage, 'error');
+                
+                // Reset form state
+                resetFormState();
+            }
+        }
+        
+        // Redirect Based on Role
+        async function redirectBasedOnRole(role) {
+            let redirectUrl = 'index.html';
+            
+            switch (role) {
+                case 'admin':
+                    redirectUrl = 'admin-dashboard.html';
+                    break;
+                case 'therapist':
+                    redirectUrl = 'dashboard.html'; // Therapist dashboard
+                    break;
+                case 'user':
+                    redirectUrl = 'dashboard.html'; // User dashboard
+                    break;
+                default:
+                    console.error('Unknown user role:', role);
+                    return;
+            }
+            
+            // Add a small delay for better UX
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 500);
+        }
+        
+        // Reset Form State
+        function resetFormState() {
+            isLoading = false;
+            loginBtn.disabled = false;
+            btnText.textContent = 'Sign In';
+            loadingSpinner.style.display = 'none';
+        }
+        
+        // Show Notification
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="icon">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+                </div>
+                <div class="message">${message}</div>
+                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Copy Demo Credentials
+        function copyCredentials(email, password) {
+            const text = `Email: ${email}\nPassword: ${password}`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Credentials copied to clipboard!', 'success');
+                
+                // Auto-fill the form
+                emailInput.value = email;
+                passwordInput.value = password;
+                rememberMe.checked = true;
+                
+                // Validate fields
+                validateEmail();
+                validatePassword();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showNotification('Failed to copy credentials', 'error');
+            });
+        }
+        
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            navLinks.classList.toggle('active');
+            menuToggle.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        }
+        
+        function closeMobileMenu(event) {
+            if (!navLinks.contains(event.target) && !menuToggle.contains(event.target) && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        }
+        
+        // Add some CSS for initial animation
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .login-container {
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: opacity 0.5s ease, transform 0.5s ease;
+                }
+                
+                .feature-item {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                    transition: opacity 0.5s ease, transform 0.5s ease;
+                }
+                
+                .feature-item:nth-child(1) { transition-delay: 0.1s; }
+                .feature-item:nth-child(2) { transition-delay: 0.2s; }
+                .feature-item:nth-child(3) { transition-delay: 0.3s; }
+                
+                .loaded .login-container {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                
+                .loaded .feature-item {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            </style>
+        `);
+        
+        // Add loaded class after page load
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
         });
     </script>
 </body>
