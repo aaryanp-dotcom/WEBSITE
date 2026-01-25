@@ -5,15 +5,609 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Dashboard - MindSpace</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .dashboard-wrapper {
+            min-height: 100vh;
+            background: #F5F9F8;
+            padding-top: 80px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .dashboard-header {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            color: #2C3E50;
+            margin: 0 0 10px 0;
+        }
+
+        .wave {
+            animation: wave 2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .user-info {
+            color: #6B7280;
+            margin: 0;
+        }
+
+        .current-date {
+            color: #6B7280;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .quick-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 32px;
+            font-weight: 800;
+            color: #5A9B8E;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 12px;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-section {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #2C3E50;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-subtitle {
+            color: #6B7280;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .therapists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .therapist-card {
+            background: #F5F9F8;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .therapist-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(90, 155, 142, 0.15);
+        }
+
+        .therapist-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .therapist-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .therapist-info {
+            flex: 1;
+        }
+
+        .therapist-name {
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            color: #2C3E50;
+        }
+
+        .therapist-specialization {
+            color: #5A9B8E;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .therapist-bio {
+            color: #6B7280;
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .booking-form {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
+        }
+
+        .btn-book {
+            width: 100%;
+            padding: 12px;
+            background: #5A9B8E;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-book:hover {
+            background: #4A8B7E;
+            transform: translateY(-2px);
+        }
+
+        .booking-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #E5E7EB;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: #5A9B8E;
+            color: white;
+            border-color: #5A9B8E;
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: #F5F9F8;
+            border-color: #5A9B8E;
+        }
+
+        .bookings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .booking-card {
+            background: #F5F9F8;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            gap: 16px;
+        }
+
+        .booking-therapist {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #2C3E50;
+        }
+
+        .booking-date-time {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .date-badge,
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+
+        .date-badge.today {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #D1ECF1;
+            color: #0C5460;
+        }
+
+        .status-cancelled {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #2C3E50;
+            font-weight: 600;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .btn-cancel {
+            padding: 10px 16px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-cancel:hover {
+            background: #d32f2f;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .loading-state,
+        .empty-state,
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #E5E7EB;
+            border-top-color: #5A9B8E;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #2C3E50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #6B7280;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 16px 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification-success {
+            border-left: 4px solid #4caf50;
+        }
+
+        .notification-error {
+            border-left: 4px solid #f44336;
+        }
+
+        .notification-warning {
+            border-left: 4px solid #ff9800;
+        }
+
+        .notification-info {
+            border-left: 4px solid #2196f3;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-card {
+            background: #F5F9F8;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .resource-icon {
+            width: 60px;
+            height: 60px;
+            background: #C9E4DE;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            color: #5A9B8E;
+        }
+
+        .resource-card h3 {
+            margin: 0 0 12px 0;
+            color: #2C3E50;
+            font-size: 18px;
+        }
+
+        .resource-card p {
+            margin: 0 0 16px 0;
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .quick-stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .therapists-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="logo">🧠 MindSpace</a>
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">MindSpace</span>
+            </a>
             <ul class="nav-links">
                 <li><a href="user-dashboard.html" class="active">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
@@ -30,111 +624,111 @@
         </div>
     </nav>
 
-    <!-- Main Dashboard Content -->
-    <main class="dashboard-container">
-        <!-- Dashboard Header -->
-        <section class="dashboard-header">
-            <div class="header-content">
-                <h1 class="welcome-title">Welcome back! <span class="wave">👋</span></h1>
-                <p class="user-info" id="userInfo">Loading user information...</p>
-                <div class="current-date" id="currentDate"></div>
-            </div>
-            <div class="header-actions">
-                <div class="quick-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalBookings">0</span>
-                        <span class="stat-label">Total Bookings</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="upcomingSessions">0</span>
-                        <span class="stat-label">Upcoming</span>
-                    </div>
+    <div class="dashboard-wrapper">
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-container">
+            <!-- Dashboard Header -->
+            <section class="dashboard-header">
+                <div class="header-content">
+                    <h1 class="welcome-title">Welcome back! <span class="wave">👋</span></h1>
+                    <p class="user-info" id="userInfo">Loading user information...</p>
+                    <div class="current-date" id="currentDate"></div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- Book a Session Section -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-calendar-plus"></i> Book a Session
-                    </h2>
-                    <p class="section-subtitle">Select a therapist and schedule your session</p>
-                </div>
-                <div class="section-body">
-                    <div id="therapist-list">
-                        <!-- Loading state -->
-                        <div class="loading-state">
-                            <div class="spinner"></div>
-                            <p>Loading available therapists...</p>
+                <div class="header-actions">
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalBookings">0</span>
+                            <span class="stat-label">Total Bookings</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="upcomingSessions">0</span>
+                            <span class="stat-label">Upcoming</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- My Bookings Section -->
-            <section class="dashboard-section">
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Book a Session Section -->
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-calendar-plus"></i> Book a Session
+                        </h2>
+                        <p class="section-subtitle">Select a therapist and schedule your session</p>
+                    </div>
+                    <div class="section-body">
+                        <div id="therapist-list">
+                            <div class="loading-state">
+                                <div class="spinner"></div>
+                                <p>Loading available therapists...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- My Bookings Section -->
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-calendar-check"></i> My Bookings
+                        </h2>
+                        <p class="section-subtitle">Manage your scheduled sessions</p>
+                    </div>
+                    <div class="section-body">
+                        <div class="booking-filters">
+                            <button class="filter-btn active" onclick="filterBookings('all')">All</button>
+                            <button class="filter-btn" onclick="filterBookings('upcoming')">Upcoming</button>
+                            <button class="filter-btn" onclick="filterBookings('pending')">Pending</button>
+                            <button class="filter-btn" onclick="filterBookings('completed')">Completed</button>
+                        </div>
+                        <div id="booking-list">
+                            <div class="loading-state">
+                                <div class="spinner"></div>
+                                <p>Loading your bookings...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Additional Resources Section -->
+            <section class="dashboard-section resources-section">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-calendar-check"></i> My Bookings
+                        <i class="fas fa-hands-helping"></i> Resources & Support
                     </h2>
-                    <p class="section-subtitle">Manage your scheduled sessions</p>
                 </div>
-                <div class="section-body">
-                    <div class="booking-filters">
-                        <button class="filter-btn active" onclick="filterBookings('all')">All</button>
-                        <button class="filter-btn" onclick="filterBookings('upcoming')">Upcoming</button>
-                        <button class="filter-btn" onclick="filterBookings('pending')">Pending</button>
-                        <button class="filter-btn" onclick="filterBookings('completed')">Completed</button>
-                    </div>
-                    <div id="booking-list">
-                        <!-- Loading state -->
-                        <div class="loading-state">
-                            <div class="spinner"></div>
-                            <p>Loading your bookings...</p>
+                <div class="resources-grid">
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-file-alt"></i>
                         </div>
+                        <h3>Session Notes</h3>
+                        <p>Access and review notes from your previous sessions</p>
+                        <button class="btn-secondary btn-small">View Notes</button>
+                    </div>
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Wellness Tools</h3>
+                        <p>Access guided meditations and wellness exercises</p>
+                        <button class="btn-secondary btn-small">Explore Tools</button>
+                    </div>
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h3>Help Center</h3>
+                        <p>Get help with booking, payments, or technical issues</p>
+                        <button class="btn-secondary btn-small">Get Help</button>
                     </div>
                 </div>
             </section>
-        </div>
-
-        <!-- Additional Resources Section -->
-        <section class="dashboard-section resources-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-hands-helping"></i> Resources & Support
-                </h2>
-            </div>
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <h3>Session Notes</h3>
-                    <p>Access and review notes from your previous sessions</p>
-                    <button class="btn-secondary btn-small">View Notes</button>
-                </div>
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h3>Wellness Tools</h3>
-                    <p>Access guided meditations and wellness exercises</p>
-                    <button class="btn-secondary btn-small">Explore Tools</button>
-                </div>
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    <h3>Help Center</h3>
-                    <p>Get help with booking, payments, or technical issues</p>
-                    <button class="btn-secondary btn-small">Get Help</button>
-                </div>
-            </div>
-        </section>
-    </main>
+        </main>
+    </div>
 
     <!-- Confirmation Modal -->
     <div id="confirmationModal" class="modal">
@@ -153,17 +747,13 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="auth.js"></script>
     <script>
         // Supabase Configuration
         const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
         
-        // Initialize Supabase client
         const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        // Global variables
         let currentUserId = null;
         let currentBookings = [];
         let pendingConfirmation = null;
@@ -171,7 +761,6 @@
         // Initialize dashboard
         async function initDashboard() {
             try {
-                // Check authentication
                 const { data: { session }, error: sessionError } = await client.auth.getSession();
 
                 if (!session || sessionError) {
@@ -181,20 +770,15 @@
 
                 currentUserId = session.user.id;
                 
-                // Update UI with user info
                 await updateUserInfo();
-                
-                // Set current date
                 updateCurrentDate();
                 
-                // Load data
                 await Promise.all([
                     loadTherapists(),
                     loadBookings()
                 ]);
                 
-                // Set up auto-refresh for bookings
-                setInterval(loadBookings, 30000); // Refresh every 30 seconds
+                setInterval(loadBookings, 30000);
                 
             } catch (error) {
                 console.error('Dashboard initialization error:', error);
@@ -208,14 +792,14 @@
             try {
                 const { data: profile, error } = await client
                     .from('profiles')
-                    .select('full_name, email, created_at')
+                    .select('fullname, email, createdat')
                     .eq('id', currentUserId)
                     .single();
 
                 if (error) throw error;
 
-                const displayName = profile.full_name || profile.email || 'User';
-                const joinDate = new Date(profile.created_at).toLocaleDateString('en-US', {
+                const displayName = profile.fullname || profile.email || 'User';
+                const joinDate = new Date(profile.createdat).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long'
                 });
@@ -242,14 +826,14 @@
             document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
         }
 
-        // Load available therapists
+        // Load available therapists (FIXED: using correct DB fields)
         async function loadTherapists() {
             try {
                 const { data: therapists, error } = await client
                     .from('Therapists')
                     .select('*')
                     .eq('Active', true)
-                    .eq('approval_status', 'approved')
+                    .eq('approvalstatus', 'approved')
                     .order('Name', { ascending: true });
 
                 if (error) throw error;
@@ -286,12 +870,11 @@
                 return;
             }
 
+            const today = new Date().toISOString().split('T')[0];
+            
             let html = '<div class="therapists-grid">';
             
             therapists.forEach(therapist => {
-                const today = new Date().toISOString().split('T')[0];
-                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-                
                 html += `
                     <article class="therapist-card">
                         <div class="therapist-header">
@@ -305,8 +888,8 @@
                                         <i class="fas fa-star"></i> ${therapist.Specialization}
                                     </div>
                                 ` : ''}
-                                ${therapist.Bio ? `
-                                    <p class="therapist-bio">${therapist.Bio.substring(0, 100)}${therapist.Bio.length > 100 ? '...' : ''}</p>
+                                ${therapist.bio ? `
+                                    <p class="therapist-bio">${therapist.bio.substring(0, 100)}${therapist.bio.length > 100 ? '...' : ''}</p>
                                 ` : ''}
                             </div>
                         </div>
@@ -320,8 +903,7 @@
                                     <input type="date" 
                                            id="date-${therapist.id}" 
                                            min="${today}"
-                                           required
-                                           onchange="updateAvailableTimes('${therapist.id}')">
+                                           required>
                                 </div>
                                 
                                 <div class="form-group">
@@ -351,9 +933,9 @@
             html += '</div>';
             container.innerHTML = html;
             
-            // Set default date to tomorrow for all forms
+            // Set default date to tomorrow
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
             document.querySelectorAll('input[type="date"]').forEach(input => {
-                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
                 input.value = tomorrow;
             });
         }
@@ -393,7 +975,7 @@
             document.getElementById('confirmationModal').style.display = 'flex';
         }
 
-        // Create booking in database
+        // Create booking in database (FIXED: using correct column names)
         async function createBooking(therapistId) {
             closeModal();
             
@@ -402,12 +984,14 @@
             
             try {
                 const bookingData = {
-                    user_id: currentUserId,
-                    therapist_id: therapistId,
-                    session_date: dateInput.value,
-                    start_time: timeInput.value,
+                    userid: currentUserId,
+                    therapistid: therapistId,
+                    sessiondate: dateInput.value,
+                    starttime: timeInput.value,
                     status: 'pending',
-                    created_at: new Date().toISOString()
+                    amount: 500,
+                    duration: 60,
+                    createdat: new Date().toISOString()
                 };
 
                 const { data, error } = await client
@@ -419,22 +1003,17 @@
                 if (error) {
                     if (error.code === '23505') {
                         showNotification('You already have a booking on this date. Please choose another.', 'error');
-                    } else if (error.code === '42501') {
-                        showNotification('Permission denied. Please contact support.', 'error');
                     } else {
                         throw error;
                     }
                     return;
                 }
 
-                // Reset form
                 dateInput.value = '';
                 timeInput.value = '';
                 
-                // Show success message
                 showNotification('Booking created successfully! You will receive a confirmation soon.', 'success');
                 
-                // Reload bookings
                 await loadBookings();
                 
             } catch (error) {
@@ -443,7 +1022,7 @@
             }
         }
 
-        // Load user bookings
+        // Load user bookings (FIXED: using correct joins)
         async function loadBookings() {
             try {
                 const { data: bookings, error } = await client
@@ -455,9 +1034,9 @@
                             Specialization
                         )
                     `)
-                    .eq('user_id', currentUserId)
-                    .order('session_date', { ascending: true })
-                    .order('start_time', { ascending: true });
+                    .eq('userid', currentUserId)
+                    .order('sessiondate', { ascending: true })
+                    .order('starttime', { ascending: true });
 
                 if (error) throw error;
 
@@ -502,7 +1081,7 @@
             
             bookings.forEach(booking => {
                 const therapist = booking.Therapists || {};
-                const date = new Date(booking.session_date);
+                const date = new Date(booking.sessiondate);
                 const now = new Date();
                 const isPast = date < now;
                 const isToday = date.toDateString() === now.toDateString();
@@ -522,14 +1101,14 @@
                         <div class="booking-header">
                             <div class="booking-main">
                                 <h3 class="booking-therapist">
-                                    <i class="fas fa-user-md"></i> ${therapist.Name || 'Unknown Therapist'}
+                                    <i class="fas fa-user-md"></i> Dr. ${therapist.Name || 'Unknown Therapist'}
                                 </h3>
                                 <div class="booking-date-time">
                                     <span class="date-badge ${isToday ? 'today' : ''}">
                                         <i class="far fa-calendar"></i> ${formattedDate}
                                     </span>
                                     <span class="time-badge">
-                                        <i class="far fa-clock"></i> ${booking.start_time}
+                                        <i class="far fa-clock"></i> ${booking.starttime}
                                     </span>
                                 </div>
                             </div>
@@ -551,53 +1130,20 @@
                                 <span class="detail-label">
                                     <i class="fas fa-clock"></i> Duration
                                 </span>
-                                <span class="detail-value">60 minutes</span>
+                                <span class="detail-value">${booking.duration || 60} minutes</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">
-                                    <i class="fas fa-calendar-alt"></i> Booked On
+                                    <i class="fas fa-rupee-sign"></i> Amount
                                 </span>
-                                <span class="detail-value">
-                                    ${new Date(booking.created_at).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                    })}
-                                </span>
+                                <span class="detail-value">₹${booking.amount || 500}</span>
                             </div>
                         </div>
-                        
-                        ${booking.meeting_link ? `
-                            <div class="meeting-section">
-                                <h4><i class="fas fa-video"></i> Meeting Link</h4>
-                                <a href="${booking.meeting_link}" 
-                                   target="_blank" 
-                                   rel="noopener noreferrer"
-                                   class="meeting-link">
-                                    <i class="fas fa-external-link-alt"></i> ${booking.meeting_link}
-                                </a>
-                                <small class="meeting-note">
-                                    <i class="fas fa-info-circle"></i> Join 5 minutes before your scheduled time
-                                </small>
-                            </div>
-                        ` : ''}
                         
                         <div class="booking-actions">
                             ${booking.status === 'pending' ? `
                                 <button class="btn-cancel" onclick="cancelBooking('${booking.id}')">
                                     <i class="fas fa-times"></i> Cancel Booking
-                                </button>
-                            ` : ''}
-                            
-                            ${booking.status === 'confirmed' && !isPast ? `
-                                <button class="btn-primary btn-small" onclick="joinSession('${booking.meeting_link}')">
-                                    <i class="fas fa-video"></i> Join Session
-                                </button>
-                            ` : ''}
-                            
-                            ${isPast ? `
-                                <button class="btn-secondary btn-small">
-                                    <i class="fas fa-file-alt"></i> View Notes
                                 </button>
                             ` : ''}
                         </div>
@@ -620,7 +1166,7 @@
             switch(filter) {
                 case 'upcoming':
                     filtered = currentBookings.filter(b => {
-                        const date = new Date(b.session_date);
+                        const date = new Date(b.sessiondate);
                         return date >= new Date() && b.status !== 'completed';
                     });
                     break;
@@ -641,7 +1187,7 @@
         function updateStats(bookings) {
             const total = bookings.length;
             const upcoming = bookings.filter(b => {
-                const date = new Date(b.session_date);
+                const date = new Date(b.sessiondate);
                 return date >= new Date() && b.status !== 'completed';
             }).length;
             
@@ -658,9 +1204,9 @@
             try {
                 const { error } = await client
                     .from('Bookings')
-                    .delete()
+                    .update({ status: 'cancelled' })
                     .eq('id', bookingId)
-                    .eq('user_id', currentUserId);
+                    .eq('userid', currentUserId);
 
                 if (error) throw error;
 
@@ -673,15 +1219,6 @@
             }
         }
 
-        // Join session
-        function joinSession(meetingLink) {
-            if (meetingLink) {
-                window.open(meetingLink, '_blank', 'noopener,noreferrer');
-            } else {
-                showNotification('Meeting link not available yet. Please wait for confirmation.', 'warning');
-            }
-        }
-
         // Modal functions
         function closeModal() {
             document.getElementById('confirmationModal').style.display = 'none';
@@ -690,21 +1227,19 @@
 
         // Show notification
         function showNotification(message, type = 'info') {
-            // Remove existing notifications
             const existing = document.querySelector('.notification');
             if (existing) existing.remove();
             
             const notification = document.createElement('div');
             notification.className = `notification notification-${type}`;
             notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
                 <span>${message}</span>
-                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                <button class="notification-close" onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#6B7280;">&times;</button>
             `;
             
             document.body.appendChild(notification);
             
-            // Auto-remove after 5 seconds
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.remove();
@@ -723,11 +1258,12 @@
             }
         }
 
-        // Logout function (from auth.js)
+        // Logout function
         async function logout() {
             try {
                 const { error } = await client.auth.signOut();
                 if (error) throw error;
+                localStorage.removeItem('user');
                 window.location.href = 'login.html';
             } catch (error) {
                 console.error('Logout error:', error);
