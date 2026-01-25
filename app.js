@@ -6,7 +6,15 @@ const SUPABASEKEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs";
 
 // Create Supabase client
-const supabase = window.supabase.createClient(SUPABASEURL, SUPABASEKEY);
+// NEW:
+let supabase;
+if (typeof window.supabase !== 'undefined' && !window.supabaseClient) {
+    supabase = window.supabase.createClient(SUPABASEURL, SUPABASEKEY);
+    window.supabaseClient = supabase;
+} else if (window.supabaseClient) {
+    supabase = window.supabaseClient;
+}
+
 window.supabaseClient = supabase; // Global access for debugging
 
 // Application State Management
