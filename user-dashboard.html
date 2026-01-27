@@ -81,46 +81,52 @@
                 </ul>
             </div>
         </nav>
-
+        
         <main class="dashboard-container">
             <div class="dashboard-header">
-                <h1 class="welcome-title">Welcome to MindSpace</h1>
-                <p style="color: #6B7280;">Find your therapist and book sessions</p>
+                <h1 class="welcome-title">Welcome Back!</h1>
+                <p id="userName" style="color: #6B7280;">Loading...</p>
             </div>
-
+            
             <section class="therapists-section">
                 <div class="section-header">
-                    <h2 class="section-title"><i class="fas fa-user-md"></i> Find Your Therapist</h2>
+                    <h2 class="section-title"><i class="fas fa-user-md"></i> Find a Therapist</h2>
                     <div class="filter-container">
-                        <label class="filter-label">Filter by Specialty:</label>
-                        <select id="specialtyFilter" class="filter-select" onchange="filterTherapists()">
-                            <option value="">All Specialties</option>
+                        <span class="filter-label">Filter by:</span>
+                        <select id="specializationFilter" class="filter-select" onchange="filterTherapists()">
+                            <option value="all">All Specializations</option>
+                            <option value="Clinical Psychology">Clinical Psychology</option>
+                            <option value="Counseling Psychology">Counseling Psychology</option>
+                            <option value="Child Psychology">Child Psychology</option>
+                            <option value="Marriage & Family Therapy">Marriage & Family Therapy</option>
+                            <option value="Cognitive Behavioral Therapy">Cognitive Behavioral Therapy</option>
+                            <option value="Trauma Therapy">Trauma Therapy</option>
+                            <option value="Addiction Counseling">Addiction Counseling</option>
+                            <option value="Career Counseling">Career Counseling</option>
                         </select>
                     </div>
                 </div>
-                <div id="therapistsList" class="therapists-grid">
+                <div id="therapistsGrid" class="therapists-grid">
                     <div class="loading">Loading therapists...</div>
                 </div>
             </section>
-
+            
             <section class="bookings-section">
                 <div class="section-header">
                     <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Bookings</h2>
                     <div class="filter-container">
-                        <label class="filter-label">Sort by Session Date:</label>
-                        <select id="dateSortFilter" class="filter-select" onchange="filterAndSortBookings()">
-                            <option value="asc">Upcoming First</option>
-                            <option value="desc">Latest First</option>
+                        <span class="filter-label">Sort by Session Date:</span>
+                        <select id="bookingSortFilter" class="filter-select" onchange="loadBookings()">
+                            <option value="upcoming">Upcoming First</option>
+                            <option value="recent">Most Recent First</option>
                         </select>
-                        
-                        <label class="filter-label">Status:</label>
-                        <select id="statusFilter" class="filter-select" onchange="filterAndSortBookings()">
+                        <span class="filter-label">Status:</span>
+                        <select id="bookingStatusFilter" class="filter-select" onchange="loadBookings()">
                             <option value="all">All Bookings</option>
-                            <option value="confirmed">Confirmed Only</option>
-                            <option value="pending">Pending Only</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
                             <option value="completed">Completed</option>
-                            <option value="rejected">Rejected Only</option>
-                            <option value="cancelled">Cancelled Only</option>
+                            <option value="rejected">Rejected</option>
                         </select>
                     </div>
                 </div>
@@ -130,18 +136,13 @@
             </section>
         </main>
     </div>
-
+    
     <!-- Profile Modal -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">My Profile</h2>
                 <button class="close-modal" onclick="closeProfileModal()">&times;</button>
-            </div>
-            
-            <div class="profile-info">
-                <div class="profile-info-label">EMAIL</div>
-                <div class="profile-info-value" id="profileEmail">-</div>
             </div>
             
             <form class="profile-form" onsubmit="saveProfile(event)">
@@ -151,23 +152,13 @@
                 </div>
                 
                 <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="profileEmail" class="form-input" readonly style="background: #F5F9F8;">
+                </div>
+                
+                <div class="form-group">
                     <label class="form-label">Phone Number</label>
                     <input type="tel" id="profilePhone" class="form-input" placeholder="Enter your phone number">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Date of Birth</label>
-                    <input type="date" id="profileDOB" class="form-input">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Bio / About Me</label>
-                    <textarea id="profileBio" class="form-textarea" placeholder="Tell us a bit about yourself..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Address</label>
-                    <textarea id="profileAddress" class="form-textarea" placeholder="Enter your address"></textarea>
                 </div>
                 
                 <button type="submit" class="btn-save">
@@ -176,12 +167,12 @@
             </form>
         </div>
     </div>
-
+    
     <!-- Reschedule Modal -->
     <div id="rescheduleModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Reschedule Session</h2>
+                <h2 class="modal-title">Request Reschedule</h2>
                 <button class="close-modal" onclick="closeRescheduleModal()">&times;</button>
             </div>
             
@@ -206,125 +197,115 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Reason for Rescheduling</label>
-                    <textarea id="rescheduleReason" class="form-textarea" placeholder="Optional: Let us know why you need to reschedule"></textarea>
+                    <label class="form-label">Reason (Optional)</label>
+                    <textarea id="rescheduleReason" class="form-textarea" placeholder="Let your therapist know why you need to reschedule"></textarea>
                 </div>
                 
                 <button type="submit" class="btn-save">
-                    <i class="fas fa-calendar-alt"></i> Request Reschedule
+                    <i class="fas fa-calendar-alt"></i> Send Reschedule Request
                 </button>
             </form>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
         let currentUser = null;
+        let currentUserProfile = null;
         let allTherapists = [];
-        let allBookings = [];
         let currentRescheduleBookingId = null;
-
+        
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🔵 Dashboard script started');
-            
             currentUser = JSON.parse(localStorage.getItem('user'));
             console.log('🔵 User dashboard loaded. User:', currentUser);
-
+            
             if (!currentUser || currentUser.role !== 'user') {
-                alert('Access denied. Please login as a user.');
+                alert('Please login as a user to access this page');
                 window.location.href = 'login.html';
                 return;
             }
-
-            const dobInput = document.getElementById('profileDOB');
-            dobInput.max = new Date().toISOString().split('T')[0];
-
-            const rescheduleDate = document.getElementById('rescheduleDate');
-            rescheduleDate.min = new Date().toISOString().split('T')[0];
-
+            
+            // Set min date for booking
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                input.min = today;
+            });
+            
+            await loadUserProfile();
             await loadTherapists();
             await loadBookings();
-            await loadUserProfile();
         });
-
+        
+        async function loadUserProfile() {
+            console.log('🔵 Loading user profile...');
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+                
+                if (error) throw error;
+                
+                currentUserProfile = data;
+                document.getElementById('userName').textContent = data.full_name || currentUser.email;
+                
+                console.log('🟢 User profile loaded:', data);
+            } catch (error) {
+                console.error('🔴 Error loading profile:', error);
+                document.getElementById('userName').textContent = currentUser.email;
+            }
+        }
+        
         async function loadTherapists() {
             console.log('🔵 Loading therapists...');
-            const container = document.getElementById('therapistsList');
-
+            const container = document.getElementById('therapistsGrid');
+            
             try {
                 const { data: therapists, error } = await window.supabaseClient
                     .from('Therapists')
                     .select('*')
-                    .eq('Active', true);
-
+                    .order('Name', { ascending: true });
+                
                 console.log('🔵 Therapists data:', therapists);
-
+                
                 if (error) throw error;
-
+                
                 if (!therapists || therapists.length === 0) {
-                    container.innerHTML = '<div class="empty-state">No therapists available</div>';
+                    container.innerHTML = '<div class="empty-state">No therapists available at the moment</div>';
                     return;
                 }
-
+                
                 allTherapists = therapists;
-                populateSpecialtyFilter(therapists);
                 displayTherapists(therapists);
-
+                
                 console.log('🟢 Loaded', therapists.length, 'therapists');
             } catch (error) {
                 console.error('🔴 Error loading therapists:', error);
-                container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
+                container.innerHTML = '<div class="empty-state">Error loading therapists: ' + error.message + '</div>';
             }
         }
-
-        function populateSpecialtyFilter(therapists) {
-            const filterSelect = document.getElementById('specialtyFilter');
-            const specialties = [...new Set(therapists.map(t => t.Specialization).filter(Boolean))];
-            
-            filterSelect.innerHTML = '<option value="">All Specialties</option>';
-            
-            specialties.sort().forEach(specialty => {
-                const option = document.createElement('option');
-                option.value = specialty;
-                option.textContent = specialty;
-                filterSelect.appendChild(option);
-            });
-        }
-
-        function filterTherapists() {
-            const selectedSpecialty = document.getElementById('specialtyFilter').value;
-            
-            if (!selectedSpecialty) {
-                displayTherapists(allTherapists);
-            } else {
-                const filtered = allTherapists.filter(t => t.Specialization === selectedSpecialty);
-                displayTherapists(filtered);
-            }
-        }
-
+        
         function displayTherapists(therapists) {
-            const container = document.getElementById('therapistsList');
+            const container = document.getElementById('therapistsGrid');
             
-            if (therapists.length === 0) {
-                container.innerHTML = '<div class="empty-state">No therapists found for this specialty</div>';
-                return;
-            }
-
             container.innerHTML = therapists.map(t => `
                 <div class="therapist-card">
-                    <h3 class="therapist-name">${t.Name || 'Therapist'}</h3>
+                    <h3 class="therapist-name">Dr. ${t.Name || 'Therapist'}</h3>
                     <div class="therapist-specialty">${t.Specialization || 'General Therapy'}</div>
-                    <div class="therapist-fee">₹${t.fee || 700} per session</div>
-                    <p class="therapist-bio">${t.bio || 'Experienced therapist'}</p>
-
+                    <div class="therapist-fee">₹${t.fee || 0} per session</div>
+                    ${t.bio ? `<div class="therapist-bio">${t.bio}</div>` : ''}
+                    
                     <div class="booking-form">
                         <input type="date" 
                                id="date-${t.id}" 
                                class="form-input" 
                                min="${new Date().toISOString().split('T')[0]}"
-                               placeholder="Select date">
-                        <select id="time-${t.id}" class="form-select">
+                               required>
+                        
+                        <select id="time-${t.id}" class="form-select" required>
                             <option value="">Select time</option>
                             <option value="09:00 AM">09:00 AM</option>
                             <option value="10:00 AM">10:00 AM</option>
@@ -334,17 +315,31 @@
                             <option value="04:00 PM">04:00 PM</option>
                             <option value="05:00 PM">05:00 PM</option>
                         </select>
+                        
                         <textarea id="problem-${t.id}" 
                                   class="form-textarea" 
-                                  placeholder="Briefly describe what you'd like to work on (optional)"></textarea>
-                        <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee || 700})">
-                            <i class="fas fa-check"></i> Book Session
+                                  placeholder="Briefly describe what you'd like to work on *" 
+                                  required></textarea>
+                        
+                        <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee})">
+                            <i class="fas fa-calendar-plus"></i> Book Session
                         </button>
                     </div>
                 </div>
             `).join('');
         }
-
+        
+        function filterTherapists() {
+            const specialization = document.getElementById('specializationFilter').value;
+            
+            if (specialization === 'all') {
+                displayTherapists(allTherapists);
+            } else {
+                const filtered = allTherapists.filter(t => t.Specialization === specialization);
+                displayTherapists(filtered);
+            }
+        }
+        
         async function bookSession(therapistId, therapistName, fee) {
             const date = document.getElementById('date-' + therapistId).value;
             const time = document.getElementById('time-' + therapistId).value;
@@ -354,229 +349,268 @@
                 alert('Please select both date and time');
                 return;
             }
+            
+            if (!problemDesc) {
+                alert('Please describe what you\'d like to work on');
+                return;
+            }
 
-            console.log('🔵 Booking session:', { therapistId, date, time, fee, problemDesc });
+            console.log('🔵 Booking session:', { therapistId, date, time, problemDesc });
 
             try {
-                const authUserId = currentUser.auth_id || currentUser.user_id;
+                // Check for booking conflicts (same date + time slot)
+                const { data: conflictingBookings, error: conflictError } = await window.supabaseClient
+                    .from('Bookings')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('session_date', date)
+                    .eq('start_time', time)
+                    .in('status', ['pending', 'confirmed']);
+
+                if (conflictError) throw conflictError;
+
+                if (conflictingBookings && conflictingBookings.length > 0) {
+                    alert('⚠️ You already have a booking at this time slot. Please choose a different time.');
+                    return;
+                }
+
+                // Calculate session end time (assuming 1-hour sessions)
+                const startHour = parseInt(time.split(':')[0]);
+                const isPM = time.includes('PM');
+                let endHour = startHour + 1;
                 
+                if (isPM && startHour !== 12) {
+                    endHour = (startHour + 1) % 12;
+                }
+                
+                const endTime = endHour + ':00 ' + (isPM ? 'PM' : 'AM');
+
+                // Create booking
+                const bookingData = {
+                    user_id: currentUser.id,
+                    therapist_id: therapistId,
+                    session_date: date,
+                    start_time: time,
+                    end_time: endTime,
+                    amount: fee || 0,
+                    status: 'pending',
+                    patient_name: currentUserProfile?.full_name || currentUser.email,
+                    patient_email: currentUser.email,
+                    problem_description: problemDesc
+                };
+
+                console.log('🔵 Creating booking:', bookingData);
+
                 const { data, error } = await window.supabaseClient
                     .from('Bookings')
-                    .insert([{
-                        user_id: authUserId,
-                        therapist_id: therapistId,
-                        session_date: date,
-                        start_time: time,
-                        status: 'pending',
-                        amount: fee,
-                        problem_description: problemDesc || null
-                    }])
+                    .insert([bookingData])
                     .select();
 
                 if (error) throw error;
 
-                alert('✅ Booking request sent! Waiting for therapist confirmation.');
+                console.log('🟢 Booking created:', data);
+                alert('✅ Session booked successfully! The therapist will confirm your appointment soon.');
 
+                // Clear form
                 document.getElementById('date-' + therapistId).value = '';
                 document.getElementById('time-' + therapistId).value = '';
                 document.getElementById('problem-' + therapistId).value = '';
 
+                // Reload bookings
                 await loadBookings();
 
-                console.log('🟢 Booking created:', data);
             } catch (error) {
                 console.error('🔴 Booking error:', error);
-                alert('Error: ' + error.message);
+                alert('Error booking session: ' + error.message);
             }
         }
-
+        
         async function loadBookings() {
-            console.log('🔵 Loading bookings for user:', currentUser);
+            console.log('🔵 Loading bookings...');
             const container = document.getElementById('bookingsList');
+            const sortBy = document.getElementById('bookingSortFilter').value;
+            const statusFilter = document.getElementById('bookingStatusFilter').value;
             
-            const authUserId = currentUser.auth_id || currentUser.user_id;
-
             try {
-                const { data: bookings, error } = await window.supabaseClient
+                let query = window.supabaseClient
                     .from('Bookings')
                     .select('*')
-                    .eq('user_id', authUserId);
-
-                console.log('🔵 Bookings data:', bookings);
-
+                    .eq('user_id', currentUser.id);
+                
+                // Apply status filter
+                if (statusFilter !== 'all') {
+                    query = query.eq('status', statusFilter);
+                }
+                
+                // Apply sorting
+                if (sortBy === 'upcoming') {
+                    query = query.order('session_date', { ascending: true });
+                } else {
+                    query = query.order('session_date', { ascending: false });
+                }
+                
+                const { data: bookings, error } = await query;
+                
+                console.log('🔵 Bookings:', bookings);
+                
                 if (error) throw error;
-
+                
                 if (!bookings || bookings.length === 0) {
-                    container.innerHTML = '<div class="empty-state">No bookings yet. Book your first session above!</div>';
-                    allBookings = [];
+                    container.innerHTML = '<div class="empty-state">No bookings found</div>';
                     return;
                 }
-
-                allBookings = bookings;
-                filterAndSortBookings();
-
+                
+                // Get therapist details
+                const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
+                const { data: therapists } = await window.supabaseClient
+                    .from('Therapists')
+                    .select('id, Name, Specialization')
+                    .in('id', therapistIds);
+                
+                const therapistMap = {};
+                if (therapists) {
+                    therapists.forEach(t => {
+                        therapistMap[t.id] = t;
+                    });
+                }
+                
+                // Display bookings
+                container.innerHTML = bookings.map(booking => {
+                    const therapist = therapistMap[booking.therapist_id] || {};
+                    const statusClass = 'status-' + booking.status;
+                    const hasTherapistReschedule = booking.therapist_reschedule_requested === true;
+                    
+                    return `
+                        <div class="booking-card">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                                <div>
+                                    <h3 style="font-size: 20px; font-weight: 700; color: #2C3E50; margin: 0 0 5px 0;">
+                                        Dr. ${therapist.Name || 'Therapist'}
+                                    </h3>
+                                    <div style="color: #5A9B8E; font-size: 14px; font-weight: 600; margin-bottom: 10px;">
+                                        ${therapist.Specialization || 'Therapy'}
+                                    </div>
+                                    <span class="status-badge ${statusClass}">${booking.status.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px; margin-bottom: 15px;">
+                                <div>
+                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
+                                    <div style="color: #2C3E50;">${formatDate(booking.session_date)}</div>
+                                </div>
+                                <div>
+                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
+                                    <div style="color: #2C3E50;">${booking.start_time || 'TBD'}</div>
+                                </div>
+                                <div>
+                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
+                                    <div style="color: #2C3E50;">₹${booking.amount || 0}</div>
+                                </div>
+                            </div>
+                            
+                            ${booking.problem_description ? `
+                                <div class="info-box">
+                                    <div class="info-box-title"><i class="fas fa-comment-dots"></i> Your Concern</div>
+                                    <div class="info-box-text">${booking.problem_description}</div>
+                                </div>
+                            ` : ''}
+                            
+                            ${hasTherapistReschedule ? `
+                                <div style="margin-top: 15px; padding: 15px; background: #FFF3CD; border-radius: 8px; border-left: 4px solid #F59E0B;">
+                                    <div style="font-weight: 700; color: #856404; margin-bottom: 10px;">
+                                        <i class="fas fa-info-circle"></i> Therapist Requested Reschedule
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px; margin-bottom: 10px;">
+                                        <div>
+                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">SUGGESTED DATE</div>
+                                            <div style="color: #2C3E50; font-weight: 700;">${formatDate(booking.therapist_reschedule_date)}</div>
+                                        </div>
+                                        <div>
+                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">SUGGESTED TIME</div>
+                                            <div style="color: #2C3E50; font-weight: 700;">${booking.therapist_reschedule_time || 'N/A'}</div>
+                                        </div>
+                                    </div>
+                                    ${booking.therapist_reschedule_reason ? `
+                                        <div style="margin-top: 10px;">
+                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px; font-size: 12px;">REASON</div>
+                                            <div style="color: #2C3E50; font-size: 13px;">${booking.therapist_reschedule_reason}</div>
+                                        </div>
+                                    ` : ''}
+                                    <div class="action-buttons">
+                                        <button class="btn-accept" onclick="acceptTherapistReschedule('${booking.id}', '${booking.therapist_reschedule_date}', '${booking.therapist_reschedule_time}')">
+                                            <i class="fas fa-check"></i> Accept New Time
+                                        </button>
+                                        <button class="btn-reschedule" onclick="openRescheduleModal('${booking.id}')">
+                                            <i class="fas fa-calendar-alt"></i> Suggest Different Time
+                                        </button>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${booking.next_session_notes ? `
+                                <div style="margin-top: 15px; padding: 15px; background: #E0F2F1; border-radius: 8px; border-left: 4px solid #5A9B8E;">
+                                    <div style="font-weight: 700; color: #2C3E50; margin-bottom: 8px; font-size: 14px;">
+                                        <i class="fas fa-clipboard-list"></i> Preparation for Next Session
+                                    </div>
+                                    <div style="color: #4B5563; font-size: 13px; line-height: 1.5;">${booking.next_session_notes}</div>
+                                </div>
+                            ` : ''}
+                            
+                            ${booking.status === 'confirmed' && booking.meeting_link ? `
+                                <div style="margin-top: 15px; padding: 15px; background: #D4EDDA; border-radius: 8px; border-left: 4px solid #28a745;">
+                                    <div style="font-weight: 700; color: #155724; margin-bottom: 10px;">
+                                        <i class="fas fa-video"></i> Session Confirmed
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div style="color: #155724; font-size: 12px; font-weight: 600; margin-bottom: 5px;">MEETING LINK</div>
+                                        <a href="${booking.meeting_link}" target="_blank" style="color: #5A9B8E; text-decoration: underline; word-break: break-all;">
+                                            ${booking.meeting_link}
+                                        </a>
+                                    </div>
+                                    <div class="action-buttons">
+                                        <a href="${booking.meeting_link}" target="_blank" class="btn-join">
+                                            <i class="fas fa-video"></i> Join Session
+                                        </a>
+                                        <button class="btn-reschedule" onclick="openRescheduleModal('${booking.id}')">
+                                            <i class="fas fa-calendar-alt"></i> Request Reschedule
+                                        </button>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${booking.status === 'pending' && !hasTherapistReschedule ? `
+                                <div class="action-buttons">
+                                    <button class="btn-reschedule" onclick="openRescheduleModal('${booking.id}')">
+                                        <i class="fas fa-calendar-alt"></i> Request Reschedule
+                                    </button>
+                                    <button class="btn-cancel" onclick="cancelBooking('${booking.id}')">
+                                        <i class="fas fa-times"></i> Cancel Booking
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
                 console.log('🟢 Loaded', bookings.length, 'bookings');
             } catch (error) {
                 console.error('🔴 Error loading bookings:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
         }
-
-        async function filterAndSortBookings() {
-            const container = document.getElementById('bookingsList');
-            const sortOrder = document.getElementById('dateSortFilter').value;
-            const statusFilter = document.getElementById('statusFilter').value;
-
-            if (!allBookings || allBookings.length === 0) {
-                container.innerHTML = '<div class="empty-state">No bookings yet. Book your first session above!</div>';
-                return;
-            }
-
-            let filteredBookings = allBookings;
-            if (statusFilter !== 'all') {
-                filteredBookings = allBookings.filter(b => b.status === statusFilter);
-            }
-
-            filteredBookings.sort((a, b) => {
-                const dateA = new Date(a.session_date);
-                const dateB = new Date(b.session_date);
-                
-                if (sortOrder === 'asc') {
-                    return dateA - dateB;
-                } else {
-                    return dateB - dateA;
-                }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
             });
-
-            if (filteredBookings.length === 0) {
-                container.innerHTML = '<div class="empty-state">No bookings match the selected filters</div>';
-                return;
-            }
-
-            const therapistIds = [...new Set(filteredBookings.map(b => b.therapist_id))];
-            const { data: therapists } = await window.supabaseClient
-                .from('Therapists')
-                .select('id, Name, Specialization')
-                .in('id', therapistIds);
-
-            const therapistMap = {};
-            therapists.forEach(t => {
-                therapistMap[t.id] = t;
-            });
-
-            container.innerHTML = filteredBookings.map(b => {
-                const therapist = therapistMap[b.therapist_id] || {};
-                const statusClass = 'status-' + b.status;
-                const canModify = b.status === 'pending' || b.status === 'confirmed';
-                const hasTherapistReschedule = b.therapist_reschedule_requested === true;
-
-                return `
-                    <div class="booking-card">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                            <div>
-                                <h3 style="font-size: 20px; font-weight: 700; color: #2C3E50; margin: 0 0 5px 0;">
-                                    ${therapist.Name || 'Therapist'}
-                                </h3>
-                                <p style="color: #5A9B8E; margin: 0; font-weight: 600;">${therapist.Specialization || ''}</p>
-                            </div>
-                            <span class="status-badge ${statusClass}">${b.status.toUpperCase()}</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px;">
-                            <div>
-                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
-                                <div style="color: #2C3E50;">${new Date(b.session_date).toLocaleDateString('en-IN')}</div>
-                            </div>
-                            <div>
-                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
-                                <div style="color: #2C3E50;">${b.start_time}</div>
-                            </div>
-                            <div>
-                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
-                                <div style="color: #2C3E50;">₹${b.amount || 700}</div>
-                            </div>
-                        </div>
-                        
-                        ${hasTherapistReschedule ? `
-                            <div style="margin-top: 15px; padding: 15px; background: #FEF3C7; border-radius: 8px; border-left: 4px solid #F59E0B;">
-                                <div style="font-weight: 700; color: #92400E; margin-bottom: 10px;">
-                                    <i class="fas fa-clock"></i> Therapist Suggested New Time
-                                </div>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px; margin-bottom: 10px;">
-                                    <div>
-                                        <div style="color: #92400E; font-weight: 600; margin-bottom: 4px;">NEW DATE</div>
-                                        <div style="color: #2C3E50; font-weight: 700;">${new Date(b.therapist_reschedule_date).toLocaleDateString('en-IN')}</div>
-                                    </div>
-                                    <div>
-                                        <div style="color: #92400E; font-weight: 600; margin-bottom: 4px;">NEW TIME</div>
-                                        <div style="color: #2C3E50; font-weight: 700;">${b.therapist_reschedule_time || 'N/A'}</div>
-                                    </div>
-                                </div>
-                                ${b.therapist_reschedule_reason ? `
-                                    <div style="margin-top: 10px;">
-                                        <div style="color: #92400E; font-weight: 600; margin-bottom: 4px; font-size: 12px;">REASON</div>
-                                        <div style="color: #2C3E50; font-size: 13px;">${b.therapist_reschedule_reason}</div>
-                                    </div>
-                                ` : ''}
-                                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                                    <button class="btn-accept" onclick="acceptTherapistReschedule('${b.id}', '${b.therapist_reschedule_date}', '${b.therapist_reschedule_time}')">
-                                        <i class="fas fa-check"></i> Accept New Time
-                                    </button>
-                                    <button class="btn-reschedule" onclick="openRescheduleModal('${b.id}')">
-                                        <i class="fas fa-calendar-alt"></i> Suggest Different Time
-                                    </button>
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        ${b.next_session_notes ? `
-                            <div class="info-box">
-                                <div class="info-box-title"><i class="fas fa-clipboard-list"></i> Next Session Agenda</div>
-                                <div class="info-box-text">${b.next_session_notes}</div>
-                            </div>
-                        ` : ''}
-                        
-                        ${b.status === 'confirmed' && b.meeting_link ? `
-                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
-                                <a href="${b.meeting_link}" target="_blank" class="btn-join">
-                                    <i class="fas fa-video"></i> Join Meeting
-                                </a>
-                            </div>
-                        ` : ''}
-                        ${b.status === 'pending' ? `
-                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; color: #6B7280; font-size: 13px; margin-bottom: 10px;">
-                                <i class="fas fa-clock"></i> Waiting for therapist confirmation...
-                            </div>
-                        ` : ''}
-                        ${canModify && !hasTherapistReschedule ? `
-                            <div class="action-buttons">
-                                <button class="btn-reschedule" onclick="openRescheduleModal('${b.id}')">
-                                    <i class="fas fa-calendar-alt"></i> Reschedule
-                                </button>
-                                <button class="btn-cancel" onclick="cancelBooking('${b.id}')">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                            </div>
-                        ` : ''}
-                        ${b.status === 'cancelled' ? `
-                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; color: #6B7280; font-size: 13px;">
-                                <i class="fas fa-ban"></i> This session was cancelled
-                            </div>
-                        ` : ''}
-                        ${b.status === 'completed' ? `
-                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; color: #10B981; font-size: 13px; font-weight: 600;">
-                                <i class="fas fa-check-circle"></i> Session completed
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
         }
-
+        
         async function acceptTherapistReschedule(bookingId, newDate, newTime) {
-            if (!confirm('Accept the new time suggested by your therapist?')) {
-                return;
-            }
-            
             console.log('🔵 Accepting therapist reschedule:', bookingId);
             
             try {
@@ -588,16 +622,15 @@
                         therapist_reschedule_requested: false,
                         therapist_reschedule_date: null,
                         therapist_reschedule_time: null,
-                        therapist_reschedule_reason: null,
-                        status: 'confirmed'
+                        therapist_reschedule_reason: null
                     })
                     .eq('id', bookingId)
                     .select();
                 
                 if (error) throw error;
                 
-                console.log('🟢 Therapist reschedule accepted:', data);
-                alert('✅ New time confirmed!');
+                console.log('🟢 Reschedule accepted:', data);
+                alert('✅ Reschedule accepted! Your session has been updated.');
                 await loadBookings();
                 
             } catch (error) {
@@ -605,20 +638,14 @@
                 alert('Error: ' + error.message);
             }
         }
-
-        function openProfileModal() {
-            document.getElementById('profileModal').classList.add('active');
-        }
-
-        function closeProfileModal() {
-            document.getElementById('profileModal').classList.remove('active');
-        }
-
+        
         function openRescheduleModal(bookingId) {
             currentRescheduleBookingId = bookingId;
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('rescheduleDate').min = today;
             document.getElementById('rescheduleModal').classList.add('active');
         }
-
+        
         function closeRescheduleModal() {
             currentRescheduleBookingId = null;
             document.getElementById('rescheduleDate').value = '';
@@ -626,15 +653,15 @@
             document.getElementById('rescheduleReason').value = '';
             document.getElementById('rescheduleModal').classList.remove('active');
         }
-
+        
         async function submitReschedule(event) {
             event.preventDefault();
             console.log('🔵 Submitting reschedule request...');
-
+            
             const newDate = document.getElementById('rescheduleDate').value;
             const newTime = document.getElementById('rescheduleTime').value;
             const reason = document.getElementById('rescheduleReason').value;
-
+            
             try {
                 const { data, error } = await window.supabaseClient
                     .from('Bookings')
@@ -642,7 +669,7 @@
                         reschedule_requested: true,
                         reschedule_new_date: newDate,
                         reschedule_new_start_time: newTime,
-                        reschedule_reason: reason,
+                        reschedule_reason: reason || null,
                         therapist_reschedule_requested: false,
                         therapist_reschedule_date: null,
                         therapist_reschedule_time: null,
@@ -650,48 +677,92 @@
                     })
                     .eq('id', currentRescheduleBookingId)
                     .select();
-
+                
                 if (error) throw error;
-
+                
                 console.log('🟢 Reschedule request sent:', data);
-                alert('✅ Reschedule request sent! The therapist will review and respond.');
+                alert('✅ Reschedule request sent to therapist!');
                 
                 closeRescheduleModal();
                 await loadBookings();
-
+                
             } catch (error) {
-                console.error('🔴 Reschedule error:', error);
+                console.error('🔴 Error requesting reschedule:', error);
                 alert('Error: ' + error.message);
             }
         }
-
+        
         async function cancelBooking(bookingId) {
             if (!confirm('Are you sure you want to cancel this booking?')) {
                 return;
             }
-
+            
             console.log('🔵 Cancelling booking:', bookingId);
-
+            
             try {
                 const { data, error } = await window.supabaseClient
                     .from('Bookings')
-                    .update({ status: 'cancelled' })
+                    .delete()
                     .eq('id', bookingId)
                     .select();
-
-                if (error) throw error;
-
-                console.log('🟢 Booking cancelled:', data);
-                alert('✅ Booking cancelled successfully.');
                 
+                if (error) throw error;
+                
+                console.log('🟢 Booking cancelled:', data);
+                alert('✅ Booking cancelled successfully');
                 await loadBookings();
-
+                
             } catch (error) {
-                console.error('🔴 Cancel error:', error);
+                console.error('🔴 Error cancelling booking:', error);
                 alert('Error: ' + error.message);
             }
         }
-
+        
+        function openProfileModal() {
+            if (currentUserProfile) {
+                document.getElementById('profileName').value = currentUserProfile.full_name || '';
+                document.getElementById('profileEmail').value = currentUser.email;
+                document.getElementById('profilePhone').value = currentUserProfile.phone || '';
+            }
+            document.getElementById('profileModal').classList.add('active');
+        }
+        
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+        
+        async function saveProfile(event) {
+            event.preventDefault();
+            console.log('🔵 Saving profile...');
+            
+            try {
+                const profileData = {
+                    full_name: document.getElementById('profileName').value,
+                    phone: document.getElementById('profilePhone').value
+                };
+                
+                const { data, error } = await window.supabaseClient
+                    .from('profiles')
+                    .update(profileData)
+                    .eq('user_id', currentUser.id)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Profile updated:', data);
+                alert('✅ Profile updated successfully!');
+                
+                currentUserProfile = { ...currentUserProfile, ...profileData };
+                document.getElementById('userName').textContent = profileData.full_name;
+                
+                closeProfileModal();
+                
+            } catch (error) {
+                console.error('🔴 Error saving profile:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
         window.onclick = function(event) {
             const profileModal = document.getElementById('profileModal');
             const rescheduleModal = document.getElementById('rescheduleModal');
@@ -701,94 +772,6 @@
             }
             if (event.target === rescheduleModal) {
                 closeRescheduleModal();
-            }
-        }
-
-        async function loadUserProfile() {
-            console.log('🔵 Loading user profile...');
-            
-            try {
-                const authUserId = currentUser.auth_id || currentUser.user_id;
-                
-                if (!authUserId) {
-                    console.error('🔴 No user ID found');
-                    document.getElementById('profileEmail').textContent = currentUser.email || '-';
-                    return;
-                }
-                
-                const { data: userData, error } = await window.supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('user_id', authUserId)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') {
-                    throw error;
-                }
-
-                if (!userData) {
-                    console.log('🟡 Profile not found, will create on save');
-                    document.getElementById('profileEmail').textContent = currentUser.email || '-';
-                    return;
-                }
-
-                console.log('🟢 User profile data:', userData);
-
-                document.getElementById('profileEmail').textContent = currentUser.email || userData.email || '-';
-                document.getElementById('profileName').value = userData.full_name || '';
-                document.getElementById('profilePhone').value = userData.phone || '';
-                document.getElementById('profileDOB').value = userData.date_of_birth || '';
-                document.getElementById('profileBio').value = userData.bio || '';
-                document.getElementById('profileAddress').value = userData.address || '';
-
-            } catch (error) {
-                console.error('🔴 Error loading user profile:', error);
-            }
-        }
-
-        async function saveProfile(event) {
-            event.preventDefault();
-            console.log('🔵 Saving profile...');
-
-            try {
-                const authUserId = currentUser.auth_id || currentUser.user_id;
-                
-                if (!authUserId) {
-                    throw new Error('User ID not found. Please log in again.');
-                }
-                
-                const profileData = {
-                    user_id: authUserId,
-                    full_name: document.getElementById('profileName').value,
-                    phone: document.getElementById('profilePhone').value,
-                    date_of_birth: document.getElementById('profileDOB').value || null,
-                    bio: document.getElementById('profileBio').value,
-                    address: document.getElementById('profileAddress').value,
-                    email: currentUser.email,
-                    role: currentUser.role
-                };
-
-                console.log('🔵 Saving profile data:', profileData);
-
-                const { data, error } = await window.supabaseClient
-                    .from('profiles')
-                    .upsert(profileData, { 
-                        onConflict: 'user_id',
-                        ignoreDuplicates: false 
-                    })
-                    .select();
-
-                if (error) throw error;
-
-                console.log('🟢 Profile saved:', data);
-                alert('✅ Profile saved successfully!');
-                closeProfileModal();
-                
-                await loadUserProfile();
-
-            } catch (error) {
-                console.error('🔴 Error saving profile:', error);
-                alert('Error saving profile: ' + error.message);
             }
         }
     </script>
