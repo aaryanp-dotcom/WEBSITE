@@ -96,10 +96,10 @@
                 <div class="section-header">
                     <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Bookings</h2>
                     <div class="filter-container">
-                        <label class="filter-label">Sort by:</label>
+                        <label class="filter-label">Sort by Session Date:</label>
                         <select id="dateSortFilter" class="filter-select" onchange="filterAndSortBookings()">
-                            <option value="desc">Newest First</option>
-                            <option value="asc">Oldest First</option>
+                            <option value="asc">Upcoming First</option>
+                            <option value="desc">Latest First</option>
                         </select>
                         
                         <label class="filter-label">Status:</label>
@@ -143,8 +143,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Age</label>
-                    <input type="number" id="profileAge" class="form-input" placeholder="Enter your age" min="1" max="120">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" id="profileDOB" class="form-input" max="<?php echo date('Y-m-d'); ?>">
                 </div>
                 
                 <div class="form-group">
@@ -180,6 +180,10 @@
                 window.location.href = 'login.html';
                 return;
             }
+
+            // Set max date for DOB to today
+            const dobInput = document.getElementById('profileDOB');
+            dobInput.max = new Date().toISOString().split('T')[0];
 
             await loadTherapists();
             await loadBookings();
@@ -377,15 +381,15 @@
                 filteredBookings = allBookings.filter(b => b.status === statusFilter);
             }
 
-            // Sort by date
+            // Sort by SESSION DATE (not created_at)
             filteredBookings.sort((a, b) => {
                 const dateA = new Date(a.session_date);
                 const dateB = new Date(b.session_date);
                 
                 if (sortOrder === 'asc') {
-                    return dateA - dateB; // Oldest first
+                    return dateA - dateB; // Upcoming first (earliest date first)
                 } else {
-                    return dateB - dateA; // Newest first
+                    return dateB - dateA; // Latest first (most recent date first)
                 }
             });
 
@@ -474,20 +478,24 @@
             
             try {
                 const { data: userData, error } = await window.supabaseClient
-                    .from('Users')
+                    .from('profiles')
                     .select('*')
-                    .eq('id', currentUser.id)
+                    .eq('user_id', currentUser.id)
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    console.log('🟡 Profile not found, will create on save');
+                    document.getElementById('profileEmail').textContent = currentUser.email || '-';
+                    return;
+                }
 
                 console.log('🔵 User profile data:', userData);
 
                 // Populate profile fields
-                document.getElementById('profileEmail').textContent = userData.email || '-';
+                document.getElementById('profileEmail').textContent = currentUser.email || '-';
                 document.getElementById('profileName').value = userData.name || '';
                 document.getElementById('profilePhone').value = userData.phone || '';
-                document.getElementById('profileAge').value = userData.age || '';
+                document.getElementById('profileDOB').value = userData.date_of_birth || '';
                 document.getElementById('profileBio').value = userData.bio || '';
                 document.getElementById('profileAddress').value = userData.address || '';
 
@@ -501,29 +509,42 @@
             console.log('🔵 Saving profile...');
 
             const profileData = {
+                user_id: currentUser.id,
                 name: document.getElementById('profileName').value,
                 phone: document.getElementById('profilePhone').value,
-                age: document.getElementById('profileAge').value || null,
+                date_of_birth: document.getElementById('profileDOB').value || null,
                 bio: document.getElementById('profileBio').value,
                 address: document.getElementById('profileAddress').value
             };
 
             try {
-                const { data, error } = await window.supabaseClient
-                    .from('Users')
-                    .update(profileData)
-                    .eq('id', currentUser.id)
-                    .select();
+                // Try to update first
+                const { data: existing } = await window.supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
 
-                if (error) throw error;
+                let result;
+                if (existing) {
+                    // Update existing profile
+                    result = await window.supabaseClient
+                        .from('profiles')
+                        .update(profileData)
+                        .eq('user_id', currentUser.id)
+                        .select();
+                } else {
+                    // Insert new profile
+                    result = await window.supabaseClient
+                        .from('profiles')
+                        .insert([profileData])
+                        .select();
+                }
 
-                console.log('🟢 Profile updated:', data);
-                alert('✅ Profile updated successfully!');
-                
-                // Update localStorage
-                currentUser = { ...currentUser, ...profileData };
-                localStorage.setItem('user', JSON.stringify(currentUser));
-                
+                if (result.error) throw result.error;
+
+                console.log('🟢 Profile saved:', result.data);
+                alert('✅ Profile saved successfully!');
                 closeProfileModal();
 
             } catch (error) {
