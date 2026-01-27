@@ -35,6 +35,11 @@
         .modal-title { font-size: 28px; font-weight: 700; color: #2C3E50; margin: 0; }
         .close-modal { background: none; border: none; font-size: 28px; color: #6B7280; cursor: pointer; }
         .close-modal:hover { color: #2C3E50; }
+        
+        .filter-section { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; align-items: center; }
+        .filter-input, .filter-select { padding: 10px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; min-width: 200px; }
+        .filter-input { flex: 1; }
+        .filter-label { color: #6B7280; font-weight: 600; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -97,6 +102,12 @@
                 <h2 class="modal-title">All Therapists</h2>
                 <button class="close-modal" onclick="closeModal('therapistsModal')">&times;</button>
             </div>
+            <div class="filter-section">
+                <input type="text" id="therapistSearchInput" class="filter-input" placeholder="Search by name..." oninput="filterTherapistsList()">
+                <select id="therapistSpecFilter" class="filter-select" onchange="filterTherapistsList()">
+                    <option value="">All Specializations</option>
+                </select>
+            </div>
             <div id="therapistsModalContent">
                 <div class="loading">Loading...</div>
             </div>
@@ -109,6 +120,9 @@
             <div class="modal-header">
                 <h2 class="modal-title">All Users</h2>
                 <button class="close-modal" onclick="closeModal('usersModal')">&times;</button>
+            </div>
+            <div class="filter-section">
+                <input type="text" id="userSearchInput" class="filter-input" placeholder="Search by name..." oninput="filterUsersList()">
             </div>
             <div id="usersModalContent">
                 <div class="loading">Loading...</div>
@@ -123,6 +137,12 @@
                 <h2 class="modal-title">All Bookings</h2>
                 <button class="close-modal" onclick="closeModal('bookingsModal')">&times;</button>
             </div>
+            <div class="filter-section">
+                <label class="filter-label">Filter by Doctor:</label>
+                <select id="bookingDoctorFilter" class="filter-select" onchange="filterBookingsList()">
+                    <option value="">All Doctors</option>
+                </select>
+            </div>
             <div id="bookingsModalContent">
                 <div class="loading">Loading...</div>
             </div>
@@ -135,6 +155,18 @@
             <div class="modal-header">
                 <h2 class="modal-title">Revenue Details</h2>
                 <button class="close-modal" onclick="closeModal('revenueModal')">&times;</button>
+            </div>
+            <div class="filter-section">
+                <label class="filter-label">Filter by:</label>
+                <select id="revenueDoctorFilter" class="filter-select" onchange="filterRevenueList()">
+                    <option value="">All Doctors</option>
+                </select>
+                <select id="revenueSpecFilter" class="filter-select" onchange="filterRevenueList()">
+                    <option value="">All Specializations</option>
+                </select>
+                <select id="revenueUserFilter" class="filter-select" onchange="filterRevenueList()">
+                    <option value="">All Users</option>
+                </select>
             </div>
             <div id="revenueModalContent">
                 <div class="loading">Loading...</div>
@@ -149,6 +181,8 @@
         let allTherapists = [];
         let allUsers = [];
         let allBookings = [];
+        let therapistMap = {};
+        let userMap = {};
         
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
@@ -179,6 +213,9 @@
                 allUsers = usersRes.data || [];
                 allBookings = bookingsRes.data || [];
                 
+                allTherapists.forEach(t => { therapistMap[t.id] = t; });
+                allUsers.forEach(u => { userMap[u.id] = u; });
+                
                 document.getElementById('totalTherapists').textContent = allTherapists.length;
                 document.getElementById('totalUsers').textContent = allUsers.length;
                 document.getElementById('totalBookings').textContent = allBookings.length;
@@ -200,11 +237,34 @@
         
         async function showTherapistsModal() {
             const modal = document.getElementById('therapistsModal');
-            const content = document.getElementById('therapistsModalContent');
-            
             modal.classList.add('active');
             
-            if (allTherapists.length === 0) {
+            const specFilter = document.getElementById('therapistSpecFilter');
+            const specializations = [...new Set(allTherapists.map(t => t.Specialization).filter(Boolean))];
+            specFilter.innerHTML = '<option value="">All Specializations</option>' + 
+                specializations.map(s => `<option value="${s}">${s}</option>`).join('');
+            
+            document.getElementById('therapistSearchInput').value = '';
+            filterTherapistsList();
+        }
+        
+        function filterTherapistsList() {
+            const searchTerm = document.getElementById('therapistSearchInput').value.toLowerCase();
+            const specFilter = document.getElementById('therapistSpecFilter').value;
+            
+            let filtered = allTherapists.filter(t => {
+                const matchesSearch = !searchTerm || (t.Name || '').toLowerCase().includes(searchTerm);
+                const matchesSpec = !specFilter || t.Specialization === specFilter;
+                return matchesSearch && matchesSpec;
+            });
+            
+            displayTherapistsList(filtered);
+        }
+        
+        function displayTherapistsList(therapists) {
+            const content = document.getElementById('therapistsModalContent');
+            
+            if (therapists.length === 0) {
                 content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No therapists found</p>';
                 return;
             }
@@ -221,7 +281,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${allTherapists.map(t => `
+                        ${therapists.map(t => `
                             <tr>
                                 <td>${t.Name || 'N/A'}</td>
                                 <td>${t.Specialization || 'N/A'}</td>
@@ -237,11 +297,26 @@
         
         async function showUsersModal() {
             const modal = document.getElementById('usersModal');
-            const content = document.getElementById('usersModalContent');
-            
             modal.classList.add('active');
             
-            if (allUsers.length === 0) {
+            document.getElementById('userSearchInput').value = '';
+            filterUsersList();
+        }
+        
+        function filterUsersList() {
+            const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+            
+            let filtered = allUsers.filter(u => {
+                return !searchTerm || (u.full_name || '').toLowerCase().includes(searchTerm);
+            });
+            
+            displayUsersList(filtered);
+        }
+        
+        function displayUsersList(users) {
+            const content = document.getElementById('usersModalContent');
+            
+            if (users.length === 0) {
                 content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No users found</p>';
                 return;
             }
@@ -258,7 +333,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${allUsers.map(u => `
+                        ${users.map(u => `
                             <tr>
                                 <td>${u.full_name || 'N/A'}</td>
                                 <td>${u.email || 'N/A'}</td>
@@ -274,33 +349,36 @@
         
         async function showBookingsModal() {
             const modal = document.getElementById('bookingsModal');
-            const content = document.getElementById('bookingsModalContent');
-            
             modal.classList.add('active');
             
-            if (allBookings.length === 0) {
+            const doctorFilter = document.getElementById('bookingDoctorFilter');
+            const doctors = [...new Set(allBookings.map(b => b.therapist_id))];
+            doctorFilter.innerHTML = '<option value="">All Doctors</option>' + 
+                doctors.map(id => {
+                    const therapist = therapistMap[id] || {};
+                    return `<option value="${id}">${therapist.Name || 'Therapist'}</option>`;
+                }).join('');
+            
+            filterBookingsList();
+        }
+        
+        function filterBookingsList() {
+            const doctorFilter = document.getElementById('bookingDoctorFilter').value;
+            
+            let filtered = allBookings.filter(b => {
+                return !doctorFilter || b.therapist_id === doctorFilter;
+            });
+            
+            displayBookingsList(filtered);
+        }
+        
+        function displayBookingsList(bookings) {
+            const content = document.getElementById('bookingsModalContent');
+            
+            if (bookings.length === 0) {
                 content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No bookings found</p>';
                 return;
             }
-            
-            const therapistIds = [...new Set(allBookings.map(b => b.therapist_id))];
-            const userIds = [...new Set(allBookings.map(b => b.user_id))].filter(id => id);
-            
-            const { data: therapists } = await window.supabaseClient
-                .from('Therapists')
-                .select('id, Name')
-                .in('id', therapistIds);
-            
-            const { data: users } = await window.supabaseClient
-                .from('profiles')
-                .select('id, full_name')
-                .in('id', userIds);
-            
-            const therapistMap = {};
-            therapists?.forEach(t => { therapistMap[t.id] = t; });
-            
-            const userMap = {};
-            users?.forEach(u => { userMap[u.id] = u; });
             
             content.innerHTML = `
                 <table>
@@ -315,7 +393,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${allBookings.map(b => {
+                        ${bookings.map(b => {
                             const therapist = therapistMap[b.therapist_id] || {};
                             const user = userMap[b.user_id] || {};
                             const statusClass = 'status-' + b.status;
@@ -338,41 +416,66 @@
         
         async function showRevenueModal() {
             const modal = document.getElementById('revenueModal');
-            const content = document.getElementById('revenueModalContent');
-            
             modal.classList.add('active');
             
             const confirmedBookings = allBookings.filter(b => b.status === 'confirmed');
             
-            if (confirmedBookings.length === 0) {
-                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No confirmed bookings yet</p>';
+            const doctorFilter = document.getElementById('revenueDoctorFilter');
+            const doctors = [...new Set(confirmedBookings.map(b => b.therapist_id))];
+            doctorFilter.innerHTML = '<option value="">All Doctors</option>' + 
+                doctors.map(id => {
+                    const therapist = therapistMap[id] || {};
+                    return `<option value="${id}">${therapist.Name || 'Therapist'}</option>`;
+                }).join('');
+            
+            const specFilter = document.getElementById('revenueSpecFilter');
+            const specializations = [...new Set(doctors.map(id => therapistMap[id]?.Specialization).filter(Boolean))];
+            specFilter.innerHTML = '<option value="">All Specializations</option>' + 
+                specializations.map(s => `<option value="${s}">${s}</option>`).join('');
+            
+            const userFilter = document.getElementById('revenueUserFilter');
+            const users = [...new Set(confirmedBookings.map(b => b.user_id).filter(Boolean))];
+            userFilter.innerHTML = '<option value="">All Users</option>' + 
+                users.map(id => {
+                    const user = userMap[id] || {};
+                    return `<option value="${id}">${user.full_name || 'User'}</option>`;
+                }).join('');
+            
+            filterRevenueList();
+        }
+        
+        function filterRevenueList() {
+            const doctorFilter = document.getElementById('revenueDoctorFilter').value;
+            const specFilter = document.getElementById('revenueSpecFilter').value;
+            const userFilter = document.getElementById('revenueUserFilter').value;
+            
+            let filtered = allBookings.filter(b => {
+                if (b.status !== 'confirmed') return false;
+                
+                const matchesDoctor = !doctorFilter || b.therapist_id === doctorFilter;
+                const therapist = therapistMap[b.therapist_id] || {};
+                const matchesSpec = !specFilter || therapist.Specialization === specFilter;
+                const matchesUser = !userFilter || b.user_id === userFilter;
+                
+                return matchesDoctor && matchesSpec && matchesUser;
+            });
+            
+            displayRevenueList(filtered);
+        }
+        
+        function displayRevenueList(bookings) {
+            const content = document.getElementById('revenueModalContent');
+            
+            if (bookings.length === 0) {
+                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No confirmed bookings found</p>';
                 return;
             }
             
-            const therapistIds = [...new Set(confirmedBookings.map(b => b.therapist_id))];
-            const userIds = [...new Set(confirmedBookings.map(b => b.user_id))].filter(id => id);
-            
-            const { data: therapists } = await window.supabaseClient
-                .from('Therapists')
-                .select('id, Name')
-                .in('id', therapistIds);
-            
-            const { data: users } = await window.supabaseClient
-                .from('profiles')
-                .select('id, full_name')
-                .in('id', userIds);
-            
-            const therapistMap = {};
-            therapists?.forEach(t => { therapistMap[t.id] = t; });
-            
-            const userMap = {};
-            users?.forEach(u => { userMap[u.id] = u; });
-            
-            const totalRevenue = confirmedBookings.reduce((sum, b) => sum + (b.amount || 700), 0);
+            const totalRevenue = bookings.reduce((sum, b) => sum + (b.amount || 700), 0);
             
             content.innerHTML = `
                 <div style="background: #F5F9F8; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-                    <div style="font-size: 14px; color: #6B7280; margin-bottom: 5px;">TOTAL REVENUE</div>
+                    <div style="font-size: 14px; color: #6B7280; margin-bottom: 5px;">FILTERED REVENUE</div>
                     <div style="font-size: 36px; font-weight: 800; color: #5A9B8E;">₹${totalRevenue}</div>
                 </div>
                 <table>
@@ -380,12 +483,13 @@
                         <tr>
                             <th>Patient</th>
                             <th>Therapist</th>
+                            <th>Specialization</th>
                             <th>Date</th>
                             <th>Amount</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${confirmedBookings.map(b => {
+                        ${bookings.map(b => {
                             const therapist = therapistMap[b.therapist_id] || {};
                             const user = userMap[b.user_id] || {};
                             
@@ -393,6 +497,7 @@
                                 <tr>
                                     <td>${user.full_name || 'Patient'}</td>
                                     <td>${therapist.Name || 'Therapist'}</td>
+                                    <td>${therapist.Specialization || 'N/A'}</td>
                                     <td>${new Date(b.session_date).toLocaleDateString('en-IN')}</td>
                                     <td style="font-weight: 700; color: #5A9B8E;">₹${b.amount || 700}</td>
                                 </tr>
@@ -516,39 +621,6 @@
                     container.innerHTML = '<p style="text-align: center; color: #6B7280; padding: 20px;">No bookings yet</p>';
                     return;
                 }
-                
-                const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
-                const userIds = [...new Set(bookings.map(b => b.user_id))].filter(id => id);
-                
-                let therapistMap = {};
-                let userMap = {};
-                
-                const { data: therapists } = await window.supabaseClient
-                    .from('Therapists')
-                    .select('id, Name')
-                    .in('id', therapistIds);
-                
-                therapists?.forEach(t => {
-                    therapistMap[t.id] = t;
-                });
-                
-                for (const userId of userIds) {
-                    try {
-                        const { data: user } = await window.supabaseClient
-                            .from('profiles')
-                            .select('id, full_name')
-                            .eq('id', userId)
-                            .maybeSingle();
-                        
-                        if (user) {
-                            userMap[user.id] = user;
-                        }
-                    } catch (err) {
-                        console.warn('Could not load user:', userId);
-                    }
-                }
-                
-                console.log('🔵 Therapists:', therapistMap, 'Users:', userMap);
                 
                 container.innerHTML = `
                     <table>
