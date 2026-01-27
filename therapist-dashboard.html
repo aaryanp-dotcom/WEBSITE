@@ -19,7 +19,8 @@
         .section-title { font-size: 24px; color: #2C3E50; margin: 0 0 20px 0; }
         .appointments-list { display: flex; flex-direction: column; gap: 16px; }
         .appointment-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
-        .patient-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 8px 0; }
+        .patient-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 4px 0; }
+        .patient-email { font-size: 14px; color: #6B7280; margin: 0 0 8px 0; }
         .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .status-pending { background: #FFF3CD; color: #856404; }
         .status-confirmed { background: #D4EDDA; color: #155724; }
@@ -113,12 +114,12 @@
                 if (error) throw error;
                 
                 therapistData = data;
-                document.getElementById('therapistName').textContent = (data.Name || 'Therapist');
+                document.getElementById('therapistName').textContent = data.Name || 'Therapist';
                 
-                console.log('🟢 Therapist profile loaded');
+                console.log('🟢 Therapist data loaded');
             } catch (error) {
                 console.error('🔴 Error loading therapist data:', error);
-                alert('Error loading profile: ' + error.message);
+                document.getElementById('therapistName').textContent = 'Error loading profile';
             }
         }
         
@@ -127,108 +128,145 @@
             const container = document.getElementById('appointmentsList');
             
             if (!therapistData) {
-                container.innerHTML = '<div class="loading">Loading therapist profile first...</div>';
-                setTimeout(loadAppointments, 1000);
+                container.innerHTML = '<div class="empty-state">Unable to load therapist data</div>';
                 return;
             }
             
             try {
-                const { data: appointments, error: appointmentsError } = await window.supabaseClient
+                const { data: appointments, error } = await window.supabaseClient
                     .from('Bookings')
                     .select('*')
                     .eq('therapist_id', therapistData.id)
-                    .order('session_date', { ascending: false });
+                    .order('session_date', { ascending: true });
                 
                 console.log('🔵 Appointments:', appointments);
                 
-                if (appointmentsError) throw appointmentsError;
-                
-                document.getElementById('totalAppointments').textContent = appointments.length;
-                document.getElementById('pendingCount').textContent = appointments.filter(a => a.status === 'pending').length;
-                document.getElementById('confirmedCount').textContent = appointments.filter(a => a.status === 'confirmed').length;
-                
-                const totalRevenue = appointments
-                    .filter(a => a.status === 'confirmed')
-                    .reduce((sum, a) => sum + (a.amount || 700), 0);
-                document.getElementById('totalRevenue').textContent = '₹' + totalRevenue;
+                if (error) throw error;
                 
                 if (!appointments || appointments.length === 0) {
                     container.innerHTML = '<div class="empty-state">No appointments yet</div>';
+                    updateStats(0, 0, 0, 0);
                     return;
                 }
                 
-                const userIds = [...new Set(appointments.map(a => a.user_id))].filter(id => id);
-                let patientMap = {};
+                // Calculate stats
+                const total = appointments.length;
+                const pending = appointments.filter(a => a.status === 'pending').length;
+                const confirmed = appointments.filter(a => a.status === 'confirmed').length;
+                const revenue = appointments
+                    .filter(a => a.status === 'confirmed')
+                    .reduce((sum, a) => sum + (a.amount || 0), 0);
                 
-                if (userIds.length > 0) {
-                    for (const userId of userIds) {
-                        try {
-                            const { data: patient } = await window.supabaseClient
-                                .from('profiles')
-                                .select('id, full_name, email, phone')
-                                .eq('id', userId)
-                                .maybeSingle();
-                            
-                            if (patient) {
-                                patientMap[patient.id] = patient;
-                            }
-                        } catch (err) {
-                            console.warn('Could not load patient:', userId);
-                        }
-                    }
+                updateStats(total, pending, confirmed, revenue);
+                
+                // Get user details for appointments
+                const userIds = [...new Set(appointments.map(a => a.user_id))];
+                const { data: users } = await window.supabaseClient
+                    .from('profiles')
+                    .select('user_id, full_name, email')
+                    .in('user_id', userIds);
+                
+                const userMap = {};
+                if (users) {
+                    users.forEach(u => {
+                        userMap[u.user_id] = u;
+                    });
                 }
                 
-                console.log('🟢 Patients loaded:', patientMap);
-                
-                container.innerHTML = appointments.map(a => {
-                    const patient = patientMap[a.user_id] || {};
-                    const statusClass = 'status-' + a.status;
+                // Display appointments
+                container.innerHTML = appointments.map(apt => {
+                    const user = userMap[apt.user_id] || {};
+                    const statusClass = 'status-' + apt.status;
+                    const hasRescheduleRequest = apt.reschedule_requested === true;
                     
                     return `
                         <div class="appointment-card">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
                                 <div>
-                                    <h3 class="patient-name">${patient.full_name || 'Patient'}</h3>
-                                    <p style="color: #6B7280; margin: 0;">${patient.email || ''}</p>
-                                    <p style="color: #6B7280; margin: 5px 0 0 0;">${patient.phone || ''}</p>
+                                    <h3 class="patient-name">${user.full_name || 'Patient'}</h3>
+                                    <p class="patient-email">${user.email || 'No email available'}</p>
+                                    <span class="status-badge ${statusClass}">${apt.status.toUpperCase()}</span>
+                                    ${hasRescheduleRequest ? `
+                                        <span class="status-badge" style="background: #FFA500; color: white; margin-left: 8px;">
+                                            <i class="fas fa-clock"></i> RESCHEDULE REQUEST
+                                        </span>
+                                    ` : ''}
                                 </div>
-                                <span class="status-badge ${statusClass}">${a.status.toUpperCase()}</span>
                             </div>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 14px;">
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px;">
                                 <div>
                                     <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
-                                    <div style="color: #2C3E50;">${new Date(a.session_date).toLocaleDateString('en-IN')}</div>
+                                    <div style="color: #2C3E50;">${formatDate(apt.session_date)}</div>
                                 </div>
                                 <div>
                                     <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
-                                    <div style="color: #2C3E50;">${a.start_time}</div>
+                                    <div style="color: #2C3E50;">${apt.start_time || '10:00 AM'}</div>
                                 </div>
                                 <div>
                                     <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
-                                    <div style="color: #2C3E50;">₹${a.amount || 700}</div>
+                                    <div style="color: #2C3E50;">₹${apt.amount || 0}</div>
                                 </div>
                             </div>
-                            ${a.status === 'pending' ? `
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
-                                    <input type="url" 
-                                           id="meeting-link-${a.id}" 
-                                           class="form-input" 
-                                           placeholder="Enter meeting link (e.g., Google Meet, Zoom)"
-                                           style="margin-bottom: 10px;">
-                                    <div>
-                                        <button class="btn-confirm" onclick="confirmBooking('${a.id}')">
-                                            <i class="fas fa-check"></i> Confirm & Add Link
+                            
+                            ${hasRescheduleRequest ? `
+                                <div style="margin-top: 15px; padding: 15px; background: #FFF3CD; border-radius: 8px; border-left: 4px solid #FFA500;">
+                                    <div style="font-weight: 700; color: #856404; margin-bottom: 10px;">
+                                        <i class="fas fa-info-circle"></i> Patient Requested Reschedule
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px; margin-bottom: 10px;">
+                                        <div>
+                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">NEW DATE</div>
+                                            <div style="color: #2C3E50; font-weight: 700;">${formatDate(apt.reschedule_new_date)}</div>
+                                        </div>
+                                        <div>
+                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">NEW TIME</div>
+                                            <div style="color: #2C3E50; font-weight: 700;">${apt.reschedule_new_start_time || 'N/A'}</div>
+                                        </div>
+                                    </div>
+                                    ${apt.reschedule_reason ? `
+                                        <div style="margin-top: 10px;">
+                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px; font-size: 12px;">REASON</div>
+                                            <div style="color: #2C3E50; font-size: 13px;">${apt.reschedule_reason}</div>
+                                        </div>
+                                    ` : ''}
+                                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                        <button class="btn-confirm" onclick="approveReschedule('${apt.id}', '${apt.reschedule_new_date}', '${apt.reschedule_new_start_time}')">
+                                            <i class="fas fa-check"></i> Approve Reschedule
                                         </button>
-                                        <button class="btn-reject" onclick="rejectBooking('${a.id}')">
+                                        <button class="btn-reject" onclick="rejectReschedule('${apt.id}')">
                                             <i class="fas fa-times"></i> Reject
                                         </button>
                                     </div>
                                 </div>
                             ` : ''}
-                            ${a.status === 'confirmed' && a.meeting_link ? `
+                            
+                            ${apt.status === 'pending' && !hasRescheduleRequest ? `
+                                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                                    <input type="text" 
+                                           id="meeting-link-${apt.id}" 
+                                           class="form-input" 
+                                           placeholder="Enter meeting link (e.g., Google Meet, Zoom)" 
+                                           style="margin-bottom: 10px;">
+                                    <div style="display: flex; gap: 10px;">
+                                        <button class="btn-confirm" onclick="confirmAppointment('${apt.id}')">
+                                            <i class="fas fa-check"></i> Confirm & Add Link
+                                        </button>
+                                        <button class="btn-reject" onclick="rejectAppointment('${apt.id}')">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${apt.status === 'confirmed' && apt.meeting_link ? `
                                 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
-                                    <p style="color: #6B7280; font-size: 13px; margin-bottom: 5px;">Meeting Link:</p>
-                                    <a href="${a.meeting_link}" target="_blank" style="color: #5A9B8E; word-break: break-all;">${a.meeting_link}</a>
+                                    <div style="color: #6B7280; font-size: 12px; margin-bottom: 5px;">MEETING LINK</div>
+                                    <div style="color: #5A9B8E; word-break: break-all;">
+                                        <a href="${apt.meeting_link}" target="_blank" style="color: #5A9B8E; text-decoration: underline;">
+                                            ${apt.meeting_link}
+                                        </a>
+                                    </div>
                                 </div>
                             ` : ''}
                         </div>
@@ -237,68 +275,143 @@
                 
                 console.log('🟢 Loaded', appointments.length, 'appointments');
             } catch (error) {
-                console.error('🔴 Error:', error);
+                console.error('🔴 Error loading appointments:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
         }
         
-        async function confirmBooking(bookingId) {
-            const meetingLink = document.getElementById('meeting-link-' + bookingId).value.trim();
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function updateStats(total, pending, confirmed, revenue) {
+            document.getElementById('totalAppointments').textContent = total;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('confirmedCount').textContent = confirmed;
+            document.getElementById('totalRevenue').textContent = '₹' + revenue;
+        }
+        
+        async function approveReschedule(appointmentId, newDate, newTime) {
+            console.log('🔵 Approving reschedule:', appointmentId);
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({
+                        session_date: newDate,
+                        start_time: newTime,
+                        reschedule_requested: false,
+                        reschedule_new_date: null,
+                        reschedule_new_start_time: null,
+                        reschedule_reason: null,
+                        status: 'confirmed'
+                    })
+                    .eq('id', appointmentId)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Reschedule approved:', data);
+                alert('✅ Reschedule approved! Session updated to new date/time.');
+                await loadAppointments();
+                
+            } catch (error) {
+                console.error('🔴 Error approving reschedule:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function rejectReschedule(appointmentId) {
+            if (!confirm('Reject this reschedule request? The original date/time will remain.')) {
+                return;
+            }
+            
+            console.log('🔵 Rejecting reschedule:', appointmentId);
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({
+                        reschedule_requested: false,
+                        reschedule_new_date: null,
+                        reschedule_new_start_time: null,
+                        reschedule_reason: null
+                    })
+                    .eq('id', appointmentId)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Reschedule rejected:', data);
+                alert('✅ Reschedule request rejected. Original booking remains.');
+                await loadAppointments();
+                
+            } catch (error) {
+                console.error('🔴 Error rejecting reschedule:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function confirmAppointment(appointmentId) {
+            const meetingLink = document.getElementById('meeting-link-' + appointmentId).value.trim();
             
             if (!meetingLink) {
                 alert('Please enter a meeting link');
                 return;
             }
             
-            if (!meetingLink.startsWith('http')) {
-                alert('Please enter a valid URL (must start with http:// or https://)');
-                return;
-            }
-            
-            console.log('🔵 Confirming booking:', bookingId, 'with link:', meetingLink);
+            console.log('🔵 Confirming appointment:', appointmentId);
             
             try {
-                const { error } = await window.supabaseClient
+                const { data, error } = await window.supabaseClient
                     .from('Bookings')
                     .update({
                         status: 'confirmed',
                         meeting_link: meetingLink
                     })
-                    .eq('id', bookingId);
+                    .eq('id', appointmentId)
+                    .select();
                 
                 if (error) throw error;
                 
-                alert('✅ Booking confirmed! Meeting link sent to patient.');
+                console.log('🟢 Appointment confirmed:', data);
+                alert('✅ Appointment confirmed!');
                 await loadAppointments();
                 
-                console.log('🟢 Booking confirmed');
             } catch (error) {
-                console.error('🔴 Error:', error);
+                console.error('🔴 Error confirming:', error);
                 alert('Error: ' + error.message);
             }
         }
         
-        async function rejectBooking(bookingId) {
-            if (!confirm('Are you sure you want to reject this booking?')) return;
+        async function rejectAppointment(appointmentId) {
+            if (!confirm('Are you sure you want to reject this appointment?')) {
+                return;
+            }
             
-            console.log('🔵 Rejecting booking:', bookingId);
+            console.log('🔵 Rejecting appointment:', appointmentId);
             
             try {
-                const { error } = await window.supabaseClient
+                const { data, error } = await window.supabaseClient
                     .from('Bookings')
-                    .update({
-                        status: 'rejected'
-                    })
-                    .eq('id', bookingId);
+                    .update({ status: 'rejected' })
+                    .eq('id', appointmentId)
+                    .select();
                 
                 if (error) throw error;
                 
-                alert('❌ Booking rejected');
+                console.log('🟢 Appointment rejected:', data);
+                alert('✅ Appointment rejected');
                 await loadAppointments();
                 
-                console.log('🟢 Booking rejected');
             } catch (error) {
-                console.error('🔴 Error:', error);
+                console.error('🔴 Error rejecting:', error);
                 alert('Error: ' + error.message);
             }
         }
