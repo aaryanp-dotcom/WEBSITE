@@ -347,10 +347,12 @@
             console.log('🔵 Booking session:', { therapistId, date, time, fee });
 
             try {
+                const authUserId = currentUser.auth_id || currentUser.user_id;
+                
                 const { data, error } = await window.supabaseClient
                     .from('Bookings')
                     .insert([{
-                        user_id: currentUser.id,
+                        user_id: authUserId,
                         therapist_id: therapistId,
                         session_date: date,
                         start_time: time,
@@ -376,14 +378,16 @@
         }
 
         async function loadBookings() {
-            console.log('🔵 Loading bookings for user:', currentUser.id);
+            console.log('🔵 Loading bookings for user:', currentUser);
             const container = document.getElementById('bookingsList');
+            
+            const authUserId = currentUser.auth_id || currentUser.user_id;
 
             try {
                 const { data: bookings, error } = await window.supabaseClient
                     .from('Bookings')
                     .select('*')
-                    .eq('user_id', currentUser.id);
+                    .eq('user_id', authUserId);
 
                 console.log('🔵 Bookings data:', bookings);
 
@@ -607,10 +611,18 @@
             console.log('🔵 Loading user profile...');
             
             try {
+                const authUserId = currentUser.auth_id || currentUser.user_id;
+                
+                if (!authUserId) {
+                    console.error('🔴 No user ID found');
+                    document.getElementById('profileEmail').textContent = currentUser.email || '-';
+                    return;
+                }
+                
                 const { data: userData, error } = await window.supabaseClient
                     .from('profiles')
                     .select('*')
-                    .eq('user_id', currentUser.id)
+                    .eq('user_id', authUserId)
                     .single();
 
                 if (error && error.code !== 'PGRST116') {
@@ -623,7 +635,7 @@
                     return;
                 }
 
-                console.log('🔵 User profile data:', userData);
+                console.log('🟢 User profile data:', userData);
 
                 document.getElementById('profileEmail').textContent = currentUser.email || userData.email || '-';
                 document.getElementById('profileName').value = userData.full_name || '';
@@ -642,8 +654,14 @@
             console.log('🔵 Saving profile...');
 
             try {
+                const authUserId = currentUser.auth_id || currentUser.user_id;
+                
+                if (!authUserId) {
+                    throw new Error('User ID not found. Please log in again.');
+                }
+                
                 const profileData = {
-                    user_id: currentUser.id,
+                    user_id: authUserId,
                     full_name: document.getElementById('profileName').value,
                     phone: document.getElementById('profilePhone').value,
                     date_of_birth: document.getElementById('profileDOB').value || null,
@@ -653,7 +671,8 @@
                     role: currentUser.role
                 };
 
-                // Use UPSERT to insert or update based on user_id
+                console.log('🔵 Saving profile data:', profileData);
+
                 const { data, error } = await window.supabaseClient
                     .from('profiles')
                     .upsert(profileData, { 
@@ -667,6 +686,8 @@
                 console.log('🟢 Profile saved:', data);
                 alert('✅ Profile saved successfully!');
                 closeProfileModal();
+                
+                await loadUserProfile();
 
             } catch (error) {
                 console.error('🔴 Error saving profile:', error);
