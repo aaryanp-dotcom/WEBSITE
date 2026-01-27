@@ -405,32 +405,6 @@
             display: block;
         }
         
-        /* Strength Indicator */
-        .password-strength {
-            margin-top: 8px;
-            display: flex;
-            gap: 5px;
-            height: 4px;
-        }
-        
-        .strength-bar {
-            flex: 1;
-            background: #E5E7EB;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-        
-        .strength-bar.active {
-            background: #10B981;
-        }
-        
-        .strength-text {
-            font-size: 0.8rem;
-            color: #6B7280;
-            margin-top: 5px;
-            display: none;
-        }
-        
         /* Submit Button */
         .btn-submit {
             width: 100%;
@@ -506,12 +480,6 @@
             text-decoration: underline;
         }
         
-        .login-link {
-            display: block;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-        
         /* Requirements Panel */
         .requirements-panel {
             background: #F5F9F8;
@@ -576,10 +544,6 @@
             border-left: 4px solid #EF4444;
         }
         
-        .notification.info {
-            border-left: 4px solid #3B82F6;
-        }
-        
         .notification .icon {
             font-size: 1.5rem;
         }
@@ -590,10 +554,6 @@
         
         .notification.error .icon {
             color: #EF4444;
-        }
-        
-        .notification.info .icon {
-            color: #3B82F6;
         }
         
         .notification .message {
@@ -763,6 +723,25 @@
             background: #5A9B8E;
             color: white;
         }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background: #D4EDDA;
+            color: #155724;
+            border: 1px solid #C3E6CB;
+        }
+
+        .alert-error {
+            background: #F8D7DA;
+            color: #721C24;
+            border: 1px solid #F5C6CB;
+        }
     </style>
 </head>
 <body>
@@ -794,14 +773,14 @@
             <!-- Application Information -->
             <div class="application-info">
                 <h2>Join Our Network of Mental Health Professionals</h2>
-                <p>At MindSpace, we're looking for passionate, licensed therapists to join our mission of making mental wellness accessible to everyone. If you're committed to providing quality care, we'd love to welcome you to our community.</p>
+                <p>At MindSpace, we're looking for passionate, licensed therapists to join our mission of making mental wellness accessible to everyone.</p>
                 
                 <div class="benefits-list">
                     <div class="benefit-item">
                         <div class="benefit-icon">💼</div>
                         <div class="benefit-text">
                             <h4>Flexible Practice</h4>
-                            <p>Set your own schedule and work from anywhere. No commute, no office overhead.</p>
+                            <p>Set your own schedule and work from anywhere.</p>
                         </div>
                     </div>
                     
@@ -809,7 +788,7 @@
                         <div class="benefit-icon">💰</div>
                         <div class="benefit-text">
                             <h4>Competitive Compensation</h4>
-                            <p>Earn competitive rates with transparent pricing and regular payouts.</p>
+                            <p>Earn competitive rates with transparent pricing.</p>
                         </div>
                     </div>
                     
@@ -817,15 +796,7 @@
                         <div class="benefit-icon">🛡️</div>
                         <div class="benefit-text">
                             <h4>Professional Support</h4>
-                            <p>Access to our support team, secure platform, and administrative assistance.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="benefit-item">
-                        <div class="benefit-icon">🌱</div>
-                        <div class="benefit-text">
-                            <h4>Continuing Education</h4>
-                            <p>Access to training resources, workshops, and professional development opportunities.</p>
+                            <p>Access to our support team and secure platform.</p>
                         </div>
                     </div>
                 </div>
@@ -834,12 +805,10 @@
                 <div class="requirements-panel">
                     <h4><i class="fas fa-clipboard-check"></i> Application Requirements</h4>
                     <ul class="requirements-list">
-                        <li>Valid license to practice therapy in your state/country</li>
+                        <li>Valid license to practice therapy</li>
                         <li>Minimum 2 years of clinical experience</li>
                         <li>Professional liability insurance</li>
                         <li>Master's degree or higher in relevant field</li>
-                        <li>Commitment to ethical practice and confidentiality</li>
-                        <li>Reliable internet connection and quiet workspace</li>
                     </ul>
                 </div>
                 
@@ -850,28 +819,28 @@
                         <div class="step-number">1</div>
                         <div class="step-content">
                             <h4>Submit Application</h4>
-                            <p>Complete the form with your professional details and credentials.</p>
+                            <p>Complete the form with your details.</p>
                         </div>
                     </div>
                     <div class="process-step">
                         <div class="step-number">2</div>
                         <div class="step-content">
                             <h4>Document Verification</h4>
-                            <p>Our team will verify your licenses and qualifications.</p>
+                            <p>We verify your licenses and qualifications.</p>
                         </div>
                     </div>
                     <div class="process-step">
                         <div class="step-number">3</div>
                         <div class="step-content">
                             <h4>Platform Orientation</h4>
-                            <p>Complete our onboarding process and platform training.</p>
+                            <p>Complete onboarding and training.</p>
                         </div>
                     </div>
                     <div class="process-step">
                         <div class="step-number">4</div>
                         <div class="step-content">
                             <h4>Start Practicing</h4>
-                            <p>Begin accepting clients and making a difference in people's lives.</p>
+                            <p>Begin accepting clients!</p>
                         </div>
                     </div>
                 </div>
@@ -881,8 +850,10 @@
             <div class="application-form-container">
                 <div class="form-header">
                     <h1>Therapist Application</h1>
-                    <p>Complete the form below to join our network. We'll review your application within 24-48 hours.</p>
+                    <p>Complete the form below to join our network.</p>
                 </div>
+
+                <div id="alertMessage"></div>
                 
                 <form id="therapistForm" novalidate>
                     <div class="form-row">
@@ -898,7 +869,6 @@
                                 class="form-input"
                                 placeholder="Dr. John Doe"
                                 required
-                                autocomplete="name"
                             >
                             <div class="error-message">Please enter your full name</div>
                         </div>
@@ -915,9 +885,8 @@
                                 class="form-input"
                                 placeholder="your.email@example.com"
                                 required
-                                autocomplete="email"
                             >
-                            <div class="error-message">Please enter a valid email address</div>
+                            <div class="error-message">Please enter a valid email</div>
                         </div>
                     </div>
                     
@@ -934,9 +903,8 @@
                                 class="form-input"
                                 placeholder="+91 98765 43210"
                                 required
-                                autocomplete="tel"
                             >
-                            <div class="error-message">Please enter a valid phone number</div>
+                            <div class="error-message">Please enter phone number</div>
                         </div>
                         
                         <div class="form-group">
@@ -946,13 +914,13 @@
                                 <span class="required-mark">*</span>
                             </label>
                             <select id="experience" class="form-select" required>
-                                <option value="">Select years of experience</option>
+                                <option value="">Select years</option>
                                 <option value="1-2">1-2 years</option>
                                 <option value="3-5">3-5 years</option>
                                 <option value="6-10">6-10 years</option>
                                 <option value="10+">10+ years</option>
                             </select>
-                            <div class="error-message">Please select your years of experience</div>
+                            <div class="error-message">Please select experience</div>
                         </div>
                     </div>
                     
@@ -966,18 +934,10 @@
                             type="text" 
                             id="specialization" 
                             class="form-input"
-                            placeholder="e.g., Anxiety, Depression, Relationship Counseling"
+                            placeholder="e.g., Anxiety, Depression"
                             required
                         >
-                        <div class="error-message">Please enter your specialization</div>
-                        <div class="specialization-tags">
-                            <span class="specialization-tag" onclick="selectSpecialization('Anxiety')">Anxiety</span>
-                            <span class="specialization-tag" onclick="selectSpecialization('Depression')">Depression</span>
-                            <span class="specialization-tag" onclick="selectSpecialization('Stress Management')">Stress</span>
-                            <span class="specialization-tag" onclick="selectSpecialization('Relationship Counseling')">Relationships</span>
-                            <span class="specialization-tag" onclick="selectSpecialization('Trauma Therapy')">Trauma</span>
-                            <span class="specialization-tag" onclick="selectSpecialization('Cognitive Behavioral Therapy')">CBT</span>
-                        </div>
+                        <div class="error-message">Please enter specialization</div>
                     </div>
                     
                     <div class="form-group">
@@ -989,11 +949,11 @@
                         <textarea 
                             id="qualifications" 
                             class="form-textarea"
-                            placeholder="List your degrees, certifications, and relevant training (e.g., MA in Clinical Psychology, Licensed Professional Counselor, CBT Certification)"
+                            placeholder="List your degrees and certifications"
                             required
                             rows="4"
                         ></textarea>
-                        <div class="error-message">Please enter your qualifications</div>
+                        <div class="error-message">Please enter qualifications</div>
                     </div>
                     
                     <div class="form-group">
@@ -1005,11 +965,11 @@
                         <textarea 
                             id="bio" 
                             class="form-textarea"
-                            placeholder="Tell us about your therapeutic approach, experience, and what makes you passionate about mental health care. (200-500 words)"
+                            placeholder="Tell us about your therapeutic approach..."
                             required
                             rows="6"
                         ></textarea>
-                        <div class="error-message">Please write a professional bio</div>
+                        <div class="error-message">Please write a bio</div>
                     </div>
                     
                     <div class="form-row">
@@ -1027,19 +987,12 @@
                                     placeholder="Minimum 8 characters"
                                     minlength="8"
                                     required
-                                    autocomplete="new-password"
                                 >
                                 <button type="button" class="password-toggle" id="passwordToggle">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
-                            <div class="password-strength" id="passwordStrength">
-                                <div class="strength-bar"></div>
-                                <div class="strength-bar"></div>
-                                <div class="strength-bar"></div>
-                                <div class="strength-bar"></div>
-                            </div>
-                            <div class="error-message" id="passwordError">Password must be at least 8 characters with letters and numbers</div>
+                            <div class="error-message">Password must be 8+ characters</div>
                         </div>
                         
                         <div class="form-group">
@@ -1053,28 +1006,16 @@
                                     type="password" 
                                     id="confirmPassword" 
                                     class="form-input"
-                                    placeholder="Re-enter your password"
+                                    placeholder="Re-enter password"
                                     minlength="8"
                                     required
-                                    autocomplete="new-password"
                                 >
                                 <button type="button" class="password-toggle" id="confirmPasswordToggle">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
-                            <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                            <div class="error-message">Passwords do not match</div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <div class="remember-me">
-                            <input type="checkbox" id="termsAgreement" required>
-                            <label for="termsAgreement">
-                                I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>
-                                <span class="required-mark">*</span>
-                            </label>
-                        </div>
-                        <div class="error-message">You must agree to the terms and conditions</div>
                     </div>
                     
                     <button type="submit" class="btn-submit" id="submitBtn">
@@ -1085,7 +1026,7 @@
                 
                 <div class="form-footer">
                     <p>Already have an account? <a href="login.html">Login here</a></p>
-                    <p class="login-link">Looking for therapy? <a href="signup-user.html">Sign up as a patient</a></p>
+                    <p>Looking for therapy? <a href="signup-user.html">Sign up as a patient</a></p>
                 </div>
             </div>
         </div>
@@ -1102,569 +1043,162 @@
                 <li><a href="privacy.html">Privacy Policy</a></li>
                 <li><a href="terms.html">Terms of Service</a></li>
                 <li><a href="contact.html">Contact Us</a></li>
-                <li><a href="faq.html">FAQ</a></li>
             </ul>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2026 MindSpace Healthcare Pvt. Ltd. All rights reserved.</p>
-            <p>If you're in crisis, please contact emergency services immediately.</p>
         </div>
     </footer>
 
     <!-- Supabase Configuration -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
     <script>
-        // Supabase Configuration
         const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabase = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        // Application State
-        let isLoading = false;
-        
-        // DOM Elements
-        const therapistForm = document.getElementById('therapistForm');
-        const fullNameInput = document.getElementById('fullName');
-        const emailInput = document.getElementById('email');
-        const phoneInput = document.getElementById('phone');
-        const experienceSelect = document.getElementById('experience');
-        const specializationInput = document.getElementById('specialization');
-        const qualificationsInput = document.getElementById('qualifications');
-        const bioInput = document.getElementById('bio');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-        const passwordToggle = document.getElementById('passwordToggle');
-        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
-        const passwordStrength = document.getElementById('passwordStrength');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const termsAgreement = document.getElementById('termsAgreement');
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
-        
-        // Initialize Application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize event listeners
-            initEventListeners();
-            
-            // Add animation to form
-            setTimeout(() => {
-                document.querySelector('.application-form-container').style.opacity = '1';
-                document.querySelector('.application-form-container').style.transform = 'translateY(0)';
-            }, 300);
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => { alertDiv.innerHTML = ''; }, 5000);
+        }
+
+        // Password toggle
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
         });
-        
-        // Initialize Event Listeners
-        function initEventListeners() {
-            // Password toggles
-            passwordToggle.addEventListener('click', () => togglePasswordVisibility(passwordInput, passwordToggle));
-            confirmPasswordToggle.addEventListener('click', () => togglePasswordVisibility(confirmPasswordInput, confirmPasswordToggle));
-            
-            // Password strength indicator
-            passwordInput.addEventListener('input', updatePasswordStrength);
-            
-            // Form submission
-            therapistForm.addEventListener('submit', handleTherapistSignup);
-            
-            // Form validation
-            fullNameInput.addEventListener('blur', validateFullName);
-            emailInput.addEventListener('blur', validateEmail);
-            phoneInput.addEventListener('blur', validatePhone);
-            specializationInput.addEventListener('blur', validateSpecialization);
-            qualificationsInput.addEventListener('blur', validateQualifications);
-            bioInput.addEventListener('blur', validateBio);
-            passwordInput.addEventListener('blur', validatePassword);
-            confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
-            
-            // Real-time validation
-            const inputs = [fullNameInput, emailInput, phoneInput, specializationInput, qualificationsInput, bioInput, passwordInput, confirmPasswordInput];
-            inputs.forEach(input => {
-                input.addEventListener('input', clearError);
-            });
-            
-            // Mobile menu toggle
-            if (menuToggle) {
-                menuToggle.addEventListener('click', toggleMobileMenu);
-            }
-            
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', closeMobileMenu);
-        }
-        
-        // Toggle Password Visibility
-        function togglePasswordVisibility(inputElement, toggleButton) {
-            const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
-            inputElement.setAttribute('type', type);
-            toggleButton.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-        }
-        
-        // Update Password Strength
-        function updatePasswordStrength() {
-            const password = passwordInput.value;
-            const bars = passwordStrength.querySelectorAll('.strength-bar');
-            const strengthText = document.getElementById('passwordError');
-            
-            // Reset all bars
-            bars.forEach(bar => bar.classList.remove('active'));
-            
-            if (password.length === 0) {
-                strengthText.textContent = '';
+
+        document.getElementById('confirmPasswordToggle').addEventListener('click', function() {
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+            confirmPasswordInput.type = type;
+            this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        });
+
+        // Mobile menu
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        // Form submission
+        document.getElementById('therapistForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const experience = document.getElementById('experience').value;
+            const specialization = document.getElementById('specialization').value.trim();
+            const qualifications = document.getElementById('qualifications').value.trim();
+            const bio = document.getElementById('bio').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!fullName || !email || !phone || !experience || !specialization || !qualifications || !bio || !password || !confirmPassword) {
+                showAlert('Please fill in all required fields', 'error');
                 return;
             }
-            
-            let strength = 0;
-            
-            // Length check
-            if (password.length >= 8) strength++;
-            if (password.length >= 12) strength++;
-            
-            // Complexity checks
-            if (/[A-Z]/.test(password)) strength++;
-            if (/[0-9]/.test(password)) strength++;
-            if (/[^A-Za-z0-9]/.test(password)) strength++;
-            
-            // Cap at 4
-            strength = Math.min(strength, 4);
-            
-            // Update bars
-            for (let i = 0; i < strength; i++) {
-                bars[i].classList.add('active');
-            }
-            
-            // Update strength text
-            if (strength < 2) {
-                strengthText.textContent = 'Weak password';
-            } else if (strength < 4) {
-                strengthText.textContent = 'Medium password';
-            } else {
-                strengthText.textContent = 'Strong password';
-            }
-        }
-        
-        // Form Validation
-        function validateFullName() {
-            const name = fullNameInput.value.trim();
-            
-            if (!name) {
-                showError(fullNameInput, 'Full name is required');
-                return false;
-            }
-            
-            if (name.length < 2) {
-                showError(fullNameInput, 'Name must be at least 2 characters');
-                return false;
-            }
-            
-            clearError(fullNameInput);
-            return true;
-        }
-        
-        function validateEmail() {
-            const email = emailInput.value.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            if (!email) {
-                showError(emailInput, 'Email is required');
-                return false;
-            }
-            
-            if (!emailRegex.test(email)) {
-                showError(emailInput, 'Please enter a valid email address');
-                return false;
-            }
-            
-            clearError(emailInput);
-            return true;
-        }
-        
-        function validatePhone() {
-            const phone = phoneInput.value.trim();
-            const phoneRegex = /^[\d\s\+\-\(\)]{10,}$/;
-            
-            if (!phone) {
-                showError(phoneInput, 'Phone number is required');
-                return false;
-            }
-            
-            if (!phoneRegex.test(phone)) {
-                showError(phoneInput, 'Please enter a valid phone number');
-                return false;
-            }
-            
-            clearError(phoneInput);
-            return true;
-        }
-        
-        function validateSpecialization() {
-            const specialization = specializationInput.value.trim();
-            
-            if (!specialization) {
-                showError(specializationInput, 'Specialization is required');
-                return false;
-            }
-            
-            if (specialization.length < 3) {
-                showError(specializationInput, 'Please enter a valid specialization');
-                return false;
-            }
-            
-            clearError(specializationInput);
-            return true;
-        }
-        
-        function validateQualifications() {
-            const qualifications = qualificationsInput.value.trim();
-            
-            if (!qualifications) {
-                showError(qualificationsInput, 'Qualifications are required');
-                return false;
-            }
-            
-            if (qualifications.length < 20) {
-                showError(qualificationsInput, 'Please provide detailed qualifications (minimum 20 characters)');
-                return false;
-            }
-            
-            clearError(qualificationsInput);
-            return true;
-        }
-        
-        function validateBio() {
-            const bio = bioInput.value.trim();
-            
-            if (!bio) {
-                showError(bioInput, 'Professional bio is required');
-                return false;
-            }
-            
-            if (bio.length < 100) {
-                showError(bioInput, 'Please write a more detailed bio (minimum 100 characters)');
-                return false;
-            }
-            
-            if (bio.length > 2000) {
-                showError(bioInput, 'Bio is too long (maximum 2000 characters)');
-                return false;
-            }
-            
-            clearError(bioInput);
-            return true;
-        }
-        
-        function validatePassword() {
-            const password = passwordInput.value;
-            
-            if (!password) {
-                showError(passwordInput, 'Password is required');
-                return false;
-            }
-            
+
             if (password.length < 8) {
-                showError(passwordInput, 'Password must be at least 8 characters');
-                return false;
+                showAlert('Password must be at least 8 characters', 'error');
+                return;
             }
-            
-            if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
-                showError(passwordInput, 'Password must contain letters and numbers');
-                return false;
-            }
-            
-            clearError(passwordInput);
-            return true;
-        }
-        
-        function validateConfirmPassword() {
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
-            
-            if (!confirmPassword) {
-                showError(confirmPasswordInput, 'Please confirm your password');
-                return false;
-            }
-            
+
             if (password !== confirmPassword) {
-                showError(confirmPasswordInput, 'Passwords do not match');
-                return false;
-            }
-            
-            clearError(confirmPasswordInput);
-            return true;
-        }
-        
-        // Error Handling
-        function showError(input, message) {
-            const formGroup = input.closest('.form-group');
-            const errorElement = formGroup.querySelector('.error-message');
-            
-            formGroup.classList.add('error');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-            input.classList.add('error');
-        }
-        
-        function clearError(input) {
-            const formGroup = input.closest('.form-group');
-            const errorElement = formGroup.querySelector('.error-message');
-            
-            formGroup.classList.remove('error');
-            errorElement.style.display = 'none';
-            input.classList.remove('error');
-        }
-        
-        // Handle Therapist Signup
-        async function handleTherapistSignup(event) {
-            event.preventDefault();
-            
-            // Validate all fields
-            const validations = [
-                validateFullName(),
-                validateEmail(),
-                validatePhone(),
-                validateSpecialization(),
-                validateQualifications(),
-                validateBio(),
-                validatePassword(),
-                validateConfirmPassword()
-            ];
-            
-            // Check terms agreement
-            if (!termsAgreement.checked) {
-                showNotification('You must agree to the terms and conditions', 'error');
+                showAlert('Passwords do not match', 'error');
                 return;
             }
-            
-            if (validations.includes(false)) {
-                showNotification('Please fix the errors in the form', 'error');
-                return;
-            }
-            
-            // Set loading state
-            isLoading = true;
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
             submitBtn.disabled = true;
-            btnText.textContent = 'Submitting Application...';
-            loadingSpinner.style.display = 'block';
-            
-            // Get form data
-            const formData = {
-                fullName: fullNameInput.value.trim(),
-                email: emailInput.value.trim(),
-                phone: phoneInput.value.trim(),
-                experience: experienceSelect.value,
-                specialization: specializationInput.value.trim(),
-                qualifications: qualificationsInput.value.trim(),
-                bio: bioInput.value.trim(),
-                password: passwordInput.value
-            };
-            
+            btnText.style.display = 'none';
+            loadingSpinner.style.display = 'inline-block';
+
             try {
-                // Sign up with Supabase Auth
+                console.log('🔵 Starting therapist signup...');
+
+                // 1. Sign up with Supabase Auth
                 const { data: authData, error: authError } = await supabase.auth.signUp({
-                    email: formData.email,
-                    password: formData.password,
+                    email: email,
+                    password: password,
                     options: {
                         data: {
-                            full_name: formData.fullName,
-                            phone: formData.phone,
+                            full_name: fullName,
+                            phone: phone,
                             role: 'therapist'
                         }
                     }
                 });
-                
-                if (authError) {
-                    if (authError.message.includes('already registered')) {
-                        throw new Error('This email is already registered. Please try logging in.');
-                    }
-                    throw authError;
-                }
-                
-                // Create profile in profiles table
+
+                if (authError) throw authError;
+
+                console.log('🟢 Auth user created:', authData.user.id);
+
+                // 2. Create profile in profiles table
                 if (authData.user) {
                     const { error: profileError } = await supabase
                         .from('profiles')
-                        .insert([
-                            {
-                                id: authData.user.id,
-                                email: formData.email,
-                                full_name: formData.fullName,
-                                phone: formData.phone,
-                                role: 'therapist',
-                                created_at: new Date().toISOString()
-                            }
-                        ]);
-                    
+                        .insert({
+                            user_id: authData.user.id,  // ✅ FIXED: using user_id
+                            email: email,
+                            full_name: fullName,  // ✅ FIXED: using full_name
+                            phone: phone,
+                            role: 'therapist',
+                            approved: false,  // Therapists need admin approval
+                            created_at: new Date().toISOString()
+                        });
+
                     if (profileError) {
-                        console.error('Profile creation error:', profileError);
+                        console.error('🔴 Profile creation error:', profileError);
+                        throw new Error('Failed to create therapist profile. Please contact support.');
+                    }
+
+                    console.log('🟢 Profile created successfully');
+
+                    // 3. Create therapist record in Therapists table
+                    const { error: therapistError } = await supabase
+                        .from('Therapists')
+                        .insert({
+                            user_id: authData.user.id,
+                            Name: fullName,
+                            email: email,
+                            phone: phone,
+                            Specialization: specialization,
+                            Experience: experience,
+                            qualifications: qualifications,
+                            description: bio,
+                            Active: false,  // Inactive until admin approves
+                            approved: false
+                        });
+
+                    if (therapistError) {
+                        console.error('🔴 Therapist record error:', therapistError);
+                        // Don't throw - profile is already created
+                    } else {
+                        console.log('🟢 Therapist record created');
                     }
                 }
-                
-                // Create therapist record in Therapists table
-                const { error: therapistError } = await supabase
-                    .from('Therapists')
-                    .insert([
-                        {
-                            user_id: authData.user.id,
-                            Name: formData.fullName,
-                            email: formData.email,
-                            phone: formData.phone,
-                            Specialization: formData.specialization,
-                            experience: formData.experience,
-                            qualifications: formData.qualifications,
-                            bio: formData.bio,
-                            approval_status: 'pending',
-                            Active: false,
-                            created_at: new Date().toISOString()
-                        }
-                    ]);
-                
-                if (therapistError) {
-                    throw therapistError;
-                }
-                
-                // Show success message
-                showNotification('✅ Application submitted successfully! Our team will review it within 24-48 hours.', 'success');
-                
-                // Clear form (optional)
+
+                showAlert('✅ Application submitted! We will review and contact you within 24-48 hours.', 'success');
+
                 setTimeout(() => {
-                    therapistForm.reset();
-                    resetFormState();
-                    
-                    // Redirect to login page after successful submission
-                    window.location.href = 'login.html?message=application_submitted';
-                }, 2000);
-                
+                    window.location.href = 'login.html';
+                }, 3000);
+
             } catch (error) {
-                console.error('Application error:', error);
-                
-                // Show appropriate error message
-                let errorMessage = 'Application failed. Please try again.';
-                
-                if (error.message.includes('already registered')) {
-                    errorMessage = error.message;
-                } else if (error.message.includes('network')) {
-                    errorMessage = 'Network error. Please check your connection and try again.';
-                }
-                
-                showNotification(errorMessage, 'error');
-                
-                // Reset form state
-                resetFormState();
+                console.error('🔴 Signup error:', error);
+                showAlert(error.message || 'Error submitting application. Please try again.', 'error');
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                loadingSpinner.style.display = 'none';
             }
-        }
-        
-        // Reset Form State
-        function resetFormState() {
-            isLoading = false;
-            submitBtn.disabled = false;
-            btnText.textContent = 'Submit Application';
-            loadingSpinner.style.display = 'none';
-        }
-        
-        // Show Notification
-        function showNotification(message, type = 'info') {
-            // Remove existing notification
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-            
-            // Create new notification
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <div class="icon">
-                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
-                </div>
-                <div class="message">${message}</div>
-                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
-            `;
-            
-            // Add to DOM
-            document.body.appendChild(notification);
-            
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 5000);
-        }
-        
-        // Select Specialization
-        function selectSpecialization(specialization) {
-            const currentValue = specializationInput.value.trim();
-            const specializations = currentValue ? currentValue.split(',').map(s => s.trim()) : [];
-            
-            // Toggle selection
-            const index = specializations.indexOf(specialization);
-            if (index > -1) {
-                specializations.splice(index, 1);
-            } else {
-                specializations.push(specialization);
-            }
-            
-            // Update input
-            specializationInput.value = specializations.join(', ');
-            
-            // Update tag styles
-            const tags = document.querySelectorAll('.specialization-tag');
-            tags.forEach(tag => {
-                if (tag.textContent === specialization) {
-                    tag.classList.toggle('active');
-                }
-            });
-        }
-        
-        // Mobile Menu Functions
-        function toggleMobileMenu() {
-            navLinks.classList.toggle('active');
-            menuToggle.innerHTML = navLinks.classList.contains('active') 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
-        }
-        
-        function closeMobileMenu(event) {
-            if (!navLinks.contains(event.target) && !menuToggle.contains(event.target) && navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-        }
-        
-        // Add some CSS for initial animation
-        document.head.insertAdjacentHTML('beforeend', `
-            <style>
-                .application-form-container {
-                    opacity: 0;
-                    transform: translateY(20px);
-                    transition: opacity 0.5s ease, transform 0.5s ease;
-                }
-                
-                .benefit-item {
-                    opacity: 0;
-                    transform: translateX(-20px);
-                    transition: opacity 0.5s ease, transform 0.5s ease;
-                }
-                
-                .benefit-item:nth-child(1) { transition-delay: 0.1s; }
-                .benefit-item:nth-child(2) { transition-delay: 0.2s; }
-                .benefit-item:nth-child(3) { transition-delay: 0.3s; }
-                .benefit-item:nth-child(4) { transition-delay: 0.4s; }
-                
-                .loaded .application-form-container {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-                
-                .loaded .benefit-item {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            </style>
-        `);
-        
-        // Add loaded class after page load
-        window.addEventListener('load', () => {
-            document.body.classList.add('loaded');
         });
     </script>
 </body>
