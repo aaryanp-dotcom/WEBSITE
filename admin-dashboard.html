@@ -11,7 +11,8 @@
         .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
         .dashboard-header { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .stat-number { font-size: 36px; font-weight: 800; color: #5A9B8E; display: block; }
         .stat-label { font-size: 12px; color: #6B7280; text-transform: uppercase; margin-top: 8px; display: block; }
         .section { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
@@ -26,6 +27,14 @@
         .status-confirmed { background: #D4EDDA; color: #155724; }
         .status-rejected { background: #F8D7DA; color: #721C24; }
         .loading { text-align: center; padding: 40px; color: #6B7280; }
+        
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; border-radius: 16px; padding: 40px; max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-title { font-size: 28px; font-weight: 700; color: #2C3E50; margin: 0; }
+        .close-modal { background: none; border: none; font-size: 28px; color: #6B7280; cursor: pointer; }
+        .close-modal:hover { color: #2C3E50; }
     </style>
 </head>
 <body>
@@ -47,19 +56,19 @@
             </div>
             
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card" onclick="showTherapistsModal()">
                     <span class="stat-number" id="totalTherapists">0</span>
                     <span class="stat-label">Total Therapists</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="showUsersModal()">
                     <span class="stat-number" id="totalUsers">0</span>
                     <span class="stat-label">Total Users</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="showBookingsModal()">
                     <span class="stat-number" id="totalBookings">0</span>
                     <span class="stat-label">Total Bookings</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="showRevenueModal()">
                     <span class="stat-number" id="totalRevenue">₹0</span>
                     <span class="stat-label">Total Revenue</span>
                 </div>
@@ -81,10 +90,65 @@
         </main>
     </div>
     
+    <!-- Therapists Modal -->
+    <div id="therapistsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">All Therapists</h2>
+                <button class="close-modal" onclick="closeModal('therapistsModal')">&times;</button>
+            </div>
+            <div id="therapistsModalContent">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Modal -->
+    <div id="usersModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">All Users</h2>
+                <button class="close-modal" onclick="closeModal('usersModal')">&times;</button>
+            </div>
+            <div id="usersModalContent">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bookings Modal -->
+    <div id="bookingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">All Bookings</h2>
+                <button class="close-modal" onclick="closeModal('bookingsModal')">&times;</button>
+            </div>
+            <div id="bookingsModalContent">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue Modal -->
+    <div id="revenueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Revenue Details</h2>
+                <button class="close-modal" onclick="closeModal('revenueModal')">&times;</button>
+            </div>
+            <div id="revenueModalContent">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
         let currentUser = null;
+        let allTherapists = [];
+        let allUsers = [];
+        let allBookings = [];
         
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
@@ -106,24 +170,237 @@
             
             try {
                 const [therapistsRes, usersRes, bookingsRes] = await Promise.all([
-                    window.supabaseClient.from('Therapists').select('*', { count: 'exact' }),
-                    window.supabaseClient.from('profiles').select('*', { count: 'exact' }).eq('role', 'user'),
+                    window.supabaseClient.from('Therapists').select('*'),
+                    window.supabaseClient.from('profiles').select('*').eq('role', 'user'),
                     window.supabaseClient.from('Bookings').select('*')
                 ]);
                 
-                document.getElementById('totalTherapists').textContent = therapistsRes.data?.length || 0;
-                document.getElementById('totalUsers').textContent = usersRes.data?.length || 0;
-                document.getElementById('totalBookings').textContent = bookingsRes.data?.length || 0;
+                allTherapists = therapistsRes.data || [];
+                allUsers = usersRes.data || [];
+                allBookings = bookingsRes.data || [];
                 
-                const revenue = bookingsRes.data
-                    ?.filter(b => b.status === 'confirmed')
-                    .reduce((sum, b) => sum + (b.amount || 700), 0) || 0;
+                document.getElementById('totalTherapists').textContent = allTherapists.length;
+                document.getElementById('totalUsers').textContent = allUsers.length;
+                document.getElementById('totalBookings').textContent = allBookings.length;
+                
+                const revenue = allBookings
+                    .filter(b => b.status === 'confirmed')
+                    .reduce((sum, b) => sum + (b.amount || 700), 0);
                 document.getElementById('totalRevenue').textContent = '₹' + revenue;
                 
                 console.log('🟢 Stats loaded');
             } catch (error) {
                 console.error('🔴 Error loading statistics:', error);
             }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        async function showTherapistsModal() {
+            const modal = document.getElementById('therapistsModal');
+            const content = document.getElementById('therapistsModalContent');
+            
+            modal.classList.add('active');
+            
+            if (allTherapists.length === 0) {
+                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No therapists found</p>';
+                return;
+            }
+            
+            content.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Specialization</th>
+                            <th>Fee</th>
+                            <th>Active</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allTherapists.map(t => `
+                            <tr>
+                                <td>${t.Name || 'N/A'}</td>
+                                <td>${t.Specialization || 'N/A'}</td>
+                                <td>₹${t.fee || 700}</td>
+                                <td>${t.Active ? '✅ Yes' : '❌ No'}</td>
+                                <td>${t.description || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        async function showUsersModal() {
+            const modal = document.getElementById('usersModal');
+            const content = document.getElementById('usersModalContent');
+            
+            modal.classList.add('active');
+            
+            if (allUsers.length === 0) {
+                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No users found</p>';
+                return;
+            }
+            
+            content.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date of Birth</th>
+                            <th>Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allUsers.map(u => `
+                            <tr>
+                                <td>${u.full_name || 'N/A'}</td>
+                                <td>${u.email || 'N/A'}</td>
+                                <td>${u.phone || 'N/A'}</td>
+                                <td>${u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString('en-IN') : 'N/A'}</td>
+                                <td>${u.address || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        async function showBookingsModal() {
+            const modal = document.getElementById('bookingsModal');
+            const content = document.getElementById('bookingsModalContent');
+            
+            modal.classList.add('active');
+            
+            if (allBookings.length === 0) {
+                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No bookings found</p>';
+                return;
+            }
+            
+            const therapistIds = [...new Set(allBookings.map(b => b.therapist_id))];
+            const userIds = [...new Set(allBookings.map(b => b.user_id))].filter(id => id);
+            
+            const { data: therapists } = await window.supabaseClient
+                .from('Therapists')
+                .select('id, Name')
+                .in('id', therapistIds);
+            
+            const { data: users } = await window.supabaseClient
+                .from('profiles')
+                .select('id, full_name')
+                .in('id', userIds);
+            
+            const therapistMap = {};
+            therapists?.forEach(t => { therapistMap[t.id] = t; });
+            
+            const userMap = {};
+            users?.forEach(u => { userMap[u.id] = u; });
+            
+            content.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Therapist</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allBookings.map(b => {
+                            const therapist = therapistMap[b.therapist_id] || {};
+                            const user = userMap[b.user_id] || {};
+                            const statusClass = 'status-' + b.status;
+                            
+                            return `
+                                <tr>
+                                    <td>${user.full_name || 'Patient'}</td>
+                                    <td>${therapist.Name || 'Therapist'}</td>
+                                    <td>${new Date(b.session_date).toLocaleDateString('en-IN')}</td>
+                                    <td>${b.start_time}</td>
+                                    <td>₹${b.amount || 700}</td>
+                                    <td><span class="status-badge ${statusClass}">${b.status.toUpperCase()}</span></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        async function showRevenueModal() {
+            const modal = document.getElementById('revenueModal');
+            const content = document.getElementById('revenueModalContent');
+            
+            modal.classList.add('active');
+            
+            const confirmedBookings = allBookings.filter(b => b.status === 'confirmed');
+            
+            if (confirmedBookings.length === 0) {
+                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No confirmed bookings yet</p>';
+                return;
+            }
+            
+            const therapistIds = [...new Set(confirmedBookings.map(b => b.therapist_id))];
+            const userIds = [...new Set(confirmedBookings.map(b => b.user_id))].filter(id => id);
+            
+            const { data: therapists } = await window.supabaseClient
+                .from('Therapists')
+                .select('id, Name')
+                .in('id', therapistIds);
+            
+            const { data: users } = await window.supabaseClient
+                .from('profiles')
+                .select('id, full_name')
+                .in('id', userIds);
+            
+            const therapistMap = {};
+            therapists?.forEach(t => { therapistMap[t.id] = t; });
+            
+            const userMap = {};
+            users?.forEach(u => { userMap[u.id] = u; });
+            
+            const totalRevenue = confirmedBookings.reduce((sum, b) => sum + (b.amount || 700), 0);
+            
+            content.innerHTML = `
+                <div style="background: #F5F9F8; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                    <div style="font-size: 14px; color: #6B7280; margin-bottom: 5px;">TOTAL REVENUE</div>
+                    <div style="font-size: 36px; font-weight: 800; color: #5A9B8E;">₹${totalRevenue}</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Therapist</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${confirmedBookings.map(b => {
+                            const therapist = therapistMap[b.therapist_id] || {};
+                            const user = userMap[b.user_id] || {};
+                            
+                            return `
+                                <tr>
+                                    <td>${user.full_name || 'Patient'}</td>
+                                    <td>${therapist.Name || 'Therapist'}</td>
+                                    <td>${new Date(b.session_date).toLocaleDateString('en-IN')}</td>
+                                    <td style="font-weight: 700; color: #5A9B8E;">₹${b.amount || 700}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
         }
         
         async function loadApplications() {
@@ -310,6 +587,12 @@
             } catch (error) {
                 console.error('🔴 Error:', error);
                 container.innerHTML = '<p style="color: red; text-align: center;">Error: ' + error.message + '</p>';
+            }
+        }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
             }
         }
     </script>
