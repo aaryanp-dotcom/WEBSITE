@@ -1,397 +1,468 @@
-<!-- Supabase Configuration -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    // Prevent duplicate declaration
-    if (typeof supabase === 'undefined') {
-        var supabase;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    // Supabase Configuration
-    const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    // Application State
-    let isLoading = false;
-    
-    // DOM Elements
-    const loginForm = document.getElementById('loginForm');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const passwordToggle = document.getElementById('passwordToggle');
-    const loginBtn = document.getElementById('loginBtn');
-    const btnText = document.getElementById('btnText');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const rememberMe = document.getElementById('rememberMe');
-    const menuToggle = document.getElementById('menuToggle');
-    const navLinks = document.getElementById('navLinks');
-    
-    // Initialize Application
-    document.addEventListener('DOMContentLoaded', function() {
-        checkExistingSession();
-        loadSavedCredentials();
-        initEventListeners();
+    <style>
+        /* Login Page Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        setTimeout(() => {
-            document.querySelector('.login-container').style.opacity = '1';
-            document.querySelector('.login-container').style.transform = 'translateY(0)';
-        }, 300);
-    });
-    
-    // Check Existing Session
-    async function checkExistingSession() {
-        try {
-            const { data, error } = await supabase.auth.getSession();
-            
-            if (error) {
-                console.error('Session check error:', error);
-                return;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #F5F9F8 0%, #E8F3F1 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+        }
+        
+        .auth-card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #E5E7EB;
+        }
+        
+        .auth-header {
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            padding: 40px;
+            text-align: center;
+            color: #FFFFFF;
+        }
+        
+        .auth-logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .auth-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .auth-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .auth-body {
+            padding: 40px;
+        }
+        
+        .auth-form .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2C3E50;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
+        }
+        
+        .form-input.error {
+            border-color: #F87171;
+            background: #FEF2F2;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6B7280;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px;
+        }
+        
+        .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-auth:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(90, 155, 142, 0.3);
+        }
+        
+        .btn-auth:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn-auth.loading {
+            position: relative;
+            color: transparent;
+        }
+        
+        .btn-auth.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #FFFFFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .auth-footer {
+            text-align: center;
+            padding: 30px 40px;
+            border-top: 1px solid #E5E7EB;
+            background: #F9FAFB;
+        }
+        
+        .auth-footer p {
+            color: #6B7280;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        
+        .auth-link {
+            color: #5A9B8E;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .auth-link:hover {
+            color: #4A8B7E;
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: #5A9B8E;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+        
+        .back-link:hover {
+            color: #4A8B7E;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6B7280;
+        }
+        
+        .forgot-password {
+            color: #5A9B8E;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .auth-header {
+                padding: 30px 20px;
             }
             
-            if (data && data.session) {
-                const userId = data.session.user.id;
-
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single();
-
-                if (profileError) {
-                    console.error('Profile fetch error:', profileError);
+            .auth-body {
+                padding: 30px 20px;
+            }
+            
+            .auth-footer {
+                padding: 25px 20px;
+            }
+            
+            .back-link {
+                top: 20px;
+                left: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .auth-card {
+                border-radius: 16px;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+    
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">🧠</div>
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to continue your wellness journey</p>
+            </div>
+            
+            <div class="auth-body">
+                <form id="loginForm" class="auth-form" novalidate>
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email" 
+                               id="email" 
+                               class="form-input" 
+                               placeholder="you@example.com" 
+                               required
+                               autocomplete="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="password-container">
+                            <input type="password" 
+                                   id="password" 
+                                   class="form-input" 
+                                   placeholder="Enter your password" 
+                                   required
+                                   autocomplete="current-password"
+                                   minlength="6">
+                            <button type="button" class="password-toggle" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-password" id="forgotPassword">
+                            Forgot password?
+                        </a>
+                    </div>
+                    
+                    <button type="submit" class="btn-auth" id="submitBtn">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+            </div>
+            
+            <div class="auth-footer">
+                <p>Don't have an account?</p>
+                <div style="display: flex; gap: 20px; justify-content: center;">
+                    <a href="signup-user.html" class="auth-link">
+                        <i class="fas fa-user"></i> Sign Up as User
+                    </a>
+                    <a href="signup-therapist.html" class="auth-link">
+                        <i class="fas fa-user-md"></i> Sign Up as Therapist
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Supabase first -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Then load auth.js -->
+    <script src="auth.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize components
+            initLoginForm();
+            initPasswordToggle();
+            initForgotPassword();
+            
+            // Auto-focus email field
+            setTimeout(() => {
+                const emailInput = document.getElementById('email');
+                if (emailInput) {
+                    emailInput.focus();
+                }
+            }, 100);
+        });
+        
+        function initLoginForm() {
+            const form = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!form) return;
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                // Validate
+                if (!email || !password) {
+                    showAuthAlert('Please fill in all fields', 'error');
                     return;
                 }
-
-                const userData = {
-                    id: profile.id,
-                    email: profile.email,
-                    fullname: profile.fullname || profile.full_name || '',
-                    role: profile.role,
-                    lastLogin: new Date().toISOString()
-                };
-                localStorage.setItem('user', JSON.stringify(userData));
-
-                redirectBasedOnRole(profile.role);
-            }
-        } catch (error) {
-            console.error('Error checking session:', error);
-        }
-    }
-    
-    // Load Saved Credentials
-    function loadSavedCredentials() {
-        const savedEmail = localStorage.getItem('mindspace_saved_email');
-        const savedRemember = localStorage.getItem('mindspace_remember_me');
-        
-        if (savedEmail && savedRemember === 'true') {
-            emailInput.value = savedEmail;
-            rememberMe.checked = true;
-        }
-    }
-    
-    // Initialize Event Listeners
-    function initEventListeners() {
-        passwordToggle.addEventListener('click', togglePasswordVisibility);
-        loginForm.addEventListener('submit', handleLogin);
-        emailInput.addEventListener('blur', validateEmail);
-        passwordInput.addEventListener('blur', validatePassword);
-        emailInput.addEventListener('input', clearError);
-        passwordInput.addEventListener('input', clearError);
-        
-        if (menuToggle) {
-            menuToggle.addEventListener('click', toggleMobileMenu);
-        }
-        
-        document.addEventListener('click', closeMobileMenu);
-    }
-    
-    // Toggle Password Visibility
-    function togglePasswordVisibility() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        passwordToggle.innerHTML = type === 'password'
-            ? '<i class="fas fa-eye"></i>'
-            : '<i class="fas fa-eye-slash"></i>';
-    }
-    
-    // Form Validation
-    function validateEmail() {
-        const email = emailInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!email) {
-            showError(emailInput, 'Email is required');
-            return false;
-        }
-        
-        if (!emailRegex.test(email)) {
-            showError(emailInput, 'Please enter a valid email address');
-            return false;
-        }
-        
-        clearError(emailInput);
-        return true;
-    }
-    
-    function validatePassword() {
-        const password = passwordInput.value;
-        
-        if (!password) {
-            showError(passwordInput, 'Password is required');
-            return false;
-        }
-        
-        if (password.length < 6) {
-            showError(passwordInput, 'Password must be at least 6 characters');
-            return false;
-        }
-        
-        clearError(passwordInput);
-        return true;
-    }
-    
-    // Error Handling
-    function showError(input, message) {
-        const formGroup = input.closest('.form-group');
-        const errorElement = formGroup.querySelector('.error-message');
-        
-        formGroup.classList.add('error');
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-        input.classList.add('error');
-    }
-    
-    function clearError(input) {
-        const formGroup = input.closest('.form-group');
-        const errorElement = formGroup.querySelector('.error-message');
-        
-        formGroup.classList.remove('error');
-        errorElement.style.display = 'none';
-        input.classList.remove('error');
-    }
-    
-    // Handle Login
-    async function handleLogin(event) {
-        event.preventDefault();
-        
-        const isEmailValid = validateEmail();
-        const isPasswordValid = validatePassword();
-        
-        if (!isEmailValid || !isPasswordValid) {
-            showNotification('Please fix the errors in the form', 'error');
-            return;
-        }
-        
-        isLoading = true;
-        loginBtn.disabled = true;
-        btnText.textContent = 'Signing In...';
-        loadingSpinner.style.display = 'block';
-        
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        
-        try {
-            if (rememberMe.checked) {
-                localStorage.setItem('mindspace_saved_email', email);
-                localStorage.setItem('mindspace_remember_me', 'true');
-            } else {
-                localStorage.removeItem('mindspace_saved_email');
-                localStorage.removeItem('mindspace_remember_me');
-            }
-            
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
+                
+                // Show loading
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.classList.add('loading');
+                submitBtn.innerHTML = '';
+                
+                try {
+                    // Use the login function from auth.js
+                    const result = await loginUser(email, password);
+                    
+                    if (result.success) {
+                        showAuthAlert('Login successful! Redirecting...', 'success');
+                        
+                        // Store remember me preference
+                        const rememberMe = document.getElementById('rememberMe').checked;
+                        if (rememberMe) {
+                            localStorage.setItem('rememberEmail', email);
+                        } else {
+                            localStorage.removeItem('rememberEmail');
+                        }
+                        
+                        // Redirect based on role
+                        setTimeout(() => {
+                            const targetDashboard = {
+                                'admin': 'admin-dashboard.html',
+                                'therapist': 'therapist-dashboard.html',
+                                'user': 'user-dashboard.html'
+                            }[result.role] || 'user-dashboard.html';
+                            
+                            window.location.href = targetDashboard;
+                        }, 1500);
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    showAuthAlert(error.message || 'Login failed. Please try again.', 'error');
+                    
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('loading');
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                }
             });
             
-            if (authError) {
-                throw authError;
+            // Pre-fill remembered email
+            const rememberedEmail = localStorage.getItem('rememberEmail');
+            if (rememberedEmail) {
+                document.getElementById('email').value = rememberedEmail;
+                document.getElementById('rememberMe').checked = true;
             }
+        }
+        
+        function initPasswordToggle() {
+            const toggleBtn = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
             
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', authData.user.id)
-                .single();
+            if (!toggleBtn || !passwordInput) return;
             
-            if (profileError) {
-                throw profileError;
-            }
-
-            if (profile.role === 'therapist') {
-                const { data: therapist, error: therapistError } = await supabase
-                    .from('Therapists')
-                    .select('approvalstatus')
-                    .eq('id', profile.id)
-                    .single();
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
                 
-                if (therapistError) {
-                    throw therapistError;
-                }
-                
-                if (therapist && therapist.approvalstatus !== 'approved') {
-                    await supabase.auth.signOut();
-                    throw new Error('Your therapist account is pending approval. Please wait for admin approval.');
-                }
-            }
-            
-            const userData = {
-                id: profile.id,
-                email: profile.email,
-                fullname: profile.fullname || profile.full_name || '',
-                role: profile.role,
-                lastLogin: new Date().toISOString()
-            };
-            
-            localStorage.setItem('user', JSON.stringify(userData));
-            
-            showNotification(`Welcome back, ${userData.fullname || 'User'}!`, 'success');
-            
-            setTimeout(() => {
-                redirectBasedOnRole(profile.role);
-            }, 1500);
-            
-        } catch (error) {
-            console.error('Login error:', error);
-            
-            let errorMessage = 'Login failed. Please try again.';
-            
-            if (error.message && error.message.includes('Invalid login credentials')) {
-                errorMessage = 'Invalid email or password. Please try again.';
-            } else if (error.message && error.message.includes('Email not confirmed')) {
-                errorMessage = 'Please verify your email address before logging in.';
-            } else if (error.message && error.message.includes('pending approval')) {
-                errorMessage = error.message;
-            }
-            
-            showNotification(errorMessage, 'error');
-            resetFormState();
-        }
-    }
-    
-    // Redirect Based on Role
-    async function redirectBasedOnRole(role) {
-        let redirectUrl = 'index.html';
-        
-        switch (role) {
-            case 'admin':
-                redirectUrl = 'admin-dashboard.html';
-                break;
-            case 'therapist':
-                redirectUrl = 'therapist-dashboard.html';
-                break;
-            case 'user':
-                redirectUrl = 'user-dashboard.html';
-                break;
-            default:
-                console.error('Unknown user role:', role);
-                return;
+                // Update icon
+                const icon = this.querySelector('i');
+                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+            });
         }
         
-        setTimeout(() => {
-            window.location.href = redirectUrl;
-        }, 500);
-    }
-    
-    // Reset Form State
-    function resetFormState() {
-        isLoading = false;
-        loginBtn.disabled = false;
-        btnText.textContent = 'Sign In';
-        loadingSpinner.style.display = 'none';
-    }
-    
-    // Show Notification
-    function showNotification(message, type = 'info') {
-        const existingNotification = document.querySelector('.notification');
-        if (existingNotification) {
-            existingNotification.remove();
+        function initForgotPassword() {
+            const forgotBtn = document.getElementById('forgotPassword');
+            
+            if (!forgotBtn) return;
+            
+            forgotBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showAuthAlert('Please contact support at support@mindspace.com to reset your password.', 'error');
+            });
         }
-        
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="icon">
-                ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
-            </div>
-            <div class="message">${message}</div>
-            <button class="close-btn" onclick="this.parentElement.remove()">×</button>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.remove();
-            }
-        }, 5000);
-    }
-    
-    // Copy Demo Credentials
-    function copyCredentials(email, password) {
-        const text = `Email: ${email}\nPassword: ${password}`;
-        
-        navigator.clipboard.writeText(text).then(() => {
-            showNotification('Credentials copied to clipboard!', 'success');
-            
-            emailInput.value = email;
-            passwordInput.value = password;
-            rememberMe.checked = true;
-            
-            validateEmail();
-            validatePassword();
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-            showNotification('Failed to copy credentials', 'error');
-        });
-    }
-    
-    // Mobile Menu Functions
-    function toggleMobileMenu() {
-        navLinks.classList.toggle('active');
-        menuToggle.innerHTML = navLinks.classList.contains('active') 
-            ? '<i class="fas fa-times"></i>' 
-            : '<i class="fas fa-bars"></i>';
-    }
-    
-    function closeMobileMenu(event) {
-        if (!navLinks.contains(event.target) && !menuToggle.contains(event.target) && navLinks.classList.contains('active')) {
-            navLinks.classList.remove('active');
-            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
-        }
-    }
-    
-    document.head.insertAdjacentHTML('beforeend', `
-        <style>
-            .login-container {
-                opacity: 0;
-                transform: translateY(20px);
-                transition: opacity 0.5s ease, transform 0.5s ease;
-            }
-            
-            .feature-item {
-                opacity: 0;
-                transform: translateX(-20px);
-                transition: opacity 0.5s ease, transform 0.5s ease;
-            }
-            
-            .feature-item:nth-child(1) { transition-delay: 0.1s; }
-            .feature-item:nth-child(2) { transition-delay: 0.2s; }
-            .feature-item:nth-child(3) { transition-delay: 0.3s; }
-            
-            .loaded .login-container {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            
-            .loaded .feature-item {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        </style>
-    `);
-    
-    window.addEventListener('load', () => {
-        document.body.classList.add('loaded');
-    });
-</script>
+    </script>
+</body>
+</html>
