@@ -29,6 +29,7 @@
         .status-pending { background: #FFF3CD; color: #856404; }
         .status-approved { background: #D4EDDA; color: #155724; }
         .status-confirmed { background: #D4EDDA; color: #155724; }
+        .status-rejected { background: #F8D7DA; color: #721C24; }
         .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
     </style>
 </head>
@@ -109,28 +110,24 @@
             console.log('🔵 Loading statistics...');
 
             try {
-                // Total Users
                 const { count: usersCount } = await window.supabaseClient
                     .from('profiles')
                     .select('*', { count: 'exact', head: true })
                     .eq('role', 'user');
                 document.getElementById('totalUsers').textContent = usersCount || 0;
 
-                // Total Therapists
                 const { count: therapistsCount } = await window.supabaseClient
                     .from('Therapists')
                     .select('*', { count: 'exact', head: true })
                     .eq('approval_status', 'approved');
                 document.getElementById('totalTherapists').textContent = therapistsCount || 0;
 
-                // Pending Applications
                 const { count: pendingCount } = await window.supabaseClient
                     .from('Therapists')
                     .select('*', { count: 'exact', head: true })
                     .eq('approval_status', 'pending');
                 document.getElementById('pendingApplications').textContent = pendingCount || 0;
 
-                // Total Bookings
                 const { count: bookingsCount } = await window.supabaseClient
                     .from('Bookings')
                     .select('*', { count: 'exact', head: true });
@@ -183,6 +180,10 @@
                             <div>
                                 <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">EXPERIENCE</div>
                                 <div style="color: #2C3E50;">${app.experience || '0'} years</div>
+                            </div>
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">SESSION FEE</div>
+                                <div style="color: #2C3E50;">₹${app.fee || 700}</div>
                             </div>
                         </div>
                         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
@@ -266,7 +267,6 @@
             const container = document.getElementById('bookingsList');
 
             try {
-                // Get bookings WITHOUT JOIN
                 const { data: bookings, error: bookingsError } = await window.supabaseClient
                     .from('Bookings')
                     .select('*')
@@ -282,7 +282,6 @@
                     return;
                 }
 
-                // Get therapist and user details separately
                 const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
                 const userIds = [...new Set(bookings.map(b => b.user_id))];
 
@@ -298,7 +297,6 @@
 
                 console.log('🔵 Therapists:', therapists, 'Users:', users);
 
-                // Create maps
                 const therapistMap = {};
                 therapists?.forEach(t => { therapistMap[t.id] = t; });
 
@@ -308,6 +306,7 @@
                 container.innerHTML = bookings.map(b => {
                     const therapist = therapistMap[b.therapist_id] || {};
                     const user = userMap[b.user_id] || {};
+                    const statusClass = 'status-' + b.status;
 
                     return `
                         <div class="booking-card">
@@ -318,7 +317,7 @@
                                     </h3>
                                     <p style="margin: 0; color: #6B7280; font-size: 14px;">Booking ID: #${b.id.substring(0, 8)}</p>
                                 </div>
-                                <span class="status-badge status-${b.status}">${b.status.toUpperCase()}</span>
+                                <span class="status-badge ${statusClass}">${b.status.toUpperCase()}</span>
                             </div>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 14px;">
                                 <div>
@@ -331,13 +330,19 @@
                                 </div>
                                 <div>
                                     <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">AMOUNT</div>
-                                    <div style="color: #2C3E50;">₹${b.amount || 500}</div>
+                                    <div style="color: #2C3E50;">₹${b.amount || 700}</div>
                                 </div>
                                 <div>
                                     <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">CREATED</div>
                                     <div style="color: #2C3E50;">${new Date(b.created_at).toLocaleDateString('en-IN')}</div>
                                 </div>
                             </div>
+                            ${b.meeting_link ? `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                                    <p style="color: #6B7280; font-size: 13px; margin-bottom: 5px;">Meeting Link:</p>
+                                    <a href="${b.meeting_link}" target="_blank" style="color: #5A9B8E; word-break: break-all; font-size: 13px;">${b.meeting_link}</a>
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }).join('');
