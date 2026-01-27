@@ -40,6 +40,15 @@
         .filter-input, .filter-select { padding: 10px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; min-width: 200px; }
         .filter-input { flex: 1; }
         .filter-label { color: #6B7280; font-weight: 600; font-size: 14px; }
+        
+        .searchable-select { position: relative; min-width: 250px; }
+        .searchable-select input { width: 100%; padding: 10px 35px 10px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; cursor: pointer; }
+        .searchable-select .dropdown-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #6B7280; }
+        .searchable-select .dropdown-list { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #E5E7EB; border-radius: 8px; margin-top: 5px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .searchable-select .dropdown-list.active { display: block; }
+        .searchable-select .dropdown-item { padding: 10px 15px; cursor: pointer; transition: background 0.2s; }
+        .searchable-select .dropdown-item:hover { background: #F5F9F8; }
+        .searchable-select .dropdown-item.selected { background: #E8F5F1; color: #5A9B8E; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -65,9 +74,9 @@
                     <span class="stat-number" id="totalTherapists">0</span>
                     <span class="stat-label">Total Therapists</span>
                 </div>
-                <div class="stat-card" onclick="showUsersModal()">
-                    <span class="stat-number" id="totalUsers">0</span>
-                    <span class="stat-label">Total Users</span>
+                <div class="stat-card" onclick="showPatientsModal()">
+                    <span class="stat-number" id="totalPatients">0</span>
+                    <span class="stat-label">Total Patients</span>
                 </div>
                 <div class="stat-card" onclick="showBookingsModal()">
                     <span class="stat-number" id="totalBookings">0</span>
@@ -114,17 +123,17 @@
         </div>
     </div>
     
-    <!-- Users Modal -->
-    <div id="usersModal" class="modal">
+    <!-- Patients Modal -->
+    <div id="patientsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">All Users</h2>
-                <button class="close-modal" onclick="closeModal('usersModal')">&times;</button>
+                <h2 class="modal-title">All Patients</h2>
+                <button class="close-modal" onclick="closeModal('patientsModal')">&times;</button>
             </div>
             <div class="filter-section">
-                <input type="text" id="userSearchInput" class="filter-input" placeholder="Search by name..." oninput="filterUsersList()">
+                <input type="text" id="patientSearchInput" class="filter-input" placeholder="Search by name..." oninput="filterPatientsList()">
             </div>
-            <div id="usersModalContent">
+            <div id="patientsModalContent">
                 <div class="loading">Loading...</div>
             </div>
         </div>
@@ -139,9 +148,11 @@
             </div>
             <div class="filter-section">
                 <label class="filter-label">Filter by Doctor:</label>
-                <select id="bookingDoctorFilter" class="filter-select" onchange="filterBookingsList()">
-                    <option value="">All Doctors</option>
-                </select>
+                <div class="searchable-select" id="bookingDoctorSelectWrapper">
+                    <input type="text" id="bookingDoctorSearch" placeholder="Search or select doctor..." readonly onclick="toggleDropdown('bookingDoctorSelectWrapper')">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <div class="dropdown-list" id="bookingDoctorList"></div>
+                </div>
             </div>
             <div id="bookingsModalContent">
                 <div class="loading">Loading...</div>
@@ -158,15 +169,21 @@
             </div>
             <div class="filter-section">
                 <label class="filter-label">Filter by:</label>
-                <select id="revenueDoctorFilter" class="filter-select" onchange="filterRevenueList()">
-                    <option value="">All Doctors</option>
-                </select>
-                <select id="revenueSpecFilter" class="filter-select" onchange="filterRevenueList()">
-                    <option value="">All Specializations</option>
-                </select>
-                <select id="revenueUserFilter" class="filter-select" onchange="filterRevenueList()">
-                    <option value="">All Users</option>
-                </select>
+                <div class="searchable-select" id="revenueDoctorSelectWrapper">
+                    <input type="text" id="revenueDoctorSearch" placeholder="Search or select doctor..." readonly onclick="toggleDropdown('revenueDoctorSelectWrapper')">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <div class="dropdown-list" id="revenueDoctorList"></div>
+                </div>
+                <div class="searchable-select" id="revenueSpecSelectWrapper">
+                    <input type="text" id="revenueSpecSearch" placeholder="Search or select specialization..." readonly onclick="toggleDropdown('revenueSpecSelectWrapper')">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <div class="dropdown-list" id="revenueSpecList"></div>
+                </div>
+                <div class="searchable-select" id="revenuePatientSelectWrapper">
+                    <input type="text" id="revenuePatientSearch" placeholder="Search or select patient..." readonly onclick="toggleDropdown('revenuePatientSelectWrapper')">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <div class="dropdown-list" id="revenuePatientList"></div>
+                </div>
             </div>
             <div id="revenueModalContent">
                 <div class="loading">Loading...</div>
@@ -179,14 +196,19 @@
     <script>
         let currentUser = null;
         let allTherapists = [];
-        let allUsers = [];
+        let allPatients = [];
         let allBookings = [];
         let therapistMap = {};
-        let userMap = {};
+        let patientMap = {};
+        
+        let selectedBookingDoctor = '';
+        let selectedRevenueDoctor = '';
+        let selectedRevenueSpec = '';
+        let selectedRevenuePatient = '';
         
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
-            console.log('🔵 Admin dashboard loaded. User:', currentUser);
+            console.log('🔵 Admin dashboard loaded. Patient:', currentUser);
             
             if (!currentUser || currentUser.role !== 'admin') {
                 alert('Access denied. Admin role required.');
@@ -197,27 +219,92 @@
             await loadStatistics();
             await loadApplications();
             await loadBookings();
+            
+            document.addEventListener('click', function(e) {
+                const dropdowns = document.querySelectorAll('.searchable-select');
+                dropdowns.forEach(dropdown => {
+                    if (!dropdown.contains(e.target)) {
+                        const list = dropdown.querySelector('.dropdown-list');
+                        if (list) list.classList.remove('active');
+                    }
+                });
+            });
         });
+        
+        function toggleDropdown(wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+            const list = wrapper.querySelector('.dropdown-list');
+            
+            document.querySelectorAll('.dropdown-list').forEach(dl => {
+                if (dl !== list) dl.classList.remove('active');
+            });
+            
+            list.classList.toggle('active');
+        }
+        
+        function createSearchableDropdown(wrapperId, items, onSelect, currentValue = '') {
+            const wrapper = document.getElementById(wrapperId);
+            const input = wrapper.querySelector('input');
+            const list = wrapper.querySelector('.dropdown-list');
+            
+            input.value = currentValue;
+            input.removeAttribute('readonly');
+            
+            function renderItems(filteredItems) {
+                list.innerHTML = filteredItems.map(item => `
+                    <div class="dropdown-item ${item.value === currentValue ? 'selected' : ''}" data-value="${item.value}">
+                        ${item.label}
+                    </div>
+                `).join('');
+                
+                list.querySelectorAll('.dropdown-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        const label = this.textContent.trim();
+                        input.value = label;
+                        input.setAttribute('readonly', 'readonly');
+                        list.classList.remove('active');
+                        onSelect(value);
+                    });
+                });
+            }
+            
+            renderItems(items);
+            
+            input.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filtered = items.filter(item => 
+                    item.label.toLowerCase().includes(searchTerm)
+                );
+                renderItems(filtered);
+                list.classList.add('active');
+            });
+            
+            input.addEventListener('focus', function() {
+                this.removeAttribute('readonly');
+                list.classList.add('active');
+            });
+        }
         
         async function loadStatistics() {
             console.log('🔵 Loading statistics...');
             
             try {
-                const [therapistsRes, usersRes, bookingsRes] = await Promise.all([
+                const [therapistsRes, patientsRes, bookingsRes] = await Promise.all([
                     window.supabaseClient.from('Therapists').select('*'),
                     window.supabaseClient.from('profiles').select('*').eq('role', 'user'),
                     window.supabaseClient.from('Bookings').select('*')
                 ]);
                 
                 allTherapists = therapistsRes.data || [];
-                allUsers = usersRes.data || [];
+                allPatients = patientsRes.data || [];
                 allBookings = bookingsRes.data || [];
                 
                 allTherapists.forEach(t => { therapistMap[t.id] = t; });
-                allUsers.forEach(u => { userMap[u.id] = u; });
+                allPatients.forEach(u => { patientMap[u.id] = u; });
                 
                 document.getElementById('totalTherapists').textContent = allTherapists.length;
-                document.getElementById('totalUsers').textContent = allUsers.length;
+                document.getElementById('totalPatients').textContent = allPatients.length;
                 document.getElementById('totalBookings').textContent = allBookings.length;
                 
                 const revenue = allBookings
@@ -295,29 +382,29 @@
             `;
         }
         
-        async function showUsersModal() {
-            const modal = document.getElementById('usersModal');
+        async function showPatientsModal() {
+            const modal = document.getElementById('patientsModal');
             modal.classList.add('active');
             
-            document.getElementById('userSearchInput').value = '';
-            filterUsersList();
+            document.getElementById('patientSearchInput').value = '';
+            filterPatientsList();
         }
         
-        function filterUsersList() {
-            const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+        function filterPatientsList() {
+            const searchTerm = document.getElementById('patientSearchInput').value.toLowerCase();
             
-            let filtered = allUsers.filter(u => {
+            let filtered = allPatients.filter(u => {
                 return !searchTerm || (u.full_name || '').toLowerCase().includes(searchTerm);
             });
             
-            displayUsersList(filtered);
+            displayPatientsList(filtered);
         }
         
-        function displayUsersList(users) {
-            const content = document.getElementById('usersModalContent');
+        function displayPatientsList(patients) {
+            const content = document.getElementById('patientsModalContent');
             
-            if (users.length === 0) {
-                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No users found</p>';
+            if (patients.length === 0) {
+                content.innerHTML = '<p style="text-align: center; padding: 20px; color: #6B7280;">No patients found</p>';
                 return;
             }
             
@@ -333,7 +420,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${users.map(u => `
+                        ${patients.map(u => `
                             <tr>
                                 <td>${u.full_name || 'N/A'}</td>
                                 <td>${u.email || 'N/A'}</td>
@@ -351,22 +438,26 @@
             const modal = document.getElementById('bookingsModal');
             modal.classList.add('active');
             
-            const doctorFilter = document.getElementById('bookingDoctorFilter');
             const doctors = [...new Set(allBookings.map(b => b.therapist_id))];
-            doctorFilter.innerHTML = '<option value="">All Doctors</option>' + 
-                doctors.map(id => {
+            const doctorItems = [
+                { value: '', label: 'All Doctors' },
+                ...doctors.map(id => {
                     const therapist = therapistMap[id] || {};
-                    return `<option value="${id}">${therapist.Name || 'Therapist'}</option>`;
-                }).join('');
+                    return { value: id, label: therapist.Name || 'Therapist' };
+                })
+            ];
+            
+            createSearchableDropdown('bookingDoctorSelectWrapper', doctorItems, function(value) {
+                selectedBookingDoctor = value;
+                filterBookingsList();
+            }, selectedBookingDoctor);
             
             filterBookingsList();
         }
         
         function filterBookingsList() {
-            const doctorFilter = document.getElementById('bookingDoctorFilter').value;
-            
             let filtered = allBookings.filter(b => {
-                return !doctorFilter || b.therapist_id === doctorFilter;
+                return !selectedBookingDoctor || b.therapist_id === selectedBookingDoctor;
             });
             
             displayBookingsList(filtered);
@@ -395,12 +486,12 @@
                     <tbody>
                         ${bookings.map(b => {
                             const therapist = therapistMap[b.therapist_id] || {};
-                            const user = userMap[b.user_id] || {};
+                            const patient = patientMap[b.user_id] || {};
                             const statusClass = 'status-' + b.status;
                             
                             return `
                                 <tr>
-                                    <td>${user.full_name || 'Patient'}</td>
+                                    <td>${patient.full_name || 'Patient'}</td>
                                     <td>${therapist.Name || 'Therapist'}</td>
                                     <td>${new Date(b.session_date).toLocaleDateString('en-IN')}</td>
                                     <td>${b.start_time}</td>
@@ -420,44 +511,58 @@
             
             const confirmedBookings = allBookings.filter(b => b.status === 'confirmed');
             
-            const doctorFilter = document.getElementById('revenueDoctorFilter');
             const doctors = [...new Set(confirmedBookings.map(b => b.therapist_id))];
-            doctorFilter.innerHTML = '<option value="">All Doctors</option>' + 
-                doctors.map(id => {
+            const doctorItems = [
+                { value: '', label: 'All Doctors' },
+                ...doctors.map(id => {
                     const therapist = therapistMap[id] || {};
-                    return `<option value="${id}">${therapist.Name || 'Therapist'}</option>`;
-                }).join('');
+                    return { value: id, label: therapist.Name || 'Therapist' };
+                })
+            ];
             
-            const specFilter = document.getElementById('revenueSpecFilter');
             const specializations = [...new Set(doctors.map(id => therapistMap[id]?.Specialization).filter(Boolean))];
-            specFilter.innerHTML = '<option value="">All Specializations</option>' + 
-                specializations.map(s => `<option value="${s}">${s}</option>`).join('');
+            const specItems = [
+                { value: '', label: 'All Specializations' },
+                ...specializations.map(s => ({ value: s, label: s }))
+            ];
             
-            const userFilter = document.getElementById('revenueUserFilter');
-            const users = [...new Set(confirmedBookings.map(b => b.user_id).filter(Boolean))];
-            userFilter.innerHTML = '<option value="">All Users</option>' + 
-                users.map(id => {
-                    const user = userMap[id] || {};
-                    return `<option value="${id}">${user.full_name || 'User'}</option>`;
-                }).join('');
+            const patients = [...new Set(confirmedBookings.map(b => b.user_id).filter(Boolean))];
+            const patientItems = [
+                { value: '', label: 'All Patients' },
+                ...patients.map(id => {
+                    const patient = patientMap[id] || {};
+                    return { value: id, label: patient.full_name || 'Patient' };
+                })
+            ];
+            
+            createSearchableDropdown('revenueDoctorSelectWrapper', doctorItems, function(value) {
+                selectedRevenueDoctor = value;
+                filterRevenueList();
+            }, selectedRevenueDoctor);
+            
+            createSearchableDropdown('revenueSpecSelectWrapper', specItems, function(value) {
+                selectedRevenueSpec = value;
+                filterRevenueList();
+            }, selectedRevenueSpec);
+            
+            createSearchableDropdown('revenuePatientSelectWrapper', patientItems, function(value) {
+                selectedRevenuePatient = value;
+                filterRevenueList();
+            }, selectedRevenuePatient);
             
             filterRevenueList();
         }
         
         function filterRevenueList() {
-            const doctorFilter = document.getElementById('revenueDoctorFilter').value;
-            const specFilter = document.getElementById('revenueSpecFilter').value;
-            const userFilter = document.getElementById('revenueUserFilter').value;
-            
             let filtered = allBookings.filter(b => {
                 if (b.status !== 'confirmed') return false;
                 
-                const matchesDoctor = !doctorFilter || b.therapist_id === doctorFilter;
+                const matchesDoctor = !selectedRevenueDoctor || b.therapist_id === selectedRevenueDoctor;
                 const therapist = therapistMap[b.therapist_id] || {};
-                const matchesSpec = !specFilter || therapist.Specialization === specFilter;
-                const matchesUser = !userFilter || b.user_id === userFilter;
+                const matchesSpec = !selectedRevenueSpec || therapist.Specialization === selectedRevenueSpec;
+                const matchesPatient = !selectedRevenuePatient || b.user_id === selectedRevenuePatient;
                 
-                return matchesDoctor && matchesSpec && matchesUser;
+                return matchesDoctor && matchesSpec && matchesPatient;
             });
             
             displayRevenueList(filtered);
@@ -491,11 +596,11 @@
                     <tbody>
                         ${bookings.map(b => {
                             const therapist = therapistMap[b.therapist_id] || {};
-                            const user = userMap[b.user_id] || {};
+                            const patient = patientMap[b.user_id] || {};
                             
                             return `
                                 <tr>
-                                    <td>${user.full_name || 'Patient'}</td>
+                                    <td>${patient.full_name || 'Patient'}</td>
                                     <td>${therapist.Name || 'Therapist'}</td>
                                     <td>${therapist.Specialization || 'N/A'}</td>
                                     <td>${new Date(b.session_date).toLocaleDateString('en-IN')}</td>
@@ -637,12 +742,12 @@
                         <tbody>
                             ${bookings.map(b => {
                                 const therapist = therapistMap[b.therapist_id] || {};
-                                const user = userMap[b.user_id] || {};
+                                const patient = patientMap[b.user_id] || {};
                                 const statusClass = 'status-' + b.status;
                                 
                                 return `
                                     <tr>
-                                        <td>${user.full_name || 'Patient'}</td>
+                                        <td>${patient.full_name || 'Patient'}</td>
                                         <td>${therapist.Name || 'Therapist'}</td>
                                         <td>${new Date(b.session_date).toLocaleDateString('en-IN')}</td>
                                         <td>${b.start_time}</td>
