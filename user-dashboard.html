@@ -25,7 +25,8 @@
         .therapist-fee { font-size: 20px; font-weight: 700; color: #2C3E50; margin-bottom: 10px; }
         .therapist-bio { color: #6B7280; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
         .booking-form { display: flex; flex-direction: column; gap: 12px; }
-        .form-input, .form-select { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .form-textarea { resize: vertical; min-height: 80px; }
         .btn-book { width: 100%; padding: 12px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.3s; }
         .btn-book:hover { background: #4A8B7E; }
         .bookings-section { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; }
@@ -34,6 +35,7 @@
         .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .status-pending { background: #FFF3CD; color: #856404; }
         .status-confirmed { background: #D4EDDA; color: #155724; }
+        .status-completed { background: #D1ECF1; color: #0C5460; }
         .status-rejected { background: #F8D7DA; color: #721C24; }
         .status-cancelled { background: #6C757D; color: #FFF; }
         .btn-join { padding: 10px 20px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; margin-right: 10px; }
@@ -42,7 +44,12 @@
         .btn-reschedule:hover { background: #D97706; }
         .btn-cancel { padding: 10px 20px; background: #EF4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .btn-cancel:hover { background: #DC2626; }
+        .btn-accept { padding: 10px 20px; background: #10B981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 10px; }
+        .btn-accept:hover { background: #059669; }
         .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
+        .info-box { background: #E0F2F1; padding: 15px; border-radius: 8px; border-left: 4px solid #5A9B8E; margin-top: 15px; }
+        .info-box-title { font-weight: 700; color: #2C3E50; margin-bottom: 8px; font-size: 14px; }
+        .info-box-text { color: #4B5563; font-size: 13px; line-height: 1.5; }
         
         .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
@@ -54,7 +61,6 @@
         .profile-form, .reschedule-form { display: flex; flex-direction: column; gap: 20px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-label { font-weight: 600; color: #2C3E50; font-size: 14px; }
-        .form-textarea { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; font-family: inherit; min-height: 100px; resize: vertical; }
         .btn-save { padding: 14px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; transition: background 0.3s; }
         .btn-save:hover { background: #4A8B7E; }
         .profile-info { background: #F5F9F8; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
@@ -112,6 +118,7 @@
                             <option value="all">All Bookings</option>
                             <option value="confirmed">Confirmed Only</option>
                             <option value="pending">Pending Only</option>
+                            <option value="completed">Completed</option>
                             <option value="rejected">Rejected Only</option>
                             <option value="cancelled">Cancelled Only</option>
                         </select>
@@ -327,6 +334,9 @@
                             <option value="04:00 PM">04:00 PM</option>
                             <option value="05:00 PM">05:00 PM</option>
                         </select>
+                        <textarea id="problem-${t.id}" 
+                                  class="form-textarea" 
+                                  placeholder="Briefly describe what you'd like to work on (optional)"></textarea>
                         <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee || 700})">
                             <i class="fas fa-check"></i> Book Session
                         </button>
@@ -338,13 +348,14 @@
         async function bookSession(therapistId, therapistName, fee) {
             const date = document.getElementById('date-' + therapistId).value;
             const time = document.getElementById('time-' + therapistId).value;
+            const problemDesc = document.getElementById('problem-' + therapistId).value.trim();
 
             if (!date || !time) {
                 alert('Please select both date and time');
                 return;
             }
 
-            console.log('🔵 Booking session:', { therapistId, date, time, fee });
+            console.log('🔵 Booking session:', { therapistId, date, time, fee, problemDesc });
 
             try {
                 const authUserId = currentUser.auth_id || currentUser.user_id;
@@ -357,7 +368,8 @@
                         session_date: date,
                         start_time: time,
                         status: 'pending',
-                        amount: fee
+                        amount: fee,
+                        problem_description: problemDesc || null
                     }])
                     .select();
 
@@ -367,6 +379,7 @@
 
                 document.getElementById('date-' + therapistId).value = '';
                 document.getElementById('time-' + therapistId).value = '';
+                document.getElementById('problem-' + therapistId).value = '';
 
                 await loadBookings();
 
@@ -455,6 +468,7 @@
                 const therapist = therapistMap[b.therapist_id] || {};
                 const statusClass = 'status-' + b.status;
                 const canModify = b.status === 'pending' || b.status === 'confirmed';
+                const hasTherapistReschedule = b.therapist_reschedule_requested === true;
 
                 return `
                     <div class="booking-card">
@@ -481,6 +495,46 @@
                                 <div style="color: #2C3E50;">₹${b.amount || 700}</div>
                             </div>
                         </div>
+                        
+                        ${hasTherapistReschedule ? `
+                            <div style="margin-top: 15px; padding: 15px; background: #FEF3C7; border-radius: 8px; border-left: 4px solid #F59E0B;">
+                                <div style="font-weight: 700; color: #92400E; margin-bottom: 10px;">
+                                    <i class="fas fa-clock"></i> Therapist Suggested New Time
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px; margin-bottom: 10px;">
+                                    <div>
+                                        <div style="color: #92400E; font-weight: 600; margin-bottom: 4px;">NEW DATE</div>
+                                        <div style="color: #2C3E50; font-weight: 700;">${new Date(b.therapist_reschedule_date).toLocaleDateString('en-IN')}</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #92400E; font-weight: 600; margin-bottom: 4px;">NEW TIME</div>
+                                        <div style="color: #2C3E50; font-weight: 700;">${b.therapist_reschedule_time || 'N/A'}</div>
+                                    </div>
+                                </div>
+                                ${b.therapist_reschedule_reason ? `
+                                    <div style="margin-top: 10px;">
+                                        <div style="color: #92400E; font-weight: 600; margin-bottom: 4px; font-size: 12px;">REASON</div>
+                                        <div style="color: #2C3E50; font-size: 13px;">${b.therapist_reschedule_reason}</div>
+                                    </div>
+                                ` : ''}
+                                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                    <button class="btn-accept" onclick="acceptTherapistReschedule('${b.id}', '${b.therapist_reschedule_date}', '${b.therapist_reschedule_time}')">
+                                        <i class="fas fa-check"></i> Accept New Time
+                                    </button>
+                                    <button class="btn-reschedule" onclick="openRescheduleModal('${b.id}')">
+                                        <i class="fas fa-calendar-alt"></i> Suggest Different Time
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${b.next_session_notes ? `
+                            <div class="info-box">
+                                <div class="info-box-title"><i class="fas fa-clipboard-list"></i> Next Session Agenda</div>
+                                <div class="info-box-text">${b.next_session_notes}</div>
+                            </div>
+                        ` : ''}
+                        
                         ${b.status === 'confirmed' && b.meeting_link ? `
                             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
                                 <a href="${b.meeting_link}" target="_blank" class="btn-join">
@@ -493,7 +547,7 @@
                                 <i class="fas fa-clock"></i> Waiting for therapist confirmation...
                             </div>
                         ` : ''}
-                        ${canModify ? `
+                        ${canModify && !hasTherapistReschedule ? `
                             <div class="action-buttons">
                                 <button class="btn-reschedule" onclick="openRescheduleModal('${b.id}')">
                                     <i class="fas fa-calendar-alt"></i> Reschedule
@@ -508,9 +562,48 @@
                                 <i class="fas fa-ban"></i> This session was cancelled
                             </div>
                         ` : ''}
+                        ${b.status === 'completed' ? `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; color: #10B981; font-size: 13px; font-weight: 600;">
+                                <i class="fas fa-check-circle"></i> Session completed
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
+        }
+
+        async function acceptTherapistReschedule(bookingId, newDate, newTime) {
+            if (!confirm('Accept the new time suggested by your therapist?')) {
+                return;
+            }
+            
+            console.log('🔵 Accepting therapist reschedule:', bookingId);
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({
+                        session_date: newDate,
+                        start_time: newTime,
+                        therapist_reschedule_requested: false,
+                        therapist_reschedule_date: null,
+                        therapist_reschedule_time: null,
+                        therapist_reschedule_reason: null,
+                        status: 'confirmed'
+                    })
+                    .eq('id', bookingId)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Therapist reschedule accepted:', data);
+                alert('✅ New time confirmed!');
+                await loadBookings();
+                
+            } catch (error) {
+                console.error('🔴 Error accepting reschedule:', error);
+                alert('Error: ' + error.message);
+            }
         }
 
         function openProfileModal() {
@@ -549,7 +642,11 @@
                         reschedule_requested: true,
                         reschedule_new_date: newDate,
                         reschedule_new_start_time: newTime,
-                        reschedule_reason: reason
+                        reschedule_reason: reason,
+                        therapist_reschedule_requested: false,
+                        therapist_reschedule_date: null,
+                        therapist_reschedule_time: null,
+                        therapist_reschedule_reason: null
                     })
                     .eq('id', currentRescheduleBookingId)
                     .select();
