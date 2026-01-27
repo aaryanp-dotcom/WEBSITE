@@ -504,56 +504,56 @@
             }
         }
 
-        async function saveProfile(event) {
-            event.preventDefault();
-            console.log('🔵 Saving profile...');
+       async function saveProfile(event) {
+    event.preventDefault();
+    console.log('🔵 Saving profile...');
 
-            const profileData = {
-                user_id: currentUser.id,
-                full_name: document.getElementById('profileName').value,
-                phone: document.getElementById('profilePhone').value,
-                date_of_birth: document.getElementById('profileDOB').value || null,
-                bio: document.getElementById('profileBio').value,
-                address: document.getElementById('profileAddress').value,
-                email: currentUser.email,
-                role: currentUser.role
-            };
+    try {
+        // Try to check if profile exists
+        const { data: existing } = await window.supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single();
 
-            try {
-                // Try to check if profile exists
-                const { data: existing } = await window.supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .single();
+        const profileData = {
+            user_id: currentUser.id,
+            full_name: document.getElementById('profileName').value,
+            phone: document.getElementById('profilePhone').value,
+            date_of_birth: document.getElementById('profileDOB').value || null,
+            bio: document.getElementById('profileBio').value,
+            address: document.getElementById('profileAddress').value,
+            email: currentUser.email,
+            role: currentUser.role
+        };
 
-                let result;
-                if (existing) {
-                    // Update existing profile
-                    result = await window.supabaseClient
-                        .from('profiles')
-                        .update(profileData)
-                        .eq('user_id', currentUser.id)
-                        .select();
-                } else {
-                    // Insert new profile
-                    result = await window.supabaseClient
-                        .from('profiles')
-                        .insert([profileData])
-                        .select();
-                }
-
-                if (result.error) throw result.error;
-
-                console.log('🟢 Profile saved:', result.data);
-                alert('✅ Profile saved successfully!');
-                closeProfileModal();
-
-            } catch (error) {
-                console.error('🔴 Error saving profile:', error);
-                alert('Error saving profile: ' + error.message);
-            }
+        let result;
+        if (existing) {
+            // Update existing profile
+            result = await window.supabaseClient
+                .from('profiles')
+                .update(profileData)
+                .eq('user_id', currentUser.id)
+                .select();
+        } else {
+            // Insert new profile - generate UUID in code
+            const newId = crypto.randomUUID();
+            profileData.id = newId;
+            
+            result = await window.supabaseClient
+                .from('profiles')
+                .insert([profileData])
+                .select();
         }
-    </script>
-</body>
-</html>
+
+        if (result.error) throw result.error;
+
+        console.log('🟢 Profile saved:', result.data);
+        alert('✅ Profile saved successfully!');
+        closeProfileModal();
+
+    } catch (error) {
+        console.error('🔴 Error saving profile:', error);
+        alert('Error saving profile: ' + error.message);
+    }
+}
