@@ -1,660 +1,1174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Therapist Dashboard - MindSpace</title>
-  
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    .dashboard-wrapper {
-      min-height: 100vh;
-      background: #F5F9F8;
-      padding-top: 80px;
-    }
-
-    .dashboard-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 30px 20px;
-    }
-
-    .dash-header {
-      background: #FFFFFF;
-      border: 1px solid #E5E7EB;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 18px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
-    }
-
-    .therapist-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .therapist-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFFFFF;
-      font-weight: 800;
-      font-size: 20px;
-    }
-
-    .therapist-meta h1 {
-      margin: 0;
-      color: #5A9B8E;
-      font-size: 26px;
-      line-height: 1.2;
-    }
-
-    .therapist-meta p {
-      margin: 6px 0 0;
-      color: #6B7280;
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    .btn-logout {
-      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-logout:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(220, 53, 69, 0.25);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-bottom: 22px;
-    }
-
-    @media (max-width: 992px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 576px) {
-      .stats-grid { grid-template-columns: 1fr; }
-    }
-
-    .stat-card {
-      background: #FFFFFF;
-      border: 1px solid #E5E7EB;
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-
-    .stat-label {
-      color: #6B7280;
-      font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stat-value {
-      margin-top: 8px;
-      font-size: 30px;
-      font-weight: 900;
-      color: #2C3E50;
-      line-height: 1;
-    }
-
-    .panel {
-      background: #FFFFFF;
-      border: 1px solid #E5E7EB;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      margin-bottom: 22px;
-    }
-
-    .panel-title {
-      margin: 0 0 16px;
-      color: #2C3E50;
-      font-size: 18px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .booking-row {
-      padding: 14px 0;
-      border-top: 1px solid #E5E7EB;
-    }
-
-    .booking-row:first-child {
-      border-top: none;
-      padding-top: 0;
-    }
-
-    .booking-status {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .booking-status.pending {
-      background: #FFF3CD;
-      color: #856404;
-    }
-
-    .booking-status.confirmed {
-      background: #D4EDDA;
-      color: #155724;
-    }
-
-    .booking-status.completed {
-      background: #D1ECF1;
-      color: #0C5460;
-    }
-
-    .booking-status.cancelled {
-      background: #F8D7DA;
-      color: #721C24;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #6B7280;
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      color: #C9E4DE;
-      margin-bottom: 16px;
-    }
-
-    .loading-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #6B7280;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .btn-action {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-approve {
-      background: #4caf50;
-      color: white;
-    }
-
-    .btn-approve:hover {
-      background: #45a049;
-      transform: translateY(-2px);
-    }
-
-    .btn-reject {
-      background: #f44336;
-      color: white;
-    }
-
-    .btn-reject:hover {
-      background: #d32f2f;
-      transform: translateY(-2px);
-    }
-
-    .btn-complete {
-      background: #2196F3;
-      color: white;
-    }
-
-    .btn-complete:hover {
-      background: #1976D2;
-      transform: translateY(-2px);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCare Pro - Therapist Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/therapist-dashboard.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-
-<body>
-  <div class="dashboard-wrapper">
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div class="nav-container">
-        <a href="index.html" class="logo">
-          <span class="logo-icon">🧠</span>
-          <span class="logo-text">MindSpace</span>
-        </a>
-
-        <ul class="nav-links">
-          <li><a href="therapist-dashboard.html" class="active">Dashboard</a></li>
-          <li><a href="index.html">Home</a></li>
-          <li><button class="btn-nav-login" id="navLogoutBtn" type="button">Logout</button></li>
-        </ul>
-      </div>
-    </nav>
-
-    <!-- Dashboard Container -->
-    <main class="dashboard-container">
-      <!-- Dashboard Header -->
-      <section class="dash-header">
-        <div class="therapist-left">
-          <div class="therapist-avatar" id="therapistAvatar">T</div>
-          <div class="therapist-meta">
-            <h1 id="therapistName">Therapist Dashboard</h1>
-            <p id="therapistSpecialization">Loading...</p>
-          </div>
+<body class="theme-light">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen active">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading therapist dashboard...</p>
         </div>
-        <button class="btn-logout" id="logoutBtn" type="button">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
-      </section>
+    </div>
 
-      <!-- Stats Grid -->
-      <section class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">
-            <i class="fas fa-calendar-check"></i> Total Bookings
-          </div>
-          <div class="stat-value" id="totalBookings">0</div>
+    <!-- Notification Center -->
+    <div id="notificationCenter" class="notification-center">
+        <div class="notification-header">
+            <h3>Therapist Notifications</h3>
+            <button class="btn-icon" id="markAllRead">
+                <i class="fas fa-check-double"></i>
+            </button>
+            <button class="btn-icon close-notifications">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            <i class="fas fa-clock"></i> Pending
-          </div>
-          <div class="stat-value" id="pendingBookings">0</div>
+        <div class="notification-list">
+            <!-- Notifications will be populated here -->
         </div>
+    </div>
 
-        <div class="stat-card">
-          <div class="stat-label">
-            <i class="fas fa-check-circle"></i> Confirmed
-          </div>
-          <div class="stat-value" id="confirmedBookings">0</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            <i class="fas fa-star"></i> Completed
-          </div>
-          <div class="stat-value" id="completedBookings">0</div>
-        </div>
-      </section>
-
-      <!-- Pending Bookings -->
-      <section class="panel">
-        <h2 class="panel-title">
-          <i class="fas fa-hourglass-half"></i> Pending Booking Requests
-        </h2>
-        <div id="pendingBookingsList">
-          <div class="loading-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading pending requests...</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- All Bookings -->
-      <section class="panel">
-        <h2 class="panel-title">
-          <i class="fas fa-list"></i> All Bookings
-        </h2>
-        <div id="allBookingsList">
-          <div class="loading-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading bookings...</p>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <script>
-    const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let currentTherapist = null;
-    let allBookings = [];
-
-    async function init() {
-      try {
-        // Check authentication
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError || !user) {
-          window.location.href = 'login.html';
-          return;
-        }
-
-        // Get profile
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, role, fullname, email')
-          .eq('id', user.id)
-          .single();
-
-        if (profileError || !profile || profile.role !== 'therapist') {
-          alert('Access denied. Therapist role required.');
-          window.location.href = 'login.html';
-          return;
-        }
-
-        // Get therapist details (FIXED: using id, not userid)
-        const { data: therapist, error: therapistError } = await supabase
-          .from('Therapists')
-          .select('*')
-          .eq('id', profile.id)
-          .single();
-
-        if (therapistError) {
-          console.error('Therapist fetch error:', therapistError);
-          alert('Error loading therapist profile.');
-          window.location.href = 'login.html';
-          return;
-        }
-
-        // Check approval status
-        if (therapist.approvalstatus !== 'approved') {
-          await supabase.auth.signOut();
-          alert('Your therapist account is pending approval. Please wait for admin approval.');
-          window.location.href = 'login.html';
-          return;
-        }
-
-        currentTherapist = therapist;
-
-        // Update UI
-        updateHeader(therapist);
-        
-        // Load bookings
-        await loadBookings();
-
-      } catch (error) {
-        console.error('Initialization error:', error);
-        alert('Error loading dashboard. Please try again.');
-        window.location.href = 'login.html';
-      }
-    }
-
-    function updateHeader(therapist) {
-      const nameEl = document.getElementById('therapistName');
-      const specEl = document.getElementById('therapistSpecialization');
-      const avatarEl = document.getElementById('therapistAvatar');
-
-      const displayName = therapist.Name ? `Dr. ${therapist.Name}` : 'Therapist Dashboard';
-      nameEl.textContent = displayName;
-      specEl.textContent = therapist.Specialization || 'General Therapy';
-      avatarEl.textContent = (therapist.Name || 'T').charAt(0).toUpperCase();
-    }
-
-    async function loadBookings() {
-      try {
-        const { data: bookings, error } = await supabase
-          .from('Bookings')
-          .select('*')
-          .eq('therapistid', currentTherapist.id)
-          .order('sessiondate', { ascending: false });
-
-        if (error) throw error;
-
-        allBookings = bookings || [];
-
-        // Update stats
-        updateStats(allBookings);
-
-        // Display bookings
-        displayPendingBookings(allBookings.filter(b => b.status === 'pending'));
-        displayAllBookings(allBookings);
-
-      } catch (error) {
-        console.error('Error loading bookings:', error);
-        document.getElementById('pendingBookingsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error loading bookings</p></div>';
-        document.getElementById('allBookingsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error loading bookings</p></div>';
-      }
-    }
-
-    function updateStats(bookings) {
-      document.getElementById('totalBookings').textContent = bookings.length;
-      document.getElementById('pendingBookings').textContent = bookings.filter(b => b.status === 'pending').length;
-      document.getElementById('confirmedBookings').textContent = bookings.filter(b => b.status === 'confirmed').length;
-      document.getElementById('completedBookings').textContent = bookings.filter(b => b.status === 'completed').length;
-    }
-
-    async function displayPendingBookings(bookings) {
-      const container = document.getElementById('pendingBookingsList');
-
-      if (!bookings.length) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending booking requests</p></div>';
-        return;
-      }
-
-      // Get user names
-      const userIds = [...new Set(bookings.map(b => b.userid))];
-      const { data: users } = await supabase
-        .from('profiles')
-        .select('id, fullname')
-        .in('id', userIds);
-
-      container.innerHTML = bookings.map(booking => {
-        const user = users?.find(u => u.id === booking.userid);
-        const date = new Date(booking.sessiondate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-
-        return `
-          <div class="booking-row">
-            <div>
-              <div style="font-weight:700;color:#2C3E50;margin-bottom:6px;">
-                <span class="booking-status pending">PENDING</span>
-                ${user?.fullname || 'Patient'} • ${date} • ${booking.starttime || 'Not set'}
-              </div>
-              <div style="color:#6B7280;font-size:13px;">
-                Booking ID: ${String(booking.id).slice(0, 8)} • Duration: ${booking.duration || 60} mins • Amount: ₹${booking.amount || 500}
-              </div>
-              <div class="action-buttons">
-                <button class="btn-action btn-approve" onclick="approveBooking('${booking.id}')">
-                  <i class="fas fa-check"></i> Accept
-                </button>
-                <button class="btn-action btn-reject" onclick="rejectBooking('${booking.id}')">
-                  <i class="fas fa-times"></i> Decline
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function displayAllBookings(bookings) {
-      const container = document.getElementById('allBookingsList');
-
-      if (!bookings.length) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>No bookings yet</p></div>';
-        return;
-      }
-
-      // Get user names
-      const userIds = [...new Set(bookings.map(b => b.userid))];
-      const { data: users } = await supabase
-        .from('profiles')
-        .select('id, fullname')
-        .in('id', userIds);
-
-      container.innerHTML = bookings.map(booking => {
-        const user = users?.find(u => u.id === booking.userid);
-        const date = new Date(booking.sessiondate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-        const status = booking.status || 'pending';
-
-        return `
-          <div class="booking-row">
-            <div>
-              <div style="font-weight:700;color:#2C3E50;margin-bottom:6px;">
-                <span class="booking-status ${status}">${status.toUpperCase()}</span>
-                ${user?.fullname || 'Patient'} • ${date} • ${booking.starttime || 'Not set'}
-              </div>
-              <div style="color:#6B7280;font-size:13px;">
-                Booking ID: ${String(booking.id).slice(0, 8)} • Duration: ${booking.duration || 60} mins • Amount: ₹${booking.amount || 500}
-              </div>
-              ${status === 'confirmed' ? `
-                <div class="action-buttons">
-                  <button class="btn-action btn-complete" onclick="completeBooking('${booking.id}')">
-                    <i class="fas fa-check-double"></i> Mark Complete
-                  </button>
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar therapist-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo therapist-logo">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h1>MindCare <span class="logo-pro">Therapist</span></h1>
                 </div>
-              ` : ''}
+                <button class="btn-icon sidebar-toggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
             </div>
-          </div>
-        `;
-      }).join('');
-    }
 
-    async function approveBooking(bookingId) {
-      if (!confirm('Accept this booking request?')) return;
+            <!-- Therapist Profile Summary -->
+            <div class="therapist-profile-summary">
+                <div class="profile-avatar">
+                    <img src="https://ui-avatars.com/api/?name=Dr+Sarah+Johnson&background=4CAF50&color=fff" alt="Therapist" id="therapistAvatar">
+                    <span class="status-indicator online"></span>
+                    <span class="availability-badge">Available</span>
+                </div>
+                <div class="profile-info">
+                    <h3 id="therapistName">Dr. Sarah Johnson</h3>
+                    <p class="therapist-specialty">Licensed Clinical Psychologist</p>
+                    <div class="therapist-stats">
+                        <div class="stat">
+                            <span class="stat-value">4.9</span>
+                            <span class="stat-label">Rating</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">247</span>
+                            <span class="stat-label">Clients</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">98%</span>
+                            <span class="stat-label">Satisfaction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      try {
-        const { error } = await supabase
-          .from('Bookings')
-          .update({ status: 'confirmed' })
-          .eq('id', bookingId);
+            <!-- Navigation Menu -->
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-section="overview">
+                        <a href="#overview">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="schedule">
+                        <a href="#schedule">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Schedule</span>
+                            <span class="badge badge-warning">5</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="clients">
+                        <a href="#clients">
+                            <i class="fas fa-users"></i>
+                            <span>My Clients</span>
+                            <span class="badge badge-primary">24</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="sessions">
+                        <a href="#sessions">
+                            <i class="fas fa-video"></i>
+                            <span>Sessions</span>
+                            <span class="badge badge-success">Today: 8</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="notes">
+                        <a href="#notes">
+                            <i class="fas fa-sticky-note"></i>
+                            <span>Session Notes</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="progress">
+                        <a href="#progress">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Progress Tracking</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="resources">
+                        <a href="#resources">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Resources</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="billing">
+                        <a href="#billing">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Billing</span>
+                            <span class="badge badge-info">$4,250</span>
+                        </a>
+                    </li>
+                </ul>
 
-        if (error) throw error;
+                <div class="sidebar-divider"></div>
 
-        showNotification('Booking accepted successfully!', 'success');
-        await loadBookings();
-      } catch (error) {
-        console.error('Error approving booking:', error);
-        showNotification('Error accepting booking', 'error');
-      }
-    }
+                <ul class="nav-menu">
+                    <li class="nav-item" data-section="availability">
+                        <a href="#availability">
+                            <i class="fas fa-clock"></i>
+                            <span>Availability</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="settings">
+                        <a href="#settings">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="support">
+                        <a href="#support">
+                            <i class="fas fa-headset"></i>
+                            <span>Support</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
-    async function rejectBooking(bookingId) {
-      const reason = prompt('Reason for declining (optional):');
-      if (reason === null) return;
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="btn btn-primary btn-block" id="startSessionNow">
+                    <i class="fas fa-play-circle"></i> Start Session
+                </button>
+                <button class="btn btn-outline btn-block" id="toggleAvailability">
+                    <i class="fas fa-toggle-on"></i> Set Availability
+                </button>
+            </div>
 
-      try {
-        const { error } = await supabase
-          .from('Bookings')
-          .update({ 
-            status: 'cancelled',
-            cancellationreason: reason || 'Declined by therapist'
-          })
-          .eq('id', bookingId);
+            <!-- Today's Summary -->
+            <div class="today-summary">
+                <h4>Today's Summary</h4>
+                <div class="summary-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <span class="summary-value">8</span>
+                        <span class="summary-label">Sessions</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <span class="summary-value">6.5h</span>
+                        <span class="summary-label">Total Time</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-dollar-sign"></i>
+                    <div>
+                        <span class="summary-value">$850</span>
+                        <span class="summary-label">Earnings</span>
+                    </div>
+                </div>
+            </div>
 
-        if (error) throw error;
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="theme-toggle">
+                    <i class="fas fa-sun"></i>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <label for="themeToggle"></label>
+                    </div>
+                    <i class="fas fa-moon"></i>
+                </div>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
 
-        showNotification('Booking declined', 'info');
-        await loadBookings();
-      } catch (error) {
-        console.error('Error rejecting booking:', error);
-        showNotification('Error declining booking', 'error');
-      }
-    }
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header therapist-header">
+                <div class="header-left">
+                    <button class="btn-icon mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="schedule-view">
+                        <button class="schedule-view-btn active">Day</button>
+                        <button class="schedule-view-btn">Week</button>
+                        <button class="schedule-view-btn">Month</button>
+                        <button class="btn-icon">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="current-date">Today, December 12</span>
+                        <button class="btn-icon">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <!-- Online Status -->
+                    <div class="online-status">
+                        <span class="status-dot online"></span>
+                        <span>Available for sessions</span>
+                        <button class="btn-status-toggle">
+                            <i class="fas fa-toggle-on"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Notification Bell -->
+                    <div class="notification-wrapper">
+                        <button class="btn-icon notification-btn" id="notificationBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-count">3</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-user-clock"></i>
+                            <span>Next: 15 min</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>4 completed</span>
+                        </div>
+                    </div>
+                    
+                    <!-- User Menu -->
+                    <div class="user-menu-wrapper">
+                        <button class="user-menu-btn" id="userMenuBtn">
+                            <img src="https://ui-avatars.com/api/?name=Dr+Sarah+Johnson&background=4CAF50&color=fff" alt="Therapist" class="user-avatar-sm">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <img src="https://ui-avatars.com/api/?name=Dr+Sarah+Johnson&background=4CAF50&color=fff" alt="Therapist">
+                                <div>
+                                    <h4>Dr. Sarah Johnson</h4>
+                                    <p>Clinical Psychologist</p>
+                                </div>
+                            </div>
+                            <a href="#profile"><i class="fas fa-user-md"></i> Professional Profile</a>
+                            <a href="#availability"><i class="fas fa-clock"></i> Availability Settings</a>
+                            <a href="#earnings"><i class="fas fa-chart-bar"></i> Earnings Dashboard</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#settings"><i class="fas fa-cog"></i> Account Settings</a>
+                            <a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-    async function completeBooking(bookingId) {
-      if (!confirm('Mark this session as completed?')) return;
+            <!-- Dashboard Sections -->
+            <div class="dashboard-sections">
+                <!-- Overview Section -->
+                <section id="overview" class="dashboard-section active">
+                    <div class="section-header">
+                        <h2>Therapist Dashboard</h2>
+                        <p class="section-subtitle">Welcome back, Dr. Johnson. Here's your practice overview.</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Availability
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
 
-      try {
-        const { error } = await supabase
-          .from('Bookings')
-          .update({ status: 'completed' })
-          .eq('id', bookingId);
+                    <!-- Practice Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon primary">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Today's Sessions</h3>
+                                <div class="stat-value">8/10</div>
+                                <div class="stat-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 80%"></div>
+                                    </div>
+                                    <span class="stat-change">4 completed</span>
+                                </div>
+                            </div>
+                        </div>
 
-        if (error) throw error;
+                        <div class="stat-card">
+                            <div class="stat-card">
+                            <div class="stat-icon success">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Active Clients</h3>
+                                <div class="stat-value">24</div>
+                                <div class="stat-detail">
+                                    <span class="stat-label">3 new this week</span>
+                                    <span class="stat-badge success">+12%</span>
+                                </div>
+                            </div>
+                        </div>
 
-        showNotification('Session marked as completed!', 'success');
-        await loadBookings();
-      } catch (error) {
-        console.error('Error completing booking:', error);
-        showNotification('Error completing session', 'error');
-      }
-    }
+                        <div class="stat-card">
+                            <div class="stat-icon warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Avg. Session Time</h3>
+                                <div class="stat-value">52m</div>
+                                <div class="stat-detail">
+                                    <span class="stat-label">Industry avg: 50m</span>
+                                    <span class="stat-badge warning">+4%</span>
+                                </div>
+                            </div>
+                        </div>
 
-    function showNotification(message, type = 'info') {
-      const notification = document.createElement('div');
-      notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        padding: 16px 24px;
-        background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
-        color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        z-index: 10000;
-        font-weight: 600;
-        animation: slideIn 0.3s ease;
-      `;
-      notification.textContent = message;
-      document.body.appendChild(notification);
+                        <div class="stat-card">
+                            <div class="stat-icon info">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Monthly Earnings</h3>
+                                <div class="stat-value">$4,250</div>
+                                <div class="stat-detail">
+                                    <span class="stat-label">Projected: $18,500</span>
+                                    <button class="btn-text">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-      setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-      }, 3000);
-    }
+                    <!-- Today's Schedule & Upcoming Sessions -->
+                    <div class="section-row">
+                        <div class="section-col-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Today's Schedule</h3>
+                                    <div class="time-indicator">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Current time: 2:30 PM</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="timeline-schedule">
+                                        <div class="timeline-item completed">
+                                            <div class="timeline-time">9:00 AM</div>
+                                            <div class="timeline-content">
+                                                <div class="session-info">
+                                                    <h4>John Doe - Anxiety Management</h4>
+                                                    <p><i class="fas fa-video"></i> Video Session • 50 min</p>
+                                                    <div class="session-status">
+                                                        <span class="status-badge completed">Completed</span>
+                                                        <button class="btn-text">View Notes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="timeline-item completed">
+                                            <div class="timeline-time">10:00 AM</div>
+                                            <div class="timeline-content">
+                                                <div class="session-info">
+                                                    <h4>Emma Wilson - Depression Therapy</h4>
+                                                    <p><i class="fas fa-video"></i> Video Session • 60 min</p>
+                                                    <div class="session-status">
+                                                        <span class="status-badge completed">Completed</span>
+                                                        <button class="btn-text">Add Notes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="timeline-item completed">
+                                            <div class="timeline-time">11:15 AM</div>
+                                            <div class="timeline-content">
+                                                <div class="session-info">
+                                                    <h4>Robert Chen - Stress Management</h4>
+                                                    <p><i class="fas fa-phone-alt"></i> Phone Session • 45 min</p>
+                                                    <div class="session-status">
+                                                        <span class="status-badge completed">Completed</span>
+                                                        <button class="btn-text">View Notes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="timeline-item completed">
+                                            <div class="timeline-time">1:30 PM</div>
+                                            <div class="timeline-content">
+                                                <div class="session-info">
+                                                    <h4>Maria Garcia - Relationship Counseling</h4>
+                                                    <p><i class="fas fa-video"></i> Video Session • 60 min</p>
+                                                    <div class="session-status">
+                                                        <span class="status-badge completed">Completed</span>
+                                                        <button class="btn-text">Add Notes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="timeline-item current">
+                                            <div class="timeline-time">NOW</div>
+                                            <div class="timeline-content">
+                                                <div class="session-info">
+                                                    <h4>David Kim - Cognitive Behavioral Therapy</h4>
+                                                    <p><i class="fas fa-video"></i> Video Session • 50 min</p>
+                                                    <div class="session-status">
+                                                        <span class="status-badge in-progress">In Progress</span>
+                                                        <button class="btn btn-primary btn-sm">
+                                                            <i class="fas fa-play"></i> Join Session
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="timeline-item upcoming">
+                                            <div class="timeline-time">3:30 PM</div>
+                                            <div class="timeline-content">
+                                                <div class="session-info">
+                                                    <h4>Sophia Patel - Mindfulness Training</h4>
+                                                    <p><i class="fas fa-video"></i> Video Session • 45 min</p>
+                                                    <div class="session-status">
+                                                        <span class="status-badge upcoming">Starting soon</span>
+                                                        <button class="btn btn-outline btn-sm">Prepare</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="timeline-item upcoming">
+                                            <div class="timeline-time">4:30 PM</div>
+                                            <div class="timeline-content">
+                                                <div class="session-info">
+                                                    <h4>James Wilson - Grief Counseling</h4>
+                                                    <p><i class="fas fa-video"></i> Video Session • 60 min</p>
+                                                    <div class="session-status">
+                                                        <span class="status-badge upcoming">Scheduled</span>
+                                                        <button class="btn btn-outline btn-sm">Reschedule</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-    async function logout() {
-      if (!confirm('Are you sure you want to logout?')) return;
-      
-      await supabase.auth.signOut();
-      localStorage.removeItem('user');
-      window.location.href = 'login.html';
-    }
+                        <!-- Quick Actions & Client Alerts -->
+                        <div class="section-col-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Quick Actions</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="quick-actions-list">
+                                        <button class="quick-action-btn">
+                                            <i class="fas fa-sticky-note"></i>
+                                            <span>Add Session Notes</span>
+                                        </button>
+                                        <button class="quick-action-btn">
+                                            <i class="fas fa-calendar-plus"></i>
+                                            <span>Schedule Session</span>
+                                        </button>
+                                        <button class="quick-action-btn">
+                                            <i class="fas fa-file-prescription"></i>
+                                            <span>Create Treatment Plan</span>
+                                        </button>
+                                        <button class="quick-action-btn">
+                                            <i class="fas fa-paper-plane"></i>
+                                            <span>Send Resources</span>
+                                        </button>
+                                        <button class="quick-action-btn">
+                                            <i class="fas fa-chart-line"></i>
+                                            <span>Progress Reports</span>
+                                        </button>
+                                        <button class="quick-action-btn">
+                                            <i class="fas fa-file-invoice"></i>
+                                            <span>Generate Invoice</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card alert-card">
+                                <div class="card-header">
+                                    <h3>Client Alerts</h3>
+                                    <span class="badge badge-warning">3</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert-list">
+                                        <div class="alert-item warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <div>
+                                                <p>John Doe missed check-in (2 days)</p>
+                                                <small>Anxiety Management Program</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="alert-item info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <div>
+                                                <p>Emma Wilson progress assessment due</p>
+                                                <small>Due tomorrow</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="alert-item success">
+                                            <i class="fas fa-check-circle"></i>
+                                            <div>
+                                                <p>Robert Chen completed homework</p>
+                                                <small>Stress Management</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    document.getElementById('logoutBtn').addEventListener('click', logout);
-    document.getElementById('navLogoutBtn').addEventListener('click', logout);
+                    <!-- Recent Clients & Performance Metrics -->
+                    <div class="section-row">
+                        <div class="section-col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Recent Clients</h3>
+                                    <button class="btn-text">View All</button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="clients-list">
+                                        <div class="client-item">
+                                            <img src="https://ui-avatars.com/api/?name=John+Doe&background=667eea&color=fff" alt="Client">
+                                            <div class="client-info">
+                                                <h4>John Doe</h4>
+                                                <p>Anxiety Management • Session 8/12</p>
+                                                <div class="client-progress">
+                                                    <div class="progress-bar small">
+                                                        <div class="progress-fill" style="width: 67%"></div>
+                                                    </div>
+                                                    <span>67% complete</span>
+                                                </div>
+                                            </div>
+                                            <div class="client-actions">
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-comment"></i>
+                                                </button>
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-calendar"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="client-item">
+                                            <img src="https://ui-avatars.com/api/?name=Emma+Wilson&background=4CAF50&color=fff" alt="Client">
+                                            <div class="client-info">
+                                                <h4>Emma Wilson</h4>
+                                                <p>Depression Therapy • Session 4/8</p>
+                                                <div class="client-progress">
+                                                    <div class="progress-bar small">
+                                                        <div class="progress-fill" style="width: 50%"></div>
+                                                    </div>
+                                                    <span>50% complete</span>
+                                                </div>
+                                            </div>
+                                            <div class="client-actions">
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-comment"></i>
+                                                </button>
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-calendar"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="client-item">
+                                            <img src="https://ui-avatars.com/api/?name=Robert+Chen&background=2196F3&color=fff" alt="Client">
+                                            <div class="client-info">
+                                                <h4>Robert Chen</h4>
+                                                <p>Stress Management • Session 6/10</p>
+                                                <div class="client-progress">
+                                                    <div class="progress-bar small">
+                                                        <div class="progress-fill" style="width: 60%"></div>
+                                                    </div>
+                                                    <span>60% complete</span>
+                                                </div>
+                                            </div>
+                                            <div class="client-actions">
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-comment"></i>
+                                                </button>
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-calendar"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="client-item">
+                                            <img src="https://ui-avatars.com/api/?name=Maria+Garcia&background=FF9800&color=fff" alt="Client">
+                                            <div class="client-info">
+                                                <h4>Maria Garcia</h4>
+                                                <p>Relationship Counseling • Session 2/12</p>
+                                                <div class="client-progress">
+                                                    <div class="progress-bar small">
+                                                        <div class="progress-fill" style="width: 17%"></div>
+                                                    </div>
+                                                    <span>17% complete</span>
+                                                </div>
+                                            </div>
+                                            <div class="client-actions">
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-comment"></i>
+                                                </button>
+                                                <button class="btn-icon">
+                                                    <i class="fas fa-calendar"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-    // Add animation CSS
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
+                        <div class="section-col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Performance Metrics</h3>
+                                    <div class="time-filter">
+                                        <button class="time-filter-btn active">Week</button>
+                                        <button class="time-filter-btn">Month</button>
+                                        <button class="time-filter-btn">Quarter</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="metrics-chart">
+                                        <canvas id="performanceChart"></canvas>
+                                    </div>
+                                    <div class="metrics-summary">
+                                        <div class="metric-item">
+                                            <span class="metric-label">Client Satisfaction</span>
+                                            <span class="metric-value positive">98%</span>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span class="metric-label">Session Completion</span>
+                                            <span class="metric-value positive">95%</span>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span class="metric-label">Avg. Response Time</span>
+                                            <span class="metric-value">2.4h</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    init();
-  </script>
+                    <!-- To-Do List & Recent Notes -->
+                    <div class="section-row">
+                        <div class="section-col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Today's To-Do</h3>
+                                    <button class="btn-icon" id="addTodo">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="todo-list">
+                                        <div class="todo-item">
+                                            <input type="checkbox" id="todo1" checked>
+                                            <label for="todo1">
+                                                <span class="todo-text">Review John Doe's progress notes</span>
+                                                <span class="todo-time">9:00 AM</span>
+                                            </label>
+                                        </div>
+                                        <div class="todo-item">
+                                            <input type="checkbox" id="todo2" checked>
+                                            <label for="todo2">
+                                                <span class="todo-text">Prepare for Emma Wilson's assessment</span>
+                                                <span class="todo-time">10:30 AM</span>
+                                            </label>
+                                        </div>
+                                        <div class="todo-item">
+                                            <input type="checkbox" id="todo3">
+                                            <label for="todo3">
+                                                <span class="todo-text">Send resources to Robert Chen</span>
+                                                <span class="todo-time">Priority</span>
+                                            </label>
+                                        </div>
+                                        <div class="todo-item">
+                                            <input type="checkbox" id="todo4">
+                                            <label for="todo4">
+                                                <span class="todo-text">Update treatment plan for Maria Garcia</span>
+                                                <span class="todo-time">3:00 PM</span>
+                                            </label>
+                                        </div>
+                                        <div class="todo-item">
+                                            <input type="checkbox" id="todo5">
+                                            <label for="todo5">
+                                                <span class="todo-text">Complete monthly report</span>
+                                                <span class="todo-time">End of day</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="todo-input">
+                                        <input type="text" placeholder="Add new task...">
+                                        <button class="btn-icon">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Recent Session Notes</h3>
+                                    <button class="btn-text">View All</button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="notes-list">
+                                        <div class="note-item">
+                                            <div class="note-header">
+                                                <h4>John Doe - Session #8</h4>
+                                                <span class="note-date">Today, 9:00 AM</span>
+                                            </div>
+                                            <p class="note-preview">Showed significant improvement in anxiety management techniques. Homework completion rate increased to 90%...</p>
+                                            <div class="note-tags">
+                                                <span class="tag">Anxiety</span>
+                                                <span class="tag">Progress</span>
+                                                <span class="tag">CBT</span>
+                                            </div>
+                                        </div>
+                                        <div class="note-item">
+                                            <div class="note-header">
+                                                <h4>Emma Wilson - Session #4</h4>
+                                                <span class="note-date">Today, 10:00 AM</span>
+                                            </div>
+                                            <p class="note-preview">Discussed coping strategies for depressive episodes. Patient reported decreased frequency of low mood days...</p>
+                                            <div class="note-tags">
+                                                <span class="tag">Depression</span>
+                                                <span class="tag">Coping</span>
+                                            </div>
+                                        </div>
+                                        <div class="note-item">
+                                            <div class="note-header">
+                                                <h4>Robert Chen - Session #6</h4>
+                                                <span class="note-date">Today, 11:15 AM</span>
+                                            </div>
+                                            <p class="note-preview">Workplace stress management techniques. Implemented mindfulness exercises with positive feedback...</p>
+                                            <div class="note-tags">
+                                                <span class="tag">Stress</span>
+                                                <span class="tag">Mindfulness</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Schedule Section -->
+                <section id="schedule" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Schedule Management</h2>
+                        <p class="section-subtitle">Manage your appointments and availability</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Time Block
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-sync"></i> Sync Calendar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar View -->
+                    <div class="schedule-content">
+                        <!-- Will be populated with calendar -->
+                    </div>
+                </section>
+
+                <!-- Clients Section -->
+                <section id="clients" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>My Clients</h2>
+                        <p class="section-subtitle">Manage your client relationships and treatment plans</p>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search clients...">
+                        </div>
+                    </div>
+
+                    <!-- Clients Content -->
+                    <div class="clients-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Sessions Section -->
+                <section id="sessions" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Session Management</h2>
+                        <p class="section-subtitle">Manage all therapy sessions</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Schedule Session
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-history"></i> Session History
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sessions Content -->
+                    <div class="sessions-management">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Notes Section -->
+                <section id="notes" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Session Notes</h2>
+                        <p class="section-subtitle">Document and review therapy sessions</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> New Note
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-filter"></i> Filter Notes
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Notes Content -->
+                    <div class="notes-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Progress Tracking Section -->
+                <section id="progress" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Progress Tracking</h2>
+                        <p class="section-subtitle">Monitor client progress and outcomes</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-chart-bar"></i> Generate Report
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Progress Content -->
+                    <div class="progress-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Resources Section -->
+                <section id="resources" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Therapist Resources</h2>
+                        <p class="section-subtitle">Access tools, templates, and educational materials</p>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search resources...">
+                        </div>
+                    </div>
+
+                    <!-- Resources Content -->
+                    <div class="resources-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Billing Section -->
+                <section id="billing" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Billing & Payments</h2>
+                        <p class="section-subtitle">Manage invoices, payments, and financial reports</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-file-invoice"></i> Create Invoice
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i> Financial Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Billing Content -->
+                    <div class="billing-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Availability Section -->
+                <section id="availability" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Availability Settings</h2>
+                        <p class="section-subtitle">Set your working hours and appointment types</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary" id="setAvailability">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Availability Content -->
+                    <div class="availability-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Therapist Settings</h2>
+                        <p class="section-subtitle">Manage your account and preferences</p>
+                    </div>
+
+                    <!-- Settings Content -->
+                    <div class="settings-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Support Section -->
+                <section id="support" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Therapist Support</h2>
+                        <p class="section-subtitle">Get help and connect with our support team</p>
+                    </div>
+
+                    <!-- Support Content -->
+                    <div class="support-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Footer -->
+            <footer class="dashboard-footer">
+                <div class="footer-content">
+                    <div class="footer-links">
+                        <a href="#">Therapist Resources</a>
+                        <a href="#">Continuing Education</a>
+                        <a href="#">Professional Network</a>
+                        <a href="#">Support Center</a>
+                        <a href="#">Privacy & Compliance</a>
+                    </div>
+                    <div class="footer-copyright">
+                        <p>&copy; 2024 MindCare Pro - Therapist Platform</p>
+                        <p class="footer-version">Version 2.1.4 • Licensed to: Dr. Sarah Johnson</p>
+                    </div>
+                </div>
+            </footer>
+        </main>
+
+        <!-- Right Sidebar (Session Tools) -->
+        <aside class="right-sidebar therapist-tools">
+            <div class="sidebar-header">
+                <h3>Session Tools</h3>
+                <button class="btn-icon close-right-sidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Active Session Info -->
+            <div class="active-session-info">
+                <h4>Current Session</h4>
+                <div class="session-details">
+                    <div class="client-avatar">
+                        <img src="https://ui-avatars.com/api/?name=David+Kim&background=9C27B0&color=fff" alt="Client">
+                        <span class="live-indicator"></span>
+                    </div>
+                    <div class="client-details">
+                        <h5>David Kim</h5>
+                        <p>Cognitive Behavioral Therapy</p>
+                        <div class="session-timer">
+                            <i class="fas fa-clock"></i>
+                            <span>25:43 / 50:00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="session-controls">
+                    <button class="btn btn-sm btn-success">
+                        <i class="fas fa-microphone"></i> Unmute
+                    </button>
+                    <button class="btn btn-sm btn-outline">
+                        <i class="fas fa-video"></i> Video On
+                    </button>
+                    <button class="btn btn-sm btn-warning">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                </div>
+            </div>
+
+            <!-- Session Notes Quick Entry -->
+            <div class="quick-notes">
+                <h4>Session Notes</h4>
+                <textarea placeholder="Take notes during session..." rows="4"></textarea>
+                <div class="note-tags-quick">
+                    <span class="tag active">Progress</span>
+                    <span class="tag">Homework</span>
+                    <span class="tag">Insight</span>
+                    <span class="tag">Challenge</span>
+                </div>
+                <button class="btn btn-primary btn-block">
+                    <i class="fas fa-save"></i> Save Note
+                </button>
+            </div>
+
+            <!-- Resources Quick Access -->
+            <div class="quick-resources">
+                <h4>Quick Resources</h4>
+                <div class="resource-list">
+                    <button class="resource-btn">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>CBT Worksheet</span>
+                    </button>
+                    <button class="resource-btn">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Progress Chart</span>
+                    </button>
+                    <button class="resource-btn">
+                        <i class="fas fa-brain"></i>
+                        <span>Mindfulness Exercise</span>
+                    </button>
+                    <button class="resource-btn">
+                        <i class="fas fa-book"></i>
+                        <span>Treatment Plan</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Emergency Protocols -->
+            <div class="emergency-protocols">
+                <h4>Emergency Protocols</h4>
+                <div class="protocol-list">
+                    <button class="protocol-btn">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Crisis Intervention
+                    </button>
+                    <button class="protocol-btn">
+                        <i class="fas fa-shield-alt"></i>
+                        Safety Planning
+                    </button>
+                    <button class="protocol-btn">
+                        <i class="fas fa-phone-alt"></i>
+                        Emergency Contacts
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal System -->
+    <div id="modalContainer"></div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Session Modal -->
+    <div id="sessionModal" class="modal session-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-video"></i> Start Therapy Session</h2>
+                <button class="btn-icon close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Session modal content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/therapist-dashboard.js"></script>
+    <script>
+        // Initialize therapist dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the dashboard
+            if (typeof TherapistDashboard !== 'undefined') {
+                const dashboard = new TherapistDashboard();
+                dashboard.init();
+            }
+            
+            // Initialize performance chart
+            const performanceChartCanvas = document.getElementById('performanceChart');
+            if (performanceChartCanvas) {
+                const ctx = performanceChartCanvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Sessions',
+                            data: [7, 8, 9, 7, 8, 5, 4],
+                            backgroundColor: '#4CAF50',
+                            borderRadius: 6
+                        }, {
+                            label: 'Client Satisfaction',
+                            data: [95, 96, 98, 97, 99, 94, 96],
+                            backgroundColor: '#2196F3',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
