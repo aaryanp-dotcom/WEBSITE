@@ -3,1165 +3,1431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - MindSpace</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* Dashboard Layout */
-        .dashboard-wrapper {
-            min-height: 100vh;
-            background: #F5F9F8;
-        }
-        
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-        
-        @media (min-width: 768px) {
-            .dashboard-container {
-                padding: 40px 50px;
-            }
-        }
-        
-        /* Header Styles */
-        .dashboard-header {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            border: 1px solid #E5E7EB;
-        }
-        
-        .dashboard-header h1 {
-            color: #5A9B8E;
-            font-size: 2.5rem;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-        
-        .admin-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .admin-avatar {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2C3E50;
-        }
-        
-        .admin-details h3 {
-            color: #2C3E50;
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .admin-details p {
-            color: #6B7280;
-            font-size: 0.875rem;
-        }
-        
-        .btn-logout {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
-        }
-        
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 30px 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            border: 1px solid #E5E7EB;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(90, 155, 142, 0.1);
-        }
-        
-        .stat-card .icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #5A9B8E;
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2C3E50;
-            margin-bottom: 10px;
-            line-height: 1;
-        }
-        
-        .stat-label {
-            color: #6B7280;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Content Sections */
-        .content-section {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-            border: 1px solid #E5E7EB;
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .section-title {
-            color: #2C3E50;
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title .icon {
-            font-size: 1.25rem;
-            color: #5A9B8E;
-        }
-        
-        .refresh-btn {
-            background: #F5F9F8;
-            color: #5A9B8E;
-            padding: 10px 20px;
-            border: 1px solid #C9E4DE;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .refresh-btn:hover {
-            background: #E8F3EF;
-        }
-        
-        /* Applications List */
-        .applications-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .application-card {
-            background: #F5F9F8;
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 4px solid #5A9B8E;
-            transition: transform 0.3s ease;
-        }
-        
-        .application-card:hover {
-            transform: translateX(5px);
-        }
-        
-        .application-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .therapist-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #2C3E50;
-        }
-        
-        .therapist-specialization {
-            color: #5A9B8E;
-            font-weight: 600;
-            margin-top: 5px;
-            font-size: 0.95rem;
-        }
-        
-        .application-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .detail-label {
-            color: #6B7280;
-            font-size: 0.75rem;
-            margin-bottom: 5px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .detail-value {
-            color: #2C3E50;
-            font-weight: 600;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-        
-        .application-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            padding-top: 20px;
-            border-top: 1px solid #E5E7EB;
-        }
-        
-        .btn-approve {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-approve:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
-        }
-        
-        .btn-reject {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-reject:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(244, 67, 54, 0.3);
-        }
-        
-        /* Bookings List */
-        .bookings-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .booking-card {
-            background: #F5F9F8;
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 4px solid #5A9B8E;
-            transition: transform 0.3s ease;
-        }
-        
-        .booking-card:hover {
-            transform: translateX(5px);
-        }
-        
-        .booking-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .booking-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #2C3E50;
-        }
-        
-        .booking-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-        
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .status-pending {
-            background: #FFF3CD;
-            color: #856404;
-            border: 1px solid #FFEAA7;
-        }
-        
-        .status-approved {
-            background: #D4EDDA;
-            color: #155724;
-            border: 1px solid #C3E6CB;
-        }
-        
-        .status-rejected {
-            background: #F8D7DA;
-            color: #721C24;
-            border: 1px solid #F5C6CB;
-        }
-        
-        .status-confirmed {
-            background: #D4EDDA;
-            color: #155724;
-            border: 1px solid #C3E6CB;
-        }
-        
-        .status-completed {
-            background: #D1ECF1;
-            color: #0C5460;
-            border: 1px solid #BEE5EB;
-        }
-        
-        .status-cancelled {
-            background: #F8D7DA;
-            color: #721C24;
-            border: 1px solid #F5C6CB;
-        }
-        
-        /* Empty States */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6B7280;
-        }
-        
-        .empty-state .icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #C9E4DE;
-        }
-        
-        .empty-state h3 {
-            color: #2C3E50;
-            font-size: 1.25rem;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .empty-state p {
-            color: #6B7280;
-            font-size: 1rem;
-            max-width: 400px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-        
-        /* Loading States */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #F5F9F8;
-            border-radius: 50%;
-            border-top-color: #5A9B8E;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            color: #6B7280;
-            text-align: center;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .admin-info {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .content-section {
-                padding: 25px 20px;
-            }
-            
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .application-header,
-            .booking-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .application-actions {
-                width: 100%;
-            }
-            
-            .btn-approve,
-            .btn-reject {
-                flex: 1;
-                justify-content: center;
-            }
-        }
-        
-        /* Filter Controls */
-        .filter-controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            padding: 10px 20px;
-            border: 1px solid #E5E7EB;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: #6B7280;
-            transition: all 0.3s ease;
-        }
-        
-        .filter-btn.active {
-            background: #5A9B8E;
-            color: white;
-            border-color: #5A9B8E;
-        }
-        
-        .filter-btn:hover:not(.active) {
-            background: #F5F9F8;
-            border-color: #5A9B8E;
-        }
-        
-        /* Quick Actions */
-        .quick-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-        
-        .action-btn {
-            padding: 15px 25px;
-            border: 1px solid #E5E7EB;
-            background: white;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #2C3E50;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .action-btn:hover {
-            background: #F5F9F8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border-color: #5A9B8E;
-        }
-        
-        .action-btn .icon {
-            font-size: 1.25rem;
-            color: #5A9B8E;
-        }
-    </style>
+    <title>MindCare Pro - Admin Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 </head>
-<body>
-    <div class="dashboard-wrapper">
-        <!-- Navigation -->
-        <nav class="navbar">
-            <div class="nav-container">
-                <a href="index.html" class="logo">
-                    <span class="logo-icon">🧠</span>
-                    <span class="logo-text">MindSpace</span>
-                </a>
-                <ul class="nav-links">
-                    <li><a href="admin-dashboard.html" class="active">Admin Dashboard</a></li>
-                    async function logout() {
-    if (!confirm('Are you sure you want to logout?')) return;
-    
-    await supabase.auth.signOut();
-    localStorage.removeItem('user');
-    window.location.href = 'login.html';
-}
+<body class="theme-light">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen active">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading admin dashboard...</p>
+        </div>
+    </div>
 
-                        <span class="icon">🚪</span>
-                        Logout
-                    </button></li>
-                </ul>
-            </div>
-        </nav>
+    <!-- Notification Center -->
+    <div id="notificationCenter" class="notification-center admin-notifications">
+        <div class="notification-header">
+            <h3>System Notifications</h3>
+            <button class="btn-icon" id="markAllRead">
+                <i class="fas fa-check-double"></i>
+            </button>
+            <button class="btn-icon close-notifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list">
+            <!-- System notifications will be populated here -->
+        </div>
+    </div>
 
-        <!-- Dashboard Container -->
-        <main class="dashboard-container">
-            <!-- Dashboard Header -->
-            <div class="dashboard-header">
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <p style="color: #6B7280; margin-top: 10px; font-size: 1rem;">Manage users, therapists, and bookings</p>
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo admin-logo">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h1>MindCare <span class="logo-pro">Admin</span></h1>
                 </div>
-                <div class="admin-info">
-                    <div class="admin-avatar">A</div>
-                    <div class="admin-details">
-                        <h3 id="adminName">Administrator</h3>
-                        <p id="lastLogin">Last login: Today, 10:30 AM</p>
+                <button class="btn-icon sidebar-toggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <!-- Admin Profile -->
+            <div class="admin-profile-summary">
+                <div class="profile-avatar">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=673AB7&color=fff" alt="Admin" id="adminAvatar">
+                    <span class="status-indicator online"></span>
+                </div>
+                <div class="profile-info">
+                    <h3 id="adminName">System Admin</h3>
+                    <p class="admin-role">Super Administrator</p>
+                    <div class="admin-badges">
+                        <span class="badge badge-primary">Full Access</span>
+                        <span class="badge badge-success">Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-section="overview">
+                        <a href="#overview">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="users">
+                        <a href="#users">
+                            <i class="fas fa-users"></i>
+                            <span>User Management</span>
+                            <span class="badge badge-primary">1,247</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="therapists">
+                        <a href="#therapists">
+                            <i class="fas fa-user-md"></i>
+                            <span>Therapist Management</span>
+                            <span class="badge badge-success">84</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="sessions">
+                        <a href="#sessions">
+                            <i class="fas fa-video"></i>
+                            <span>Session Monitoring</span>
+                            <span class="badge badge-warning">246 live</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="content">
+                        <a href="#content">
+                            <i class="fas fa-newspaper"></i>
+                            <span>Content Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="billing">
+                        <a href="#billing">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Billing & Payments</span>
+                            <span class="badge badge-info">$124.5k</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="analytics">
+                        <a href="#analytics">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="reports">
+                        <a href="#reports">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="sidebar-divider"></div>
+
+                <ul class="nav-menu">
+                    <li class="nav-item" data-section="settings">
+                        <a href="#settings">
+                            <i class="fas fa-cogs"></i>
+                            <span>System Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="security">
+                        <a href="#security">
+                            <i class="fas fa-lock"></i>
+                            <span>Security</span>
+                            <span class="badge badge-danger">3 alerts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="logs">
+                        <a href="#logs">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Audit Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="support">
+                        <a href="#support">
+                            <i class="fas fa-headset"></i>
+                            <span>Support Tickets</span>
+                            <span class="badge badge-warning">12</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="sidebar-divider"></div>
+
+                <ul class="nav-menu">
+                    <li class="nav-item" data-section="backup">
+                        <a href="#backup">
+                            <i class="fas fa-database"></i>
+                            <span>Backup & Restore</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="api">
+                        <a href="#api">
+                            <i class="fas fa-code"></i>
+                            <span>API Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="maintenance">
+                        <a href="#maintenance">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- System Status -->
+            <div class="system-status">
+                <h4>System Status</h4>
+                <div class="status-indicators">
+                    <div class="status-item online">
+                        <i class="fas fa-server"></i>
+                        <span>API Server</span>
+                    </div>
+                    <div class="status-item online">
+                        <i class="fas fa-database"></i>
+                        <span>Database</span>
+                    </div>
+                    <div class="status-item warning">
+                        <i class="fas fa-cloud"></i>
+                        <span>Storage (85%)</span>
+                    </div>
+                    <div class="status-item online">
+                        <i class="fas fa-network-wired"></i>
+                        <span>Network</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Actions -->
             <div class="quick-actions">
-                <button class="action-btn" onclick="loadPendingApplications()">
-                    <span class="icon">🔍</span>
-                    Refresh Applications
+                <button class="btn btn-primary btn-block" id="adminQuickAction">
+                    <i class="fas fa-plus"></i> Add New Admin
                 </button>
-                <button class="action-btn" onclick="loadAllBookings()">
-                    <span class="icon">🔄</span>
-                    Refresh Bookings
-                </button>
-                <button class="action-btn" onclick="exportData()">
-                    <span class="icon">📊</span>
-                    Export Data
-                </button>
-                <button class="action-btn" onclick="showAnalytics()">
-                    <span class="icon">📈</span>
-                    View Analytics
+                <button class="btn btn-outline btn-block" id="systemBackup">
+                    <i class="fas fa-save"></i> Backup System
                 </button>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="icon">👥</div>
-                    <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label">Total Users</div>
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="theme-toggle">
+                    <i class="fas fa-sun"></i>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <label for="themeToggle"></label>
+                    </div>
+                    <i class="fas fa-moon"></i>
                 </div>
-                <div class="stat-card">
-                    <div class="icon">👨‍⚕️</div>
-                    <div class="stat-number" id="totalTherapists">0</div>
-                    <div class="stat-label">Active Therapists</div>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header admin-header">
+                <div class="header-left">
+                    <button class="btn-icon mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="system-health">
+                        <div class="health-indicator healthy"></div>
+                        <span>System Health: Excellent</span>
+                        <div class="health-stats">
+                            <span><i class="fas fa-memory"></i> 64% RAM</span>
+                            <span><i class="fas fa-microchip"></i> 42% CPU</span>
+                            <span><i class="fas fa-hdd"></i> 85% Storage</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="icon">📝</div>
-                    <div class="stat-number" id="pendingApplications">0</div>
-                    <div class="stat-label">Pending Applications</div>
+                
+                <div class="header-right">
+                    <!-- System Alerts -->
+                    <div class="system-alerts">
+                        <button class="btn-icon alert-btn warning" id="systemAlertsBtn">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span class="alert-count">3</span>
+                        </button>
+                        <div class="alerts-dropdown">
+                            <div class="alert-item critical">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div>
+                                    <p>High server load detected</p>
+                                    <small>5 minutes ago</small>
+                                </div>
+                            </div>
+                            <div class="alert-item warning">
+                                <i class="fas fa-database"></i>
+                                <div>
+                                    <p>Database backup overdue</p>
+                                    <small>2 hours ago</small>
+                                </div>
+                            </div>
+                            <div class="alert-item info">
+                                <i class="fas fa-user-shield"></i>
+                                <div>
+                                    <p>Security scan completed</p>
+                                    <small>Today, 3:00 AM</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Bell -->
+                    <div class="notification-wrapper">
+                        <button class="btn-icon notification-btn" id="notificationBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-count">8</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-bolt"></i>
+                            <span>Live Sessions: 246</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-user-plus"></i>
+                            <span>New Today: 47</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Search -->
+                    <div class="admin-search">
+                        <input type="text" placeholder="Search users, logs, settings...">
+                        <button class="btn-icon">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- User Menu -->
+                    <div class="user-menu-wrapper">
+                        <button class="user-menu-btn" id="userMenuBtn">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=673AB7&color=fff" alt="Admin" class="user-avatar-sm">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown admin-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <img src="https://ui-avatars.com/api/?name=Admin+User&background=673AB7&color=fff" alt="Admin">
+                                <div>
+                                    <h4>System Admin</h4>
+                                    <p>Super Administrator</p>
+                                    <small>Last login: Today, 8:30 AM</small>
+                                </div>
+                            </div>
+                            <a href="#admin-profile"><i class="fas fa-user-shield"></i> Admin Profile</a>
+                            <a href="#permissions"><i class="fas fa-key"></i> Permissions</a>
+                            <a href="#activity"><i class="fas fa-history"></i> My Activity</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#impersonate"><i class="fas fa-user-secret"></i> Impersonate User</a>
+                            <a href="#system-check"><i class="fas fa-stethoscope"></i> System Diagnostics</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="icon">📅</div>
-                    <div class="stat-number" id="totalBookings">0</div>
-                    <div class="stat-label">Total Bookings</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon">✅</div>
-                    <div class="stat-number" id="completedSessions">0</div>
-                    <div class="stat-label">Completed Sessions</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon">💰</div>
-                    <div class="stat-number" id="totalRevenue">₹0</div>
-                    <div class="stat-label">Total Revenue</div>
-                </div>
+            </header>
+
+            <!-- Dashboard Sections -->
+            <div class="dashboard-sections">
+                <!-- Overview Section -->
+                <section id="overview" class="dashboard-section active">
+                    <div class="section-header">
+                        <h2>System Overview</h2>
+                        <p class="section-subtitle">Complete platform administration and monitoring</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-cogs"></i> System Settings
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-sync"></i> Refresh Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- System Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card system-stat">
+                            <div class="stat-icon primary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Total Users</h3>
+                                <div class="stat-value">1,247</div>
+                                <div class="stat-detail">
+                                    <span class="stat-change positive">+47 today</span>
+                                    <span class="stat-breakdown">
+                                        <small>Active: 892</small>
+                                        <small>New: 47</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card system-stat">
+                            <div class="stat-icon success">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Therapists</h3>
+                                <div class="stat-value">84</div>
+                                <div class="stat-detail">
+                                    <span class="stat-change positive">+3 this week</span>
+                                    <span class="stat-breakdown">
+                                        <small>Online: 42</small>
+                                        <small>Verified: 78</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card system-stat">
+                            <div class="stat-icon warning">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Active Sessions</h3>
+                                <div class="stat-value">246</div>
+                                <div class="stat-detail">
+                                    <span class="stat-change">Peak: 312</span>
+                                    <span class="stat-breakdown">
+                                        <small>Video: 198</small>
+                                        <small>Audio: 48</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card system-stat">
+                            <div class="stat-icon danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>System Issues</h3>
+                                <div class="stat-value">3</div>
+                                <div class="stat-detail">
+                                    <span class="stat-change">1 critical</span>
+                                    <span class="stat-breakdown">
+                                        <small>Critical: 1</small>
+                                        <small>Warning: 2</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card system-stat">
+                            <div class="stat-icon info">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Revenue Today</h3>
+                                <div class="stat-value">$8,425</div>
+                                <div class="stat-detail">
+                                    <span class="stat-change positive">+12%</span>
+                                    <span class="stat-breakdown">
+                                        <small>MTD: $124.5k</small>
+                                        <small>YTD: $1.2M</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card system-stat">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Satisfaction</h3>
+                                <div class="stat-value">94.7%</div>
+                                <div class="stat-detail">
+                                    <span class="stat-change positive">+2.3%</span>
+                                    <span class="stat-breakdown">
+                                        <small>Users: 95%</small>
+                                        <small>Therapists: 92%</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Analytics & Recent Activity -->
+                    <div class="section-row">
+                        <div class="section-col-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Platform Analytics</h3>
+                                    <div class="time-range">
+                                        <select class="select-sm">
+                                            <option>Last 24 hours</option>
+                                            <option selected>Last 7 days</option>
+                                            <option>Last 30 days</option>
+                                            <option>Last quarter</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="analytics-charts">
+                                        <div class="chart-container">
+                                            <canvas id="userGrowthChart"></canvas>
+                                        </div>
+                                        <div class="chart-container">
+                                            <canvas id="revenueChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="analytics-summary">
+                                        <div class="summary-item">
+                                            <span class="summary-label">Avg. Session Duration</span>
+                                            <span class="summary-value">48m 32s</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="summary-label">Platform Uptime</span>
+                                            <span class="summary-value positive">99.97%</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="summary-label">Avg. Response Time</span>
+                                            <span class="summary-value">142ms</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="summary-label">Error Rate</span>
+                                            <span class="summary-value">0.03%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Alerts & Recent Activity -->
+                        <div class="section-col-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>System Alerts</h3>
+                                    <button class="btn-icon" id="acknowledgeAlerts">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alerts-list">
+                                        <div class="alert-item critical">
+                                            <div class="alert-icon">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            </div>
+                                            <div class="alert-content">
+                                                <h5>High Server Load</h5>
+                                                <p>CPU usage above 85% for 15 minutes</p>
+                                                <small>5 min ago • Server-02</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="alert-item warning">
+                                            <div class="alert-icon">
+                                                <i class="fas fa-database"></i>
+                                            </div>
+                                            <div class="alert-content">
+                                                <h5>Backup Overdue</h5>
+                                                <p>Daily backup missed for database-03</p>
+                                                <small>2 hours ago • Backup System</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="alert-item info">
+                                            <div class="alert-icon">
+                                                <i class="fas fa-user-shield"></i>
+                                            </div>
+                                            <div class="alert-content">
+                                                <h5>Security Scan</h5>
+                                                <p>Weekly security scan completed</p>
+                                                <small>Today, 3:00 AM • Security</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="alert-item">
+                                            <div class="alert-icon">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                            </div>
+                                            <div class="alert-content">
+                                                <h5>Storage Warning</h5>
+                                                <p>Storage usage at 85% capacity</p>
+                                                <small>Yesterday • Storage System</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Recent Admin Activity</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="activity-list compact">
+                                        <div class="activity-item">
+                                            <div class="activity-icon success">
+                                                <i class="fas fa-user-plus"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <p>New therapist approved: Dr. Alex Chen</p>
+                                                <span class="activity-time">10:30 AM</span>
+                                            </div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon primary">
+                                                <i class="fas fa-cog"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <p>System settings updated</p>
+                                                <span class="activity-time">9:45 AM</span>
+                                            </div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon warning">
+                                                <i class="fas fa-ban"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <p>User suspended: ID #2387</p>
+                                                <span class="activity-time">Yesterday, 5:20 PM</span>
+                                            </div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon info">
+                                                <i class="fas fa-file-export"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <p>Monthly report generated</p>
+                                                <span class="activity-time">Yesterday, 3:15 PM</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Management & Recent Signups -->
+                    <div class="section-row">
+                        <div class="section-col-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>User Management</h3>
+                                    <div class="header-actions">
+                                        <button class="btn btn-primary btn-sm">
+                                            <i class="fas fa-plus"></i> Add User
+                                        </button>
+                                        <button class="btn btn-outline btn-sm">
+                                            <i class="fas fa-download"></i> Export
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="data-table" id="usersTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>User ID</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Plan</th>
+                                                    <th>Status</th>
+                                                    <th>Joined</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>#2389</td>
+                                                    <td>
+                                                        <div class="user-cell">
+                                                            <img src="https://ui-avatars.com/api/?name=John+Doe&background=667eea&color=fff" alt="User">
+                                                            <span>John Doe</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>john@example.com</td>
+                                                    <td><span class="badge badge-primary">Premium</span></td>
+                                                    <td><span class="status-badge active">Active</span></td>
+                                                    <td>Dec 10, 2023</td>
+                                                    <td>
+                                                        <div class="table-actions">
+                                                            <button class="btn-icon" title="View">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button class="btn-icon" title="Edit">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button class="btn-icon" title="Message">
+                                                                <i class="fas fa-envelope"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <!-- More rows will be populated dynamically -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Signups & Quick Stats -->
+                        <div class="section-col-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Recent Signups</h3>
+                                    <span class="badge badge-success">+47 today</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="signups-list">
+                                        <div class="signup-item">
+                                            <img src="https://ui-avatars.com/api/?name=Emma+Wilson&background=4CAF50&color=fff" alt="User">
+                                            <div class="signup-info">
+                                                <h5>Emma Wilson</h5>
+                                                <p>emma@example.com</p>
+                                                <small>2 hours ago • Premium</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                        <div class="signup-item">
+                                            <img src="https://ui-avatars.com/api/?name=Robert+Chen&background=2196F3&color=fff" alt="User">
+                                            <div class="signup-info">
+                                                <h5>Robert Chen</h5>
+                                                <p>robert@example.com</p>
+                                                <small>3 hours ago • Basic</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                        <div class="signup-item">
+                                            <img src="https://ui-avatars.com/api/?name=Maria+Garcia&background=FF9800&color=fff" alt="User">
+                                            <div class="signup-info">
+                                                <h5>Maria Garcia</h5>
+                                                <p>maria@example.com</p>
+                                                <small>5 hours ago • Premium</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                        <div class="signup-item">
+                                            <img src="https://ui-avatars.com/api/?name=James+Wilson&background=9C27B0&color=fff" alt="User">
+                                            <div class="signup-info">
+                                                <h5>James Wilson</h5>
+                                                <p>james@example.com</p>
+                                                <small>Yesterday • Basic</small>
+                                            </div>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline btn-block">
+                                        View All Signups
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Quick Stats</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="quick-stats-grid">
+                                        <div class="quick-stat">
+                                            <span class="stat-label">Active Sessions</span>
+                                            <span class="stat-value">246</span>
+                                        </div>
+                                        <div class="quick-stat">
+                                            <span class="stat-label">Pending Approvals</span>
+                                            <span class="stat-value warning">8</span>
+                                        </div>
+                                        <div class="quick-stat">
+                                            <span class="stat-label">Support Tickets</span>
+                                            <span class="stat-value">12</span>
+                                        </div>
+                                        <div class="quick-stat">
+                                            <span class="stat-label">System Errors</span>
+                                            <span class="stat-value danger">3</span>
+                                        </div>
+                                        <div class="quick-stat">
+                                            <span class="stat-label">Avg. Rating</span>
+                                            <span class="stat-value">4.7</span>
+                                        </div>
+                                        <div class="quick-stat">
+                                            <span class="stat-label">Response Time</span>
+                                            <span class="stat-value">142ms</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Performance & Geographic Distribution -->
+                    <div class="section-row">
+                        <div class="section-col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>System Performance</h3>
+                                    <span class="performance-status good">Good</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="performance-metrics">
+                                        <div class="metric">
+                                            <span class="metric-label">CPU Usage</span>
+                                            <div class="metric-bar">
+                                                <div class="bar-fill" style="width: 65%">
+                                                    <span>65%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="metric">
+                                            <span class="metric-label">Memory Usage</span>
+                                            <div class="metric-bar">
+                                                <div class="bar-fill" style="width: 78%">
+                                                    <span>78%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="metric">
+                                            <span class="metric-label">Storage</span>
+                                            <div class="metric-bar">
+                                                <div class="bar-fill warning" style="width: 85%">
+                                                    <span>85%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="metric">
+                                            <span class="metric-label">Network I/O</span>
+                                            <div class="metric-bar">
+                                                <div class="bar-fill" style="width: 42%">
+                                                    <span>42%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="metric">
+                                            <span class="metric-label">Database Connections</span>
+                                            <div class="metric-bar">
+                                                <div class="bar-fill" style="width: 58%">
+                                                    <span>58%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Geographic Distribution</h3>
+                                    <select class="select-sm">
+                                        <option>Users</option>
+                                        <option>Therapists</option>
+                                        <option>Sessions</option>
+                                    </select>
+                                </div>
+                                <div class="card-body">
+                                    <div class="geo-distribution">
+                                        <div class="geo-map">
+                                            <!-- Map visualization would go here -->
+                                            <div class="map-placeholder">
+                                                <i class="fas fa-globe-americas"></i>
+                                                <p>Geographic Distribution Map</p>
+                                            </div>
+                                        </div>
+                                        <div class="geo-stats">
+                                            <div class="geo-stat">
+                                                <span class="country">United States</span>
+                                                <span class="count">42%</span>
+                                            </div>
+                                            <div class="geo-stat">
+                                                <span class="country">United Kingdom</span>
+                                                <span class="count">18%</span>
+                                            </div>
+                                            <div class="geo-stat">
+                                                <span class="country">Canada</span>
+                                                <span class="count">12%</span>
+                                            </div>
+                                            <div class="geo-stat">
+                                                <span class="country">Australia</span>
+                                                <span class="count">8%</span>
+                                            </div>
+                                            <div class="geo-stat">
+                                                <span class="country">Other</span>
+                                                <span class="count">20%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- User Management Section -->
+                <section id="users" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>User Management</h2>
+                        <p class="section-subtitle">Manage all platform users and their accounts</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-filter"></i> Filter Users
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- User Management Content -->
+                    <div class="user-management-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Therapist Management Section -->
+                <section id="therapists" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Therapist Management</h2>
+                        <p class="section-subtitle">Manage therapist accounts, verifications, and approvals</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> Add Therapist
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-check-double"></i> Pending Approvals
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Therapist Management Content -->
+                    <div class="therapist-management-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Session Monitoring Section -->
+                <section id="sessions" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Session Monitoring</h2>
+                        <p class="section-subtitle">Monitor live and historical therapy sessions</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-eye"></i> Live Monitor
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-history"></i> Session History
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Session Monitoring Content -->
+                    <div class="session-monitoring-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Content Management Section -->
+                <section id="content" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Content Management</h2>
+                        <p class="section-subtitle">Manage platform content, resources, and articles</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Content
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-sync"></i> Update All
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content Management Content -->
+                    <div class="content-management-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Billing Section -->
+                <section id="billing" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Billing & Financial Management</h2>
+                        <p class="section-subtitle">Manage payments, invoices, and financial reporting</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-file-invoice"></i> Create Invoice
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-chart-bar"></i> Financial Reports
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Billing Content -->
+                    <div class="billing-management-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analytics" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Advanced Analytics</h2>
+                        <p class="section-subtitle">Deep dive into platform analytics and metrics</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-cog"></i> Custom Reports
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Content -->
+                    <div class="analytics-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section id="reports" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Reports & Documentation</h2>
+                        <p class="section-subtitle">Generate and manage system reports</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Generate Report
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-archive"></i> Archive
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reports Content -->
+                    <div class="reports-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- System Settings Section -->
+                <section id="settings" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>System Settings</h2>
+                        <p class="section-subtitle">Configure platform settings and preferences</p>
+                    </div>
+
+                    <!-- Settings Content -->
+                    <div class="system-settings-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Security Section -->
+                <section id="security" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Security Center</h2>
+                        <p class="section-subtitle">Monitor and manage platform security</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-shield-alt"></i> Run Security Scan
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-history"></i> Audit Logs
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Security Content -->
+                    <div class="security-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Audit Logs Section -->
+                <section id="logs" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Audit Logs</h2>
+                        <p class="section-subtitle">Review system activity and user actions</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search Logs
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i> Export Logs
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Logs Content -->
+                    <div class="logs-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Support Tickets Section -->
+                <section id="support" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Support Tickets</h2>
+                        <p class="section-subtitle">Manage user and therapist support requests</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> New Ticket
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-inbox"></i> My Tickets
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Support Content -->
+                    <div class="support-tickets-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Backup Section -->
+                <section id="backup" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Backup & Restore</h2>
+                        <p class="section-subtitle">Manage system backups and data recovery</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-save"></i> Backup Now
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-history"></i> Restore
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Backup Content -->
+                    <div class="backup-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- API Management Section -->
+                <section id="api" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>API Management</h2>
+                        <p class="section-subtitle">Manage API keys, endpoints, and integrations</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-key"></i> Generate API Key
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-code"></i> Documentation
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- API Content -->
+                    <div class="api-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Maintenance Section -->
+                <section id="maintenance" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>System Maintenance</h2>
+                        <p class="section-subtitle">Perform system maintenance and updates</p>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-tools"></i> Maintenance Mode
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-sync"></i> Check Updates
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Content -->
+                    <div class="maintenance-content">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </section>
             </div>
 
-            <!-- Applications Section -->
-            <section class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="icon">🔍</span>
-                        Pending Therapist Applications
-                        <span id="applicationsCount" class="status-badge status-pending" style="margin-left: 10px;">0</span>
-                    </h2>
-                    <button class="refresh-btn" onclick="loadPendingApplications()">
-                        <span class="icon">🔄</span>
-                        Refresh
+            <!-- Footer -->
+            <footer class="dashboard-footer admin-footer">
+                <div class="footer-content">
+                    <div class="footer-links">
+                        <a href="#"><i class="fas fa-shield-alt"></i> Security Center</a>
+                        <a href="#"><i class="fas fa-file-contract"></i> Compliance</a>
+                        <a href="#"><i class="fas fa-code-branch"></i> Version 2.1.4</a>
+                        <a href="#"><i class="fas fa-server"></i> Server Status</a>
+                        <a href="#"><i class="fas fa-question-circle"></i> Admin Help</a>
+                    </div>
+                    <div class="footer-copyright">
+                        <p>&copy; 2024 MindCare Pro Administration System. All rights reserved.</p>
+                        <p class="footer-version">
+                            <span>System Uptime: 99.97%</span>
+                            <span>Last Backup: Today, 3:00 AM</span>
+                            <span>Users Online: 892</span>
+                        </p>
+                    </div>
+                </div>
+            </footer>
+        </main>
+
+        <!-- Right Sidebar (System Tools) -->
+        <aside class="right-sidebar admin-tools">
+            <div class="sidebar-header">
+                <h3>System Tools</h3>
+                <button class="btn-icon close-right-sidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Quick System Actions -->
+            <div class="system-actions">
+                <h4>Quick Actions</h4>
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <i class="fas fa-redo"></i>
+                        <span>Clear Cache</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-search"></i>
+                        <span>Search Logs</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-user-cog"></i>
+                        <span>User Search</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-bolt"></i>
+                        <span>Performance</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security Scan</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-database"></i>
+                        <span>Database</span>
                     </button>
                 </div>
-                <div id="applicationsList" class="applications-list">
-                    <div class="loading-text">
-                        <div class="loading"></div>
-                        <p>Loading applications...</p>
-                    </div>
-                </div>
-            </section>
+            </div>
 
-            <!-- Bookings Section -->
-            <section class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="icon">📅</span>
-                        Recent Bookings
-                    </h2>
-                    <div class="filter-controls">
-                        <button class="filter-btn active" onclick="filterBookings('all')">All</button>
-                        <button class="filter-btn" onclick="filterBookings('confirmed')">Confirmed</button>
-                        <button class="filter-btn" onclick="filterBookings('pending')">Pending</button>
-                        <button class="filter-btn" onclick="filterBookings('completed')">Completed</button>
-                        <button class="filter-btn" onclick="filterBookings('cancelled')">Cancelled</button>
+            <!-- Server Status -->
+            <div class="server-status">
+                <h4>Server Status</h4>
+                <div class="server-list">
+                    <div class="server-item">
+                        <div class="server-info">
+                            <h5>API Server 01</h5>
+                            <p>api-01.mindcare.com</p>
+                        </div>
+                        <div class="server-status-indicator online"></div>
+                    </div>
+                    <div class="server-item">
+                        <div class="server-info">
+                            <h5>Database Cluster</h5>
+                            <p>db-cluster-01</p>
+                        </div>
+                        <div class="server-status-indicator online"></div>
+                    </div>
+                    <div class="server-item">
+                        <div class="server-info">
+                            <h5>File Storage</h5>
+                            <p>storage-02</p>
+                        </div>
+                        <div class="server-status-indicator warning"></div>
+                    </div>
+                    <div class="server-item">
+                        <div class="server-info">
+                            <h5>Cache Server</h5>
+                            <p>cache-01</p>
+                        </div>
+                        <div class="server-status-indicator online"></div>
                     </div>
                 </div>
-                <div id="bookingsList" class="bookings-list">
-                    <div class="loading-text">
-                        <div class="loading"></div>
-                        <p>Loading bookings...</p>
-                    </div>
-                </div>
-            </section>
+            </div>
 
-            <!-- System Status Section -->
-            <section class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="icon">⚙️</span>
-                        System Status
-                    </h2>
+            <!-- Recent System Events -->
+            <div class="system-events">
+                <h4>Recent Events</h4>
+                <div class="events-list">
+                    <div class="event-item">
+                        <div class="event-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="event-content">
+                            <p>User login: Admin</p>
+                            <small>2 min ago</small>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="event-content">
+                            <p>Backup completed</p>
+                            <small>3:00 AM</small>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="event-content">
+                            <p>High CPU usage</p>
+                            <small>5 min ago</small>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="event-content">
+                            <p>New user registered</p>
+                            <small>10:30 AM</small>
+                        </div>
+                    </div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                    <div class="detail-item">
-                        <span class="detail-label">Database</span>
-                        <span class="detail-value" id="dbStatus">🟢 Connected</span>
+            </div>
+
+            <!-- System Monitor -->
+            <div class="system-monitor">
+                <h4>Live Monitor</h4>
+                <div class="monitor-stats">
+                    <div class="monitor-stat">
+                        <span>Live Sessions</span>
+                        <span class="stat-value">246</span>
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label">API Response Time</span>
-                        <span class="detail-value" id="apiResponse">~120ms</span>
+                    <div class="monitor-stat">
+                        <span>Active Users</span>
+                        <span class="stat-value">892</span>
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Last Backup</span>
-                        <span class="detail-value" id="lastBackup">Today, 02:00 AM</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Storage Usage</span>
-                        <span class="detail-value" id="storageUsage">45% (2.3GB/5GB)</span>
+                    <div class="monitor-stat">
+                        <span>API Requests</span>
+                        <span class="stat-value">1.2k/min</span>
                     </div>
                 </div>
-            </section>
-        </main>
+                <div class="monitor-chart">
+                    <!-- Mini chart would go here -->
+                    <div class="chart-placeholder"></div>
+                </div>
+            </div>
+        </aside>
     </div>
 
+    <!-- Modal System -->
+    <div id="modalContainer"></div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Admin Modals -->
+    <div id="adminModal" class="modal admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cogs"></i> System Configuration</h2>
+                <button class="btn-icon close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Admin modal content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/admin-dashboard.js"></script>
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
-       const supabase = window.supabaseClient || window.supabase.createClient(
-    'https://hviqxpfnvjsqbdjfbttm.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs'
-);
-
-        
-        // Global variables
-        let allBookings = [];
-        let currentUser = null;
-
-        // Initialize Dashboard
-        async function init() {
-            try {
-                currentUser = JSON.parse(localStorage.getItem('user'));
-                
-                if (!currentUser || currentUser.role !== 'admin') {
-                    alert('Access denied. Admin role required.');
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                // Update admin info
-                document.getElementById('adminName').textContent = currentUser.full_name || 'Administrator';
-                document.getElementById('lastLogin').textContent = `Last login: ${new Date().toLocaleString('en-IN', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}`;
-
-                await loadStatistics();
-                await loadPendingApplications();
-                await loadAllBookings();
-                updateSystemStatus();
-
-            } catch (error) {
-                console.error('Initialization error:', error);
-                alert('Error loading dashboard. Please try again.');
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the dashboard
+            if (typeof AdminDashboard !== 'undefined') {
+                const dashboard = new AdminDashboard();
+                dashboard.init();
             }
-        }
-
-        // Load Dashboard Statistics
-        async function loadStatistics() {
-            try {
-                // Total Users
-                const { count: usersCount } = await supabase
-                    .from('profiles')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('role', 'user');
-                document.getElementById('totalUsers').textContent = usersCount || 0;
-
-                // Total Therapists
-                const { count: therapistsCount } = await supabase
-                    .from('Therapists')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('approval_status', 'approved');
-                document.getElementById('totalTherapists').textContent = therapistsCount || 0;
-
-                // Pending Applications
-                const { count: pendingCount } = await supabase
-                    .from('Therapists')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('approval_status', 'pending');
-                document.getElementById('pendingApplications').textContent = pendingCount || 0;
-                document.getElementById('applicationsCount').textContent = pendingCount || 0;
-
-                // Total Bookings
-                const { count: bookingsCount } = await supabase
-                    .from('Bookings')
-                    .select('*', { count: 'exact', head: true });
-                document.getElementById('totalBookings').textContent = bookingsCount || 0;
-
-                // Completed Sessions
-                const { count: completedCount } = await supabase
-                    .from('Bookings')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'completed');
-                document.getElementById('completedSessions').textContent = completedCount || 0;
-
-                // Calculate Revenue (example: ₹500 per session)
-                const revenue = (bookingsCount || 0) * 500;
-                document.getElementById('totalRevenue').textContent = `₹${revenue.toLocaleString('en-IN')}`;
-
-            } catch (error) {
-                console.error('Error loading statistics:', error);
-                showNotification('Error loading statistics', 'error');
-            }
-        }
-
-        // Load Pending Applications
-        async function loadPendingApplications() {
-            const container = document.getElementById('applicationsList');
-            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading applications...</p></div>';
-
-            try {
-                const { data: applications, error } = await supabase
-                    .from('Therapists')
-                    .select('*')
-                    .eq('approval_status', 'pending')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-                displayApplications(applications);
-
-            } catch (error) {
-                console.error('Error loading applications:', error);
-                container.innerHTML = '<div class="empty-state"><div class="icon">😕</div><h3>Unable to load applications</h3><p>Please try refreshing the page</p></div>';
-                showNotification('Error loading applications', 'error');
-            }
-        }
-
-        // Display Applications
-        function displayApplications(applications) {
-            const container = document.getElementById('applicationsList');
             
-            if (!applications || applications.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><h3>No pending applications</h3><p>All therapist applications have been processed</p></div>';
-                return;
-            }
-
-            container.innerHTML = applications.map(app => `
-                <div class="application-card">
-                    <div class="application-header">
-                        <div>
-                            <div class="therapist-name">Dr. ${app.Name || 'N/A'}</div>
-                            <div class="therapist-specialization">${app.Specialization || 'Not specified'}</div>
-                        </div>
-                        <span class="status-badge status-pending">PENDING</span>
-                    </div>
-                    <div class="application-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Email</span>
-                            <span class="detail-value">${app.email || 'Not provided'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Phone</span>
-                            <span class="detail-value">${app.phone || 'Not provided'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Qualifications</span>
-                            <span class="detail-value">${app.qualifications || 'Not provided'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Experience</span>
-                            <span class="detail-value">${app.experience || 'Not specified'} years</span>
-                        </div>
-                    </div>
-                    <div class="detail-item" style="margin-bottom: 20px;">
-                        <span class="detail-label">Bio</span>
-                        <span class="detail-value">${app.bio || 'No bio provided'}</span>
-                    </div>
-                    <div class="application-actions">
-                        <button class="btn-approve" onclick="approveApplication('${app.id}')">
-                            <span class="icon">✓</span>
-                            Approve Application
-                        </button>
-                        <button class="btn-reject" onclick="rejectApplication('${app.id}')">
-                            <span class="icon">✕</span>
-                            Reject Application
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Approve Application
-        async function approveApplication(therapistId) {
-            if (!confirm('Are you sure you want to approve this therapist application?\n\nOnce approved, they will be able to accept bookings.')) return;
-            
-            try {
-                const { error } = await supabase
-                    .from('Therapists')
-                    .update({ 
-                        approval_status: 'approved', 
-                        Active: true,
-                        approved_at: new Date().toISOString(),
-                        approved_by: currentUser.id
-                    })
-                    .eq('id', therapistId);
-
-                if (error) throw error;
-
-                showNotification('✅ Therapist approved successfully!', 'success');
-                await loadStatistics();
-                await loadPendingApplications();
-
-            } catch (error) {
-                console.error('Error approving therapist:', error);
-                showNotification('Error approving application', 'error');
-            }
-        }
-
-        // Reject Application
-        async function rejectApplication(therapistId) {
-            const reason = prompt('Please provide a reason for rejection:', '');
-            if (reason === null) return; // User cancelled
-            if (!reason.trim()) {
-                alert('Please provide a reason for rejection');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to reject this application?\n\nReason: ${reason}`)) return;
-            
-            try {
-                const { error } = await supabase
-                    .from('Therapists')
-                    .update({ 
-                        approval_status: 'rejected', 
-                        Active: false,
-                        rejection_reason: reason,
-                        rejected_at: new Date().toISOString(),
-                        rejected_by: currentUser.id
-                    })
-                    .eq('id', therapistId);
-
-                if (error) throw error;
-
-                showNotification('❌ Application rejected', 'info');
-                await loadStatistics();
-                await loadPendingApplications();
-
-            } catch (error) {
-                console.error('Error rejecting therapist:', error);
-                showNotification('Error rejecting application', 'error');
-            }
-        }
-
-        // Load All Bookings
-        async function loadAllBookings() {
-            const container = document.getElementById('bookingsList');
-            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading bookings...</p></div>';
-
-            try {
-                const { data: bookings, error } = await supabase
-                    .from('Bookings')
-                    .select('*')
-                    .order('session_date', { ascending: false })
-                    .limit(20);
-
-                if (error) throw error;
-
-                allBookings = bookings || [];
-                displayBookings(allBookings);
-
-            } catch (error) {
-                console.error('Error loading bookings:', error);
-                container.innerHTML = '<div class="empty-state"><div class="icon">😕</div><h3>Unable to load bookings</h3><p>Please try refreshing the page</p></div>';
-                showNotification('Error loading bookings', 'error');
-            }
-        }
-
-        // Display Bookings
-        async function displayBookings(bookings) {
-            const container = document.getElementById('bookingsList');
-            
-            if (!bookings || bookings.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="icon">📅</div><h3>No bookings found</h3><p>There are no bookings in the system yet</p></div>';
-                return;
-            }
-
-            // Get therapist and user names
-            const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
-            const userIds = [...new Set(bookings.map(b => b.user_id))];
-
-            const { data: therapists } = await supabase
-                .from('Therapists')
-                .select('id, Name')
-                .in('id', therapistIds);
-
-            const { data: users } = await supabase
-                .from('profiles')
-                .select('id, full_name')
-                .in('id', userIds);
-
-            container.innerHTML = bookings.map(booking => {
-                const therapist = therapists?.find(t => t.id === booking.therapist_id);
-                const user = users?.find(u => u.id === booking.user_id);
-                const date = new Date(booking.session_date).toLocaleDateString('en-IN', { 
-                    weekday: 'short',
-                    day: 'numeric', 
-                    month: 'short', 
-                    year: 'numeric' 
+            // Initialize DataTable for users table
+            if ($.fn.DataTable) {
+                $('#usersTable').DataTable({
+                    pageLength: 10,
+                    responsive: true,
+                    order: [[5, 'desc']]
                 });
-
-                return `
-                    <div class="booking-card">
-                        <div class="booking-header">
-                            <div class="booking-title">
-                                ${user?.full_name || 'User'} → Dr. ${therapist?.Name || 'Therapist'}
-                            </div>
-                            <span class="status-badge status-${booking.status}">
-                                ${booking.status.toUpperCase()}
-                            </span>
-                        </div>
-                        <div class="booking-info">
-                            <div class="detail-item">
-                                <span class="detail-label">Date & Time</span>
-                                <span class="detail-value">${date} at ${booking.start_time}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Duration</span>
-                                <span class="detail-value">${booking.duration || '60'} minutes</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Booking ID</span>
-                                <span class="detail-value">#${booking.id.substring(0, 8)}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Amount</span>
-                                <span class="detail-value">₹${booking.amount || '500'}</span>
-                            </div>
-                        </div>
-                        <div style="margin-top: 15px; font-size: 0.875rem; color: #6B7280;">
-                            Created: ${new Date(booking.created_at).toLocaleString('en-IN')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Filter Bookings
-        function filterBookings(status) {
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            let filteredBookings = allBookings;
-            if (status !== 'all') {
-                filteredBookings = allBookings.filter(booking => booking.status === status);
             }
-            displayBookings(filteredBookings);
-        }
-
-        // Update System Status
-        async function updateSystemStatus() {
-            try {
-                // Test database connection
-                const startTime = Date.now();
-                const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
-                const endTime = Date.now();
-                
-                document.getElementById('apiResponse').textContent = `~${endTime - startTime}ms`;
-                document.getElementById('dbStatus').textContent = error ? '🔴 Error' : '🟢 Connected';
-                
-                // Update storage usage (mock)
-                document.getElementById('storageUsage').textContent = '45% (2.3GB/5GB)';
-                
-                // Update last backup
-                const now = new Date();
-                now.setHours(2, 0, 0, 0);
-                document.getElementById('lastBackup').textContent = now.toLocaleString('en-IN', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-            } catch (error) {
-                console.error('Error updating system status:', error);
-            }
-        }
-
-        // Export Data
-        function exportData() {
-            alert('Export functionality would be implemented here.\n\nThis would generate CSV/Excel reports of all data.');
-        }
-
-        // Show Analytics
-        function showAnalytics() {
-            alert('Analytics dashboard would be shown here.\n\nThis would include charts and insights about platform usage.');
-        }
-
-        // Show Notification
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
-                color: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                font-weight: 600;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
             
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Logout
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('user');
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
+            // Initialize charts
+            const userGrowthCtx = document.getElementById('userGrowthChart');
+            if (userGrowthCtx) {
+                new Chart(userGrowthCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'New Users',
+                            data: [120, 150, 180, 210, 240, 280, 320, 350, 380, 420, 460, 500],
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
             }
-        }
-
-        // Add CSS for notifications
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
+            
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                new Chart(revenueCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                        datasets: [{
+                            label: 'Revenue ($)',
+                            data: [285000, 320000, 350000, 395000],
+                            backgroundColor: '#2196F3',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
             }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Initialize dashboard when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        });
     </script>
 </body>
 </html>
