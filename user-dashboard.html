@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +13,10 @@
         .welcome-title { font-size: 32px; color: #2C3E50; margin: 0 0 10px 0; }
         .therapists-section { margin-bottom: 40px; }
         .section-title { font-size: 24px; color: #2C3E50; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .filter-container { display: flex; align-items: center; gap: 10px; }
+        .filter-label { color: #6B7280; font-weight: 600; font-size: 14px; }
+        .filter-select { padding: 10px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; min-width: 200px; }
         .therapists-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .therapist-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 25px; transition: transform 0.2s, box-shadow 0.2s; }
         .therapist-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -35,6 +38,24 @@
         .btn-join { padding: 10px 20px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
         .btn-join:hover { background: #4A8B7E; }
         .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
+        
+        /* Profile Modal Styles */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 16px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-title { font-size: 28px; font-weight: 700; color: #2C3E50; margin: 0; }
+        .close-modal { background: none; border: none; font-size: 28px; color: #6B7280; cursor: pointer; }
+        .close-modal:hover { color: #2C3E50; }
+        .profile-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-label { font-weight: 600; color: #2C3E50; font-size: 14px; }
+        .form-textarea { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; font-family: inherit; min-height: 100px; resize: vertical; }
+        .btn-save { padding: 14px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+        .btn-save:hover { background: #4A8B7E; }
+        .profile-info { background: #F5F9F8; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .profile-info-label { color: #6B7280; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .profile-info-value { color: #2C3E50; font-size: 16px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -44,6 +65,7 @@
                 <a href="index.html" class="logo"><span class="logo-icon">🧠</span><span class="logo-text">MindSpace</span></a>
                 <ul class="nav-links">
                     <li><a href="user-dashboard.html" class="active">Dashboard</a></li>
+                    <li><a href="#" onclick="openProfileModal(); return false;">My Profile</a></li>
                     <li><button onclick="logout()" class="btn-primary">Logout</button></li>
                 </ul>
             </div>
@@ -56,7 +78,15 @@
             </div>
 
             <section class="therapists-section">
-                <h2 class="section-title"><i class="fas fa-user-md"></i> Find Your Therapist</h2>
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-user-md"></i> Find Your Therapist</h2>
+                    <div class="filter-container">
+                        <label class="filter-label">Filter by Specialty:</label>
+                        <select id="specialtyFilter" class="filter-select" onchange="filterTherapists()">
+                            <option value="">All Specialties</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="therapistsList" class="therapists-grid">
                     <div class="loading">Loading therapists...</div>
                 </div>
@@ -71,10 +101,57 @@
         </main>
     </div>
 
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">My Profile</h2>
+                <button class="close-modal" onclick="closeProfileModal()">&times;</button>
+            </div>
+            
+            <div class="profile-info">
+                <div class="profile-info-label">EMAIL</div>
+                <div class="profile-info-value" id="profileEmail">-</div>
+            </div>
+            
+            <form class="profile-form" onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="profileName" class="form-input" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" id="profilePhone" class="form-input" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" id="profileAge" class="form-input" placeholder="Enter your age" min="1" max="120">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Bio / About Me</label>
+                    <textarea id="profileBio" class="form-textarea" placeholder="Tell us a bit about yourself..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea id="profileAddress" class="form-textarea" placeholder="Enter your address"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Save Profile
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
         let currentUser = null;
+        let allTherapists = [];
 
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
@@ -88,6 +165,7 @@
 
             await loadTherapists();
             await loadBookings();
+            await loadUserProfile();
         });
 
         async function loadTherapists() {
@@ -109,41 +187,85 @@
                     return;
                 }
 
-                container.innerHTML = therapists.map(t => `
-                    <div class="therapist-card">
-                        <h3 class="therapist-name">${t.Name || 'Therapist'}</h3>
-                        <div class="therapist-specialty">${t.Specialization || 'General Therapy'}</div>
-                        <div class="therapist-fee">₹${t.fee || 700} per session</div>
-                        <p class="therapist-bio">${t.description || 'Experienced therapist'}</p>
-
-                        <div class="booking-form">
-                            <input type="date" 
-                                   id="date-${t.id}" 
-                                   class="form-input" 
-                                   min="${new Date().toISOString().split('T')[0]}"
-                                   placeholder="Select date">
-                            <select id="time-${t.id}" class="form-select">
-                                <option value="">Select time</option>
-                                <option value="09:00 AM">09:00 AM</option>
-                                <option value="10:00 AM">10:00 AM</option>
-                                <option value="11:00 AM">11:00 AM</option>
-                                <option value="02:00 PM">02:00 PM</option>
-                                <option value="03:00 PM">03:00 PM</option>
-                                <option value="04:00 PM">04:00 PM</option>
-                                <option value="05:00 PM">05:00 PM</option>
-                            </select>
-                            <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee || 700})">
-                                <i class="fas fa-check"></i> Book Session
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                allTherapists = therapists;
+                
+                // Populate specialty filter
+                populateSpecialtyFilter(therapists);
+                
+                // Display all therapists initially
+                displayTherapists(therapists);
 
                 console.log('🟢 Loaded', therapists.length, 'therapists');
             } catch (error) {
                 console.error('🔴 Error loading therapists:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
+        }
+
+        function populateSpecialtyFilter(therapists) {
+            const filterSelect = document.getElementById('specialtyFilter');
+            const specialties = [...new Set(therapists.map(t => t.Specialization).filter(Boolean))];
+            
+            // Clear existing options except "All Specialties"
+            filterSelect.innerHTML = '<option value="">All Specialties</option>';
+            
+            // Add specialty options
+            specialties.sort().forEach(specialty => {
+                const option = document.createElement('option');
+                option.value = specialty;
+                option.textContent = specialty;
+                filterSelect.appendChild(option);
+            });
+        }
+
+        function filterTherapists() {
+            const selectedSpecialty = document.getElementById('specialtyFilter').value;
+            
+            if (!selectedSpecialty) {
+                displayTherapists(allTherapists);
+            } else {
+                const filtered = allTherapists.filter(t => t.Specialization === selectedSpecialty);
+                displayTherapists(filtered);
+            }
+        }
+
+        function displayTherapists(therapists) {
+            const container = document.getElementById('therapistsList');
+            
+            if (therapists.length === 0) {
+                container.innerHTML = '<div class="empty-state">No therapists found for this specialty</div>';
+                return;
+            }
+
+            container.innerHTML = therapists.map(t => `
+                <div class="therapist-card">
+                    <h3 class="therapist-name">${t.Name || 'Therapist'}</h3>
+                    <div class="therapist-specialty">${t.Specialization || 'General Therapy'}</div>
+                    <div class="therapist-fee">₹${t.fee || 700} per session</div>
+                    <p class="therapist-bio">${t.description || 'Experienced therapist'}</p>
+
+                    <div class="booking-form">
+                        <input type="date" 
+                               id="date-${t.id}" 
+                               class="form-input" 
+                               min="${new Date().toISOString().split('T')[0]}"
+                               placeholder="Select date">
+                        <select id="time-${t.id}" class="form-select">
+                            <option value="">Select time</option>
+                            <option value="09:00 AM">09:00 AM</option>
+                            <option value="10:00 AM">10:00 AM</option>
+                            <option value="11:00 AM">11:00 AM</option>
+                            <option value="02:00 PM">02:00 PM</option>
+                            <option value="03:00 PM">03:00 PM</option>
+                            <option value="04:00 PM">04:00 PM</option>
+                            <option value="05:00 PM">05:00 PM</option>
+                        </select>
+                        <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee || 700})">
+                            <i class="fas fa-check"></i> Book Session
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         async function bookSession(therapistId, therapistName, fee) {
@@ -269,6 +391,86 @@
             } catch (error) {
                 console.error('🔴 Error loading bookings:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
+            }
+        }
+
+        // Profile Modal Functions
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('profileModal');
+            if (event.target === modal) {
+                closeProfileModal();
+            }
+        }
+
+        async function loadUserProfile() {
+            console.log('🔵 Loading user profile...');
+            
+            try {
+                const { data: userData, error } = await window.supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (error) throw error;
+
+                console.log('🔵 User profile data:', userData);
+
+                // Populate profile fields
+                document.getElementById('profileEmail').textContent = userData.email || '-';
+                document.getElementById('profileName').value = userData.name || '';
+                document.getElementById('profilePhone').value = userData.phone || '';
+                document.getElementById('profileAge').value = userData.age || '';
+                document.getElementById('profileBio').value = userData.bio || '';
+                document.getElementById('profileAddress').value = userData.address || '';
+
+            } catch (error) {
+                console.error('🔴 Error loading user profile:', error);
+            }
+        }
+
+        async function saveProfile(event) {
+            event.preventDefault();
+            console.log('🔵 Saving profile...');
+
+            const profileData = {
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                age: document.getElementById('profileAge').value || null,
+                bio: document.getElementById('profileBio').value,
+                address: document.getElementById('profileAddress').value
+            };
+
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('users')
+                    .update(profileData)
+                    .eq('id', currentUser.id)
+                    .select();
+
+                if (error) throw error;
+
+                console.log('🟢 Profile updated:', data);
+                alert('✅ Profile updated successfully!');
+                
+                // Update localStorage
+                currentUser = { ...currentUser, ...profileData };
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                
+                closeProfileModal();
+
+            } catch (error) {
+                console.error('🔴 Error saving profile:', error);
+                alert('Error saving profile: ' + error.message);
             }
         }
     </script>
