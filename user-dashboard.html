@@ -29,6 +29,7 @@
         .form-textarea { resize: vertical; min-height: 80px; }
         .btn-book { width: 100%; padding: 12px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.3s; }
         .btn-book:hover { background: #4A8B7E; }
+        .btn-book:disabled { background: #9CA3AF; cursor: not-allowed; }
         .bookings-section { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; }
         .bookings-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
         .booking-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
@@ -50,6 +51,11 @@
         .info-box { background: #E0F2F1; padding: 15px; border-radius: 8px; border-left: 4px solid #5A9B8E; margin-top: 15px; }
         .info-box-title { font-weight: 700; color: #2C3E50; margin-bottom: 8px; font-size: 14px; }
         .info-box-text { color: #4B5563; font-size: 13px; line-height: 1.5; }
+        .profile-incomplete-banner { background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .profile-incomplete-banner h3 { color: #92400E; margin: 0 0 10px 0; font-size: 18px; }
+        .profile-incomplete-banner p { color: #78350F; margin: 0 0 15px 0; }
+        .profile-incomplete-banner button { background: #F59E0B; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .profile-incomplete-banner button:hover { background: #D97706; }
         
         .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
         .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -91,6 +97,15 @@
             <div class="dashboard-header">
                 <h1 class="welcome-title">Welcome Back!</h1>
                 <p id="userName" style="color: #6B7280;">Loading...</p>
+            </div>
+            
+            <!-- Profile Incomplete Warning -->
+            <div id="profileIncompleteBanner" style="display: none;" class="profile-incomplete-banner">
+                <h3><i class="fas fa-exclamation-triangle"></i> Complete Your Profile</h3>
+                <p>Please complete your profile with mandatory information (Name, Phone, DOB, Gender, City) before booking sessions.</p>
+                <button onclick="openProfileModal()">
+                    <i class="fas fa-user-edit"></i> Complete Profile Now
+                </button>
             </div>
             
             <section class="therapists-section">
@@ -183,20 +198,20 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" id="profilePhone" class="form-input" placeholder="+91 XXXXX XXXXX">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" id="profilePhone" class="form-input" placeholder="+91 XXXXX XXXXX" required>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Date of Birth</label>
-                        <input type="date" id="profileDOB" class="form-input">
+                        <label class="form-label">Date of Birth *</label>
+                        <input type="date" id="profileDOB" class="form-input" required>
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Gender</label>
-                        <select id="profileGender" class="form-select">
+                        <label class="form-label">Gender *</label>
+                        <select id="profileGender" class="form-select" required>
                             <option value="">Select gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -206,8 +221,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">City</label>
-                        <input type="text" id="profileCity" class="form-input" placeholder="Enter your city">
+                        <label class="form-label">City *</label>
+                        <input type="text" id="profileCity" class="form-input" placeholder="Enter your city" required>
                     </div>
                 </div>
                 
@@ -217,7 +232,7 @@
                 </div>
                 
                 <div style="border-top: 2px solid #E5E7EB; padding-top: 20px; margin-top: 10px;">
-                    <h3 style="color: #2C3E50; font-size: 18px; margin-bottom: 15px;">Emergency Contact</h3>
+                    <h3 style="color: #2C3E50; font-size: 18px; margin-bottom: 15px;">Emergency Contact (Optional)</h3>
                     
                     <div class="form-row">
                         <div class="form-group">
@@ -287,6 +302,7 @@
         let allTherapists = [];
         let currentRescheduleBookingId = null;
         let uploadedProfilePicture = null;
+        let isProfileComplete = false;
         
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
@@ -309,6 +325,28 @@
             await loadBookings();
         });
         
+        function checkProfileComplete() {
+            if (!currentUserProfile) return false;
+            
+            const required = [
+                currentUserProfile.full_name,
+                currentUserProfile.phone,
+                currentUserProfile.date_of_birth,
+                currentUserProfile.gender,
+                currentUserProfile.city
+            ];
+            
+            isProfileComplete = required.every(field => field && field.toString().trim() !== '');
+            
+            if (!isProfileComplete) {
+                document.getElementById('profileIncompleteBanner').style.display = 'block';
+            } else {
+                document.getElementById('profileIncompleteBanner').style.display = 'none';
+            }
+            
+            return isProfileComplete;
+        }
+        
         async function loadUserProfile() {
             console.log('🔵 Loading user profile...');
             
@@ -324,10 +362,13 @@
                 currentUserProfile = data;
                 document.getElementById('userName').textContent = data.full_name || currentUser.email;
                 
+                checkProfileComplete();
+                
                 console.log('🟢 User profile loaded:', data);
             } catch (error) {
                 console.error('🔴 Error loading profile:', error);
                 document.getElementById('userName').textContent = currentUser.email;
+                document.getElementById('profileIncompleteBanner').style.display = 'block';
             }
         }
         
@@ -362,6 +403,7 @@
         
         function displayTherapists(therapists) {
             const container = document.getElementById('therapistsGrid');
+            const bookingDisabled = !isProfileComplete;
             
             container.innerHTML = therapists.map(t => `
                 <div class="therapist-card">
@@ -370,33 +412,44 @@
                     <div class="therapist-fee">₹${t.fee || 0} per session</div>
                     ${t.bio ? `<div class="therapist-bio">${t.bio}</div>` : ''}
                     
-                    <div class="booking-form">
-                        <input type="date" 
-                               id="date-${t.id}" 
-                               class="form-input" 
-                               min="${new Date().toISOString().split('T')[0]}"
-                               required>
-                        
-                        <select id="time-${t.id}" class="form-select" required>
-                            <option value="">Select time</option>
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="10:00 AM">10:00 AM</option>
-                            <option value="11:00 AM">11:00 AM</option>
-                            <option value="02:00 PM">02:00 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="04:00 PM">04:00 PM</option>
-                            <option value="05:00 PM">05:00 PM</option>
-                        </select>
-                        
-                        <textarea id="problem-${t.id}" 
-                                  class="form-textarea" 
-                                  placeholder="Briefly describe what you'd like to work on *" 
-                                  required></textarea>
-                        
-                        <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee})">
-                            <i class="fas fa-calendar-plus"></i> Book Session
-                        </button>
-                    </div>
+                    ${bookingDisabled ? `
+                        <div style="background: #FEF3C7; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                            <p style="color: #92400E; font-size: 14px; margin: 0 0 10px 0; font-weight: 600;">
+                                <i class="fas fa-lock"></i> Complete your profile to book
+                            </p>
+                            <button onclick="openProfileModal()" style="background: #F59E0B; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                Complete Profile
+                            </button>
+                        </div>
+                    ` : `
+                        <div class="booking-form">
+                            <input type="date" 
+                                   id="date-${t.id}" 
+                                   class="form-input" 
+                                   min="${new Date().toISOString().split('T')[0]}"
+                                   required>
+                            
+                            <select id="time-${t.id}" class="form-select" required>
+                                <option value="">Select time</option>
+                                <option value="09:00 AM">09:00 AM</option>
+                                <option value="10:00 AM">10:00 AM</option>
+                                <option value="11:00 AM">11:00 AM</option>
+                                <option value="02:00 PM">02:00 PM</option>
+                                <option value="03:00 PM">03:00 PM</option>
+                                <option value="04:00 PM">04:00 PM</option>
+                                <option value="05:00 PM">05:00 PM</option>
+                            </select>
+                            
+                            <textarea id="problem-${t.id}" 
+                                      class="form-textarea" 
+                                      placeholder="Briefly describe what you'd like to work on *" 
+                                      required></textarea>
+                            
+                            <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee})">
+                                <i class="fas fa-calendar-plus"></i> Book Session
+                            </button>
+                        </div>
+                    `}
                 </div>
             `).join('');
         }
@@ -413,6 +466,12 @@
         }
         
         async function bookSession(therapistId, therapistName, fee) {
+            if (!isProfileComplete) {
+                alert('⚠️ Please complete your profile before booking a session');
+                openProfileModal();
+                return;
+            }
+            
             const date = document.getElementById('date-' + therapistId).value;
             const time = document.getElementById('time-' + therapistId).value;
             const problemDesc = document.getElementById('problem-' + therapistId).value.trim();
@@ -432,7 +491,7 @@
             try {
                 // Check for booking conflicts (same date + time slot)
                 const { data: conflictingBookings, error: conflictError } = await window.supabaseClient
-                    .from('bookings')
+                    .from('Bookings')
                     .select('*')
                     .eq('user_id', currentUser.id)
                     .eq('session_date', date)
@@ -474,7 +533,7 @@
                 console.log('🔵 Creating booking:', bookingData);
 
                 const { data, error } = await window.supabaseClient
-                    .from('bookings')
+                    .from('Bookings')
                     .insert([bookingData])
                     .select();
 
@@ -505,7 +564,7 @@
             
             try {
                 let query = window.supabaseClient
-                    .from('bookings')
+                    .from('Bookings')
                     .select('*')
                     .eq('user_id', currentUser.id);
                 
@@ -661,6 +720,14 @@
                                     </button>
                                 </div>
                             ` : ''}
+                            
+                            ${booking.status === 'completed' ? `
+                                <div style="margin-top: 15px; padding: 15px; background: #D1ECF1; border-radius: 8px; border-left: 4px solid #0C5460;">
+                                    <div style="color: #0C5460; font-weight: 600; font-size: 14px;">
+                                        <i class="fas fa-check-double"></i> Session Completed
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }).join('');
@@ -715,7 +782,7 @@
             
             try {
                 const { data, error } = await window.supabaseClient
-                    .from('bookings')
+                    .from('Bookings')
                     .update({
                         session_date: newDate,
                         start_time: newTime,
@@ -764,7 +831,7 @@
             
             try {
                 const { data, error } = await window.supabaseClient
-                    .from('bookings')
+                    .from('Bookings')
                     .update({
                         reschedule_requested: true,
                         reschedule_new_date: newDate,
@@ -801,7 +868,7 @@
             
             try {
                 const { data, error } = await window.supabaseClient
-                    .from('bookings')
+                    .from('Bookings')
                     .delete()
                     .eq('id', bookingId)
                     .select();
@@ -903,6 +970,9 @@
                 
                 currentUserProfile = { ...currentUserProfile, ...profileData };
                 document.getElementById('userName').textContent = profileData.full_name;
+                
+                checkProfileComplete();
+                displayTherapists(allTherapists);
                 
                 closeProfileModal();
                 
