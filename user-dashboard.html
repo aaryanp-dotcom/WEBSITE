@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Dashboard Styles */
         .dashboard-wrapper {
             min-height: 100vh;
             background: #F5F9F8;
@@ -29,66 +28,12 @@
             padding: 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
         }
 
         .welcome-title {
             font-size: 32px;
             color: #2C3E50;
             margin: 0 0 10px 0;
-        }
-
-        .wave {
-            animation: wave 2s infinite;
-            display: inline-block;
-        }
-
-        @keyframes wave {
-            0%, 100% { transform: rotate(0deg); }
-            10%, 30% { transform: rotate(14deg); }
-            20% { transform: rotate(-8deg); }
-            40% { transform: rotate(-4deg); }
-            50% { transform: rotate(10deg); }
-        }
-
-        .user-info {
-            color: #6B7280;
-            margin: 0;
-        }
-
-        .current-date {
-            color: #6B7280;
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        .quick-stats {
-            display: flex;
-            gap: 30px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            display: block;
-            font-size: 32px;
-            font-weight: 800;
-            color: #5A9B8E;
-        }
-
-        .stat-label {
-            display: block;
-            font-size: 12px;
-            color: #6B7280;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
         }
 
         .dashboard-section {
@@ -100,23 +45,10 @@
             margin-bottom: 30px;
         }
 
-        .section-header {
-            margin-bottom: 24px;
-        }
-
         .section-title {
             font-size: 24px;
             color: #2C3E50;
-            margin: 0 0 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-subtitle {
-            color: #6B7280;
-            margin: 0;
-            font-size: 14px;
+            margin: 0 0 20px 0;
         }
 
         .therapists-grid {
@@ -130,103 +62,47 @@
             border: 1px solid #E5E7EB;
             border-radius: 12px;
             padding: 20px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .therapist-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(90, 155, 142, 0.15);
-        }
-
-        .therapist-header {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .therapist-avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .therapist-info {
-            flex: 1;
         }
 
         .therapist-name {
-            margin: 0 0 6px 0;
             font-size: 18px;
+            font-weight: 700;
             color: #2C3E50;
+            margin: 0 0 8px 0;
         }
 
         .therapist-specialization {
             color: #5A9B8E;
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .therapist-bio {
             color: #6B7280;
             font-size: 13px;
-            margin: 0;
             line-height: 1.5;
+            margin-bottom: 16px;
         }
 
         .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-top: 16px;
             padding-top: 16px;
             border-top: 1px solid #E5E7EB;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #2C3E50;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .form-group input,
-        .form-group select {
+        .form-input, .form-select {
             padding: 10px 12px;
             border: 1px solid #E5E7EB;
             border-radius: 8px;
             font-size: 14px;
-            background: white;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #5A9B8E;
-            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
         }
 
         .btn-book {
-            width: 100%;
+            grid-column: 1 / -1;
             padding: 12px;
             background: #5A9B8E;
             color: white;
@@ -234,12 +110,10 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .btn-book:hover {
             background: #4A8B7E;
-            transform: translateY(-2px);
         }
 
         .bookings-list {
@@ -255,45 +129,10 @@
             padding: 20px;
         }
 
-        .booking-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-            gap: 16px;
-        }
-
-        .booking-therapist {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            color: #2C3E50;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-confirmed {
-            background: #D4EDDA;
-            color: #155724;
-        }
-
-        .status-completed {
-            background: #D1ECF1;
-            color: #0C5460;
-        }
-
-        .status-cancelled {
-            background: #F8D7DA;
-            color: #721C24;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6B7280;
         }
 
         .empty-state {
@@ -301,41 +140,10 @@
             padding: 60px 20px;
             color: #6B7280;
         }
-
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #C9E4DE;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #F5F9F8;
-            border-radius: 50%;
-            border-top-color: #5A9B8E;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: #6B7280;
-            text-align: center;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
     </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
-        <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-container">
                 <a href="index.html" class="logo">
@@ -349,300 +157,185 @@
             </div>
         </nav>
 
-        <!-- Dashboard Container -->
         <main class="dashboard-container">
-            <!-- Dashboard Header -->
             <div class="dashboard-header">
-                <div>
-                    <h1 class="welcome-title">Welcome back<span class="wave">👋</span></h1>
-                    <p class="user-info" id="userName">Loading...</p>
-                    <p class="current-date" id="currentDate"></p>
-                </div>
-                <div class="quick-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalBookings">0</span>
-                        <span class="stat-label">Total Sessions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="upcomingBookings">0</span>
-                        <span class="stat-label">Upcoming</span>
-                    </div>
-                </div>
+                <h1 class="welcome-title">Welcome back 👋</h1>
+                <p id="userName" style="color: #6B7280;">Loading...</p>
             </div>
 
-            <!-- Find Therapists Section -->
             <section class="dashboard-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-user-md"></i> Find Your Therapist
-                    </h2>
-                    <p class="section-subtitle">Browse our qualified mental health professionals</p>
-                </div>
+                <h2 class="section-title">Find Your Therapist</h2>
                 <div id="therapistsList" class="therapists-grid">
-                    <div class="loading-text">
-                        <div class="loading"></div>
-                        <p>Loading therapists...</p>
-                    </div>
+                    <div class="loading">Loading therapists...</div>
                 </div>
             </section>
 
-            <!-- My Bookings Section -->
             <section class="dashboard-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-calendar-alt"></i> My Appointments
-                    </h2>
-                    <p class="section-subtitle">View and manage your bookings</p>
-                </div>
+                <h2 class="section-title">My Appointments</h2>
                 <div id="bookingsList" class="bookings-list">
-                    <div class="loading-text">
-                        <div class="loading"></div>
-                        <p>Loading bookings...</p>
-                    </div>
+                    <div class="loading">Loading bookings...</div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Load app.js -->
     <script src="app.js"></script>
 
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
-
-        const supabase = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
         let currentUser = null;
 
-        // Initialize Dashboard
-        async function init() {
-            try {
-                currentUser = JSON.parse(localStorage.getItem('user'));
-                if (!currentUser || currentUser.role !== 'user') {
-                    alert('Access denied. Please login as a user.');
-                    window.location.href = 'login.html';
-                    return;
-                }
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔵 User dashboard loaded');
+            console.log('🔵 Supabase client:', !!window.supabaseClient);
 
-                // Update UI
-                document.getElementById('userName').textContent = currentUser.fullname || 'User';
-                document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-IN', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
+            // Get current user
+            currentUser = JSON.parse(localStorage.getItem('user'));
+            console.log('🔵 Current user:', currentUser);
 
-                // Load data
-                await loadTherapists();
-                await loadBookings();
-            } catch (error) {
-                console.error('Init error:', error);
-                alert('Error loading dashboard. Please try again.');
-            }
-        }
-
-        // Load Therapists
-        async function loadTherapists() {
-            const container = document.getElementById('therapistsList');
-            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading therapists...</p></div>';
-
-            try {
-                const { data: therapists, error } = await supabase
-                    .from('Therapists')
-                    .select('*')
-                    .eq('approval_status', 'approved')
-                    .eq('Active', true)
-                    .order('Name', { ascending: true });
-
-                if (error) throw error;
-
-                displayTherapists(therapists);
-            } catch (error) {
-                console.error('Error loading therapists:', error);
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">😕</div><h3>Unable to load therapists</h3><p>Please try refreshing the page</p></div>';
-            }
-        }
-
-        // Display Therapists
-        function displayTherapists(therapists) {
-            const container = document.getElementById('therapistsList');
-
-            if (!therapists || therapists.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><h3>No Therapists Available</h3><p>There are currently no therapists available for booking.</p></div>';
+            if (!currentUser) {
+                alert('Please login first');
+                window.location.href = 'login.html';
                 return;
             }
 
-            const today = new Date().toISOString().split('T')[0];
+            // Update UI
+            document.getElementById('userName').textContent = currentUser.fullname || 'User';
 
-            container.innerHTML = therapists.map(therapist => `
-                <div class="therapist-card">
-                    <div class="therapist-header">
-                        <div class="therapist-avatar">${(therapist.Name || 'T').charAt(0)}</div>
-                        <div class="therapist-info">
-                            <h3 class="therapist-name">Dr. ${therapist.Name || 'Unknown'}</h3>
-                            <p class="therapist-specialization">${therapist.Specialization || 'General Therapy'}</p>
-                            <p class="therapist-bio">${therapist.bio || 'No bio available.'}</p>
+            // Load data
+            await loadTherapists();
+            await loadBookings();
+        });
+
+        async function loadTherapists() {
+            console.log('🔵 Loading therapists...');
+            const container = document.getElementById('therapistsList');
+
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Therapists')
+                    .select('*')
+                    .eq('approval_status', 'approved')
+                    .eq('Active', true);
+
+                console.log('🔵 Therapists query result:', data, error);
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No therapists available yet</div>';
+                    return;
+                }
+
+                const today = new Date().toISOString().split('T')[0];
+
+                container.innerHTML = data.map(t => `
+                    <div class="therapist-card">
+                        <h3 class="therapist-name">Dr. ${t.Name || 'Unknown'}</h3>
+                        <p class="therapist-specialization">${t.Specialization || 'General'}</p>
+                        <p class="therapist-bio">${t.bio || 'Professional therapist'}</p>
+                        <div class="booking-form">
+                            <input type="date" id="date-${t.id}" class="form-input" min="${today}">
+                            <select id="time-${t.id}" class="form-select">
+                                <option value="">Select time</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                            </select>
+                            <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}')">Book Session</button>
                         </div>
                     </div>
-                    <div class="booking-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Date</label>
-                                <input type="date" id="date-${therapist.id}" class="date-input" min="${today}" required>
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-clock"></i> Time</label>
-                                <select id="time-${therapist.id}" required>
-                                    <option value="">Select time</option>
-                                    <option value="09:00">9:00 AM</option>
-                                    <option value="10:00">10:00 AM</option>
-                                    <option value="11:00">11:00 AM</option>
-                                    <option value="14:00">2:00 PM</option>
-                                    <option value="15:00">3:00 PM</option>
-                                    <option value="16:00">4:00 PM</option>
-                                    <option value="17:00">5:00 PM</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button class="btn-book" onclick="bookSession('${therapist.id}', '${therapist.Name}')">
-                            <i class="fas fa-check"></i> Book Session
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+
+                console.log('🟢 Therapists loaded:', data.length);
+            } catch (error) {
+                console.error('🔴 Error loading therapists:', error);
+                container.innerHTML = '<div class="empty-state">Error loading therapists: ' + error.message + '</div>';
+            }
         }
 
-        // Book Session
         async function bookSession(therapistId, therapistName) {
-            const dateInput = document.getElementById(`date-${therapistId}`);
-            const timeSelect = document.getElementById(`time-${therapistId}`);
+            const date = document.getElementById(`date-${therapistId}`).value;
+            const time = document.getElementById(`time-${therapistId}`).value;
 
-            const sessionDate = dateInput.value;
-            const startTime = timeSelect.value;
-
-            if (!sessionDate || !startTime) {
+            if (!date || !time) {
                 alert('Please select date and time');
                 return;
             }
 
-            if (!confirm(`Book session with Dr. ${therapistName} on ${sessionDate} at ${startTime}?`)) {
-                return;
-            }
+            console.log('🔵 Booking session:', { therapistId, date, time });
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await window.supabaseClient
                     .from('Bookings')
                     .insert({
                         user_id: currentUser.id,
                         therapist_id: therapistId,
-                        session_date: sessionDate,
-                        start_time: startTime,
+                        session_date: date,
+                        start_time: time,
                         status: 'confirmed',
-                        created_at: new Date().toISOString(),
-                        amount: 500
-                    })
-                    .select()
-                    .single();
+                        amount: 500,
+                        created_at: new Date().toISOString()
+                    });
+
+                console.log('🔵 Booking result:', data, error);
 
                 if (error) throw error;
 
-                alert(`✅ Session booked successfully with Dr. ${therapistName}!`);
-                dateInput.value = '';
-                timeSelect.value = '';
+                alert('✅ Session booked successfully!');
                 await loadBookings();
             } catch (error) {
-                console.error('Booking error:', error);
-                alert('Error creating booking. Please try again.');
+                console.error('🔴 Booking error:', error);
+                alert('Error: ' + error.message);
             }
         }
 
-        // Load Bookings
         async function loadBookings() {
+            console.log('🔵 Loading bookings for user:', currentUser.id);
             const container = document.getElementById('bookingsList');
-            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading bookings...</p></div>';
 
             try {
-                const { data: bookings, error } = await supabase
+                const { data, error } = await window.supabaseClient
                     .from('Bookings')
-                    .select('*, Therapists(Name, Specialization)')
+                    .select(`
+                        *,
+                        Therapists (
+                            Name,
+                            Specialization
+                        )
+                    `)
                     .eq('user_id', currentUser.id)
                     .order('session_date', { ascending: false });
 
+                console.log('🔵 Bookings query result:', data, error);
+
                 if (error) throw error;
 
-                // Update stats
-                document.getElementById('totalBookings').textContent = bookings.length;
-                document.getElementById('upcomingBookings').textContent = bookings.filter(b => b.status === 'confirmed').length;
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No bookings yet</div>';
+                    return;
+                }
 
-                displayBookings(bookings);
-            } catch (error) {
-                console.error('Error loading bookings:', error);
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">😕</div><h3>Unable to load bookings</h3><p>Please try refreshing the page</p></div>';
-            }
-        }
-
-        // Display Bookings
-        function displayBookings(bookings) {
-            const container = document.getElementById('bookingsList');
-
-            if (!bookings || bookings.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><h3>No Bookings Yet</h3><p>You haven\'t booked any sessions yet.</p></div>';
-                return;
-            }
-
-            container.innerHTML = bookings.map(booking => {
-                const therapist = booking.Therapists || {};
-                const date = new Date(booking.session_date).toLocaleDateString('en-IN');
-
-                return `
+                container.innerHTML = data.map(b => `
                     <div class="booking-card">
-                        <div class="booking-header">
-                            <div>
-                                <h3 class="booking-therapist">Dr. ${therapist.Name || 'Unknown'}</h3>
-                                <p style="color: #5A9B8E; font-weight: 600; margin: 0;">${therapist.Specialization || 'General Therapy'}</p>
-                            </div>
-                            <span class="status-badge status-${booking.status}">${booking.status.toUpperCase()}</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 14px;">
-                            <div>
-                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
-                                <div style="color: #2C3E50;">${date}</div>
-                            </div>
-                            <div>
-                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
-                                <div style="color: #2C3E50;">${booking.start_time}</div>
-                            </div>
-                            <div>
-                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
-                                <div style="color: #2C3E50;">₹${booking.amount || 500}</div>
-                            </div>
-                        </div>
+                        <h3>Dr. ${b.Therapists?.Name || 'Unknown'}</h3>
+                        <p>${b.Therapists?.Specialization || ''}</p>
+                        <p><strong>Date:</strong> ${new Date(b.session_date).toLocaleDateString()}</p>
+                        <p><strong>Time:</strong> ${b.start_time}</p>
+                        <p><strong>Status:</strong> ${b.status}</p>
+                        <p><strong>Fee:</strong> ₹${b.amount || 500}</p>
                     </div>
-                `;
-            }).join('');
-        }
+                `).join('');
 
-        // Logout
-        async function logout() {
-            if (!confirm('Are you sure you want to logout?')) return;
-
-            try {
-                await supabase.auth.signOut();
-                localStorage.removeItem('user');
-                window.location.href = 'login.html';
+                console.log('🟢 Bookings loaded:', data.length);
             } catch (error) {
-                console.error('Logout error:', error);
-                alert('Error logging out');
+                console.error('🔴 Error loading bookings:', error);
+                container.innerHTML = '<div class="empty-state">Error loading bookings: ' + error.message + '</div>';
             }
         }
-
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
