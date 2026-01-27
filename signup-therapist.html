@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* [ALL THE SAME CSS FROM THE ORIGINAL FILE - KEEPING IT INTACT] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%); min-height: 100vh; color: #2C3E50; }
         .navbar { background-color: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(10px); }
@@ -54,15 +53,12 @@
         .form-textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
         .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235A9B8E' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a 1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 20px center; background-size: 16px; padding-right: 50px; }
         .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: #5A9B8E; background: white; box-shadow: 0 0 0 4px rgba(90, 155, 142, 0.1); }
-        .form-input.error, .form-textarea.error, .form-select.error { border-color: #EF4444; background: #FEF2F2; }
         .password-wrapper { position: relative; }
         .password-toggle { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6B7280; cursor: pointer; font-size: 1.1rem; padding: 4px; }
         .password-toggle:hover { color: #5A9B8E; }
         .error-message { color: #EF4444; font-size: 0.875rem; margin-top: 5px; display: none; }
-        .form-group.error .error-message { display: block; }
         .btn-submit { width: 100%; padding: 18px; background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(90, 155, 142, 0.3); }
-        .btn-submit:active:not(:disabled) { transform: translateY(0); }
         .btn-submit:disabled { background: #9CA3AF; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-submit .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -107,9 +103,7 @@
                 <span class="logo-icon">🧠</span>
                 <span class="logo-text">MindSpace</span>
             </a>
-            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
-            </button>
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="about.html">About</a></li>
@@ -360,8 +354,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
-        // Use supabase client from app.js (already initialized)
-        const supabase = window.supabaseClient;
+        // Get supabase client from app.js
+        const supabaseClient = window.supabaseClient;
         
         function showAlert(message, type) {
             const alertDiv = document.getElementById('alertMessage');
@@ -438,7 +432,7 @@
             try {
                 console.log('🔵 Starting therapist signup...');
 
-                const { data: authData, error: authError } = await supabase.auth.signUp({
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -455,7 +449,7 @@
                 console.log('🟢 Auth user created:', authData.user.id);
 
                 if (authData.user) {
-                    const { error: profileError } = await supabase
+                    const { error: profileError } = await supabaseClient
                         .from('profiles')
                         .insert({
                             user_id: authData.user.id,
@@ -475,7 +469,7 @@
 
                     console.log('🟢 Profile created successfully');
 
-                    const { error: therapistError } = await supabase
+                    const { error: therapistError } = await supabaseClient
                         .from('Therapists')
                         .insert({
                             user_id: authData.user.id,
