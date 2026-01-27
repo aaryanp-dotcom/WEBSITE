@@ -613,7 +613,11 @@
                     .eq('user_id', currentUser.id)
                     .single();
 
-                if (error) {
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
+
+                if (!userData) {
                     console.log('🟡 Profile not found, will create on save');
                     document.getElementById('profileEmail').textContent = currentUser.email || '-';
                     return;
@@ -638,12 +642,6 @@
             console.log('🔵 Saving profile...');
 
             try {
-                const { data: existing } = await window.supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .single();
-
                 const profileData = {
                     user_id: currentUser.id,
                     full_name: document.getElementById('profileName').value,
@@ -655,23 +653,18 @@
                     role: currentUser.role
                 };
 
-                let result;
-                if (existing) {
-                    result = await window.supabaseClient
-                        .from('profiles')
-                        .update(profileData)
-                        .eq('user_id', currentUser.id)
-                        .select();
-                } else {
-                    result = await window.supabaseClient
-                        .from('profiles')
-                        .insert([profileData])
-                        .select();
-                }
+                // Use UPSERT to insert or update based on user_id
+                const { data, error } = await window.supabaseClient
+                    .from('profiles')
+                    .upsert(profileData, { 
+                        onConflict: 'user_id',
+                        ignoreDuplicates: false 
+                    })
+                    .select();
 
-                if (result.error) throw result.error;
+                if (error) throw error;
 
-                console.log('🟢 Profile saved:', result.data);
+                console.log('🟢 Profile saved:', data);
                 alert('✅ Profile saved successfully!');
                 closeProfileModal();
 
