@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
     <title>Login - MindSpace</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         /* Login Page Styles */
         * {
@@ -14,7 +15,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #F5F9F8 0%, #E8F3F1 100%);
@@ -24,12 +25,12 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
         .auth-container {
             width: 100%;
             max-width: 480px;
         }
-        
+
         .auth-card {
             background: #FFFFFF;
             border-radius: 20px;
@@ -37,38 +38,38 @@
             overflow: hidden;
             border: 1px solid #E5E7EB;
         }
-        
+
         .auth-header {
             background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
             padding: 40px;
             text-align: center;
             color: #FFFFFF;
         }
-        
+
         .auth-logo {
             font-size: 3rem;
             margin-bottom: 15px;
         }
-        
+
         .auth-title {
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 8px;
         }
-        
+
         .auth-subtitle {
             font-size: 1rem;
             opacity: 0.9;
         }
-        
+
         .auth-body {
             padding: 40px;
         }
-        
+
         .auth-form .form-group {
             margin-bottom: 24px;
         }
-        
+
         .form-label {
             display: block;
             margin-bottom: 8px;
@@ -76,7 +77,7 @@
             font-weight: 600;
             font-size: 0.9rem;
         }
-        
+
         .form-input {
             width: 100%;
             padding: 14px 16px;
@@ -86,22 +87,22 @@
             font-family: inherit;
             transition: all 0.3s ease;
         }
-        
+
         .form-input:focus {
             outline: none;
             border-color: #5A9B8E;
             box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
         }
-        
+
         .form-input.error {
             border-color: #F87171;
             background: #FEF2F2;
         }
-        
+
         .password-container {
             position: relative;
         }
-        
+
         .password-toggle {
             position: absolute;
             right: 16px;
@@ -114,7 +115,7 @@
             font-size: 1.2rem;
             padding: 4px;
         }
-        
+
         .btn-auth {
             width: 100%;
             padding: 16px;
@@ -132,23 +133,23 @@
             gap: 10px;
             margin-top: 10px;
         }
-        
+
         .btn-auth:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(90, 155, 142, 0.3);
         }
-        
+
         .btn-auth:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none !important;
         }
-        
+
         .btn-auth.loading {
             position: relative;
             color: transparent;
         }
-        
+
         .btn-auth.loading::after {
             content: '';
             position: absolute;
@@ -159,24 +160,24 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
+
         .auth-footer {
             text-align: center;
             padding: 30px 40px;
             border-top: 1px solid #E5E7EB;
             background: #F9FAFB;
         }
-        
+
         .auth-footer p {
             color: #6B7280;
             margin-bottom: 12px;
             font-size: 0.95rem;
         }
-        
+
         .auth-link {
             color: #5A9B8E;
             text-decoration: none;
@@ -186,12 +187,12 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .auth-link:hover {
             color: #4A8B7E;
             text-decoration: underline;
         }
-        
+
         .back-link {
             position: absolute;
             top: 30px;
@@ -204,11 +205,11 @@
             gap: 8px;
             transition: color 0.3s ease;
         }
-        
+
         .back-link:hover {
             color: #4A8B7E;
         }
-        
+
         .form-options {
             display: flex;
             justify-content: space-between;
@@ -216,52 +217,74 @@
             margin-top: 10px;
             font-size: 0.9rem;
         }
-        
+
         .remember-me {
             display: flex;
             align-items: center;
             gap: 8px;
             color: #6B7280;
         }
-        
+
         .forgot-password {
             color: #5A9B8E;
             text-decoration: none;
             font-weight: 500;
         }
-        
+
         .forgot-password:hover {
             text-decoration: underline;
         }
-        
+
+        .error-message {
+            background: #FEF2F2;
+            border: 1px solid #FCA5A5;
+            color: #DC2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .success-message {
+            background: #ECFDF5;
+            border: 1px solid #86EFAC;
+            color: #059669;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .auth-header {
                 padding: 30px 20px;
             }
-            
+
             .auth-body {
                 padding: 30px 20px;
             }
-            
+
             .auth-footer {
                 padding: 25px 20px;
             }
-            
+
             .back-link {
                 top: 20px;
                 left: 20px;
             }
         }
-        
+
         @media (max-width: 480px) {
             body {
                 padding: 15px;
             }
-            
+
             .auth-card {
                 border-radius: 16px;
             }
-            
+
             .form-options {
                 flex-direction: column;
                 align-items: flex-start;
@@ -274,7 +297,7 @@
     <a href="index.html" class="back-link">
         <i class="fas fa-arrow-left"></i> Back to Home
     </a>
-    
+
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
@@ -282,8 +305,11 @@
                 <h1 class="auth-title">Welcome Back</h1>
                 <p class="auth-subtitle">Sign in to continue your wellness journey</p>
             </div>
-            
+
             <div class="auth-body">
+                <div id="error-message" class="error-message"></div>
+                <div id="success-message" class="success-message"></div>
+
                 <form id="loginForm" class="auth-form" novalidate>
                     <div class="form-group">
                         <label for="email" class="form-label">
@@ -296,7 +322,7 @@
                                required
                                autocomplete="email">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="password" class="form-label">
                             <i class="fas fa-lock"></i> Password
@@ -314,7 +340,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="form-options">
                         <label class="remember-me">
                             <input type="checkbox" id="rememberMe">
@@ -324,16 +350,16 @@
                             Forgot password?
                         </a>
                     </div>
-                    
+
                     <button type="submit" class="btn-auth" id="submitBtn">
                         <i class="fas fa-sign-in-alt"></i> Sign In
                     </button>
                 </form>
             </div>
-            
+
             <div class="auth-footer">
                 <p>Don't have an account?</p>
-                <div style="display: flex; gap: 20px; justify-content: center;">
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
                     <a href="signup-user.html" class="auth-link">
                         <i class="fas fa-user"></i> Sign Up as User
                     </a>
@@ -344,123 +370,166 @@
             </div>
         </div>
     </div>
-    
-    <!-- Load Supabase first -->
+
+    <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Then load auth.js -->
-    <script src="auth.js"></script>
-    
+    <!-- Load app.js -->
+    <script src="app.js"></script>
+
     <script>
+        // Use global Supabase client
+        const supabase = window.supabaseClient;
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize components
             initLoginForm();
             initPasswordToggle();
             initForgotPassword();
-            
-            // Auto-focus email field
-            setTimeout(() => {
-                const emailInput = document.getElementById('email');
-                if (emailInput) {
-                    emailInput.focus();
-                }
-            }, 100);
-        });
-        
-        function initLoginForm() {
-            const form = document.getElementById('loginForm');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            if (!form) return;
-            
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                // Get form values
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                
-                // Validate
-                if (!email || !password) {
-                    showAuthAlert('Please fill in all fields', 'error');
-                    return;
-                }
-                
-                // Show loading
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.classList.add('loading');
-                submitBtn.innerHTML = '';
-                
-                try {
-                    // Use the login function from auth.js
-                    const result = await loginUser(email, password);
-                    
-                    if (result.success) {
-                        showAuthAlert('Login successful! Redirecting...', 'success');
-                        
-                        // Store remember me preference
-                        const rememberMe = document.getElementById('rememberMe').checked;
-                        if (rememberMe) {
-                            localStorage.setItem('rememberEmail', email);
-                        } else {
-                            localStorage.removeItem('rememberEmail');
-                        }
-                        
-                        // Redirect based on role
-                        setTimeout(() => {
-                            const targetDashboard = {
-                                'admin': 'admin-dashboard.html',
-                                'therapist': 'therapist-dashboard.html',
-                                'user': 'user-dashboard.html'
-                            }[result.role] || 'user-dashboard.html';
-                            
-                            window.location.href = targetDashboard;
-                        }, 1500);
-                    } else {
-                        throw new Error(result.error);
-                    }
-                } catch (error) {
-                    showAuthAlert(error.message || 'Login failed. Please try again.', 'error');
-                    
-                    // Reset button
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('loading');
-                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
-                }
-            });
-            
+
             // Pre-fill remembered email
             const rememberedEmail = localStorage.getItem('rememberEmail');
             if (rememberedEmail) {
                 document.getElementById('email').value = rememberedEmail;
                 document.getElementById('rememberMe').checked = true;
             }
+
+            // Auto-focus email field
+            setTimeout(() => {
+                const emailInput = document.getElementById('email');
+                if (emailInput && !emailInput.value) {
+                    emailInput.focus();
+                }
+            }, 100);
+        });
+
+        function showMessage(message, type) {
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+
+            // Hide both first
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            if (type === 'error') {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            } else {
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+            }
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+            }, 5000);
         }
-        
+
+        function initLoginForm() {
+            const form = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('submitBtn');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Get form values
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+
+                // Validate
+                if (!email || !password) {
+                    showMessage('Please fill in all fields', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showMessage('Password must be at least 6 characters', 'error');
+                    return;
+                }
+
+                // Show loading
+                submitBtn.disabled = true;
+                submitBtn.classList.add('loading');
+                submitBtn.textContent = '';
+
+                try {
+                    // Sign in with Supabase
+                    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                    if (authError) {
+                        throw new Error(authError.message);
+                    }
+
+                    // Get user profile from profiles table
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', authData.user.id)
+                        .single();
+
+                    if (profileError) {
+                        throw new Error('Failed to load user profile');
+                    }
+
+                    // Store user data
+                    localStorage.setItem('user', JSON.stringify(profile));
+
+                    // Store remember me preference
+                    const rememberMe = document.getElementById('rememberMe').checked;
+                    if (rememberMe) {
+                        localStorage.setItem('rememberEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberEmail');
+                    }
+
+                    // Show success
+                    showMessage('Login successful! Redirecting...', 'success');
+
+                    // Redirect based on role after delay
+                    setTimeout(() => {
+                        if (profile.role === 'admin') {
+                            window.location.href = 'admin-dashboard.html';
+                        } else if (profile.role === 'therapist') {
+                            window.location.href = 'therapist-dashboard.html';
+                        } else {
+                            window.location.href = 'user-dashboard.html';
+                        }
+                    }, 1500);
+
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showMessage(error.message || 'Login failed. Please check your credentials.', 'error');
+
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('loading');
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                }
+            });
+        }
+
         function initPasswordToggle() {
             const toggleBtn = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('password');
-            
-            if (!toggleBtn || !passwordInput) return;
-            
+
             toggleBtn.addEventListener('click', function() {
                 const type = passwordInput.type === 'password' ? 'text' : 'password';
                 passwordInput.type = type;
-                
+
                 // Update icon
                 const icon = this.querySelector('i');
                 icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
             });
         }
-        
+
         function initForgotPassword() {
             const forgotBtn = document.getElementById('forgotPassword');
-            
-            if (!forgotBtn) return;
-            
+
             forgotBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                showAuthAlert('Please contact support at support@mindspace.com to reset your password.', 'error');
+                alert('Please contact support at support@mindspace.com to reset your password.');
             });
         }
     </script>
