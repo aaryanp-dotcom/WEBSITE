@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,13 +39,13 @@
                 </ul>
             </div>
         </nav>
-
+        
         <main class="dashboard-container">
             <div class="dashboard-header">
                 <h1 style="font-size: 32px; color: #2C3E50; margin: 0;">Admin Dashboard</h1>
                 <p style="color: #6B7280; margin: 10px 0 0 0;">Manage therapists and monitor platform activity</p>
             </div>
-
+            
             <div class="stats-grid">
                 <div class="stat-card">
                     <span class="stat-number" id="totalTherapists">0</span>
@@ -65,14 +64,14 @@
                     <span class="stat-label">Total Revenue</span>
                 </div>
             </div>
-
+            
             <section class="section">
                 <h2 class="section-title"><i class="fas fa-user-clock"></i> Pending Therapist Applications</h2>
                 <div id="applicationsTable">
                     <div class="loading">Loading applications...</div>
                 </div>
             </section>
-
+            
             <section class="section">
                 <h2 class="section-title"><i class="fas fa-calendar-alt"></i> All Bookings</h2>
                 <div id="bookingsTable">
@@ -81,72 +80,72 @@
             </section>
         </main>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
         let currentUser = null;
-
+        
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
             console.log('🔵 Admin dashboard loaded. User:', currentUser);
-
+            
             if (!currentUser || currentUser.role !== 'admin') {
                 alert('Access denied. Admin role required.');
                 window.location.href = 'login.html';
                 return;
             }
-
+            
             await loadStatistics();
             await loadApplications();
             await loadBookings();
         });
-
+        
         async function loadStatistics() {
             console.log('🔵 Loading statistics...');
-
+            
             try {
                 const [therapistsRes, usersRes, bookingsRes] = await Promise.all([
                     window.supabaseClient.from('Therapists').select('*', { count: 'exact' }),
                     window.supabaseClient.from('profiles').select('*', { count: 'exact' }).eq('role', 'user'),
                     window.supabaseClient.from('Bookings').select('*')
                 ]);
-
+                
                 document.getElementById('totalTherapists').textContent = therapistsRes.data?.length || 0;
                 document.getElementById('totalUsers').textContent = usersRes.data?.length || 0;
                 document.getElementById('totalBookings').textContent = bookingsRes.data?.length || 0;
-
+                
                 const revenue = bookingsRes.data
                     ?.filter(b => b.status === 'confirmed')
                     .reduce((sum, b) => sum + (b.amount || 700), 0) || 0;
                 document.getElementById('totalRevenue').textContent = '₹' + revenue;
-
+                
                 console.log('🟢 Stats loaded');
             } catch (error) {
                 console.error('🔴 Error loading statistics:', error);
             }
         }
-
+        
         async function loadApplications() {
             console.log('🔵 Loading pending applications...');
             const container = document.getElementById('applicationsTable');
-
+            
             try {
                 const { data: applications, error } = await window.supabaseClient
                     .from('profiles')
                     .select('*')
                     .eq('role', 'therapist')
                     .eq('approved', false);
-
+                
                 console.log('🔵 Applications:', applications);
-
+                
                 if (error) throw error;
-
+                
                 if (!applications || applications.length === 0) {
                     container.innerHTML = '<p style="text-align: center; color: #6B7280; padding: 20px;">No pending applications</p>';
                     return;
                 }
-
+                
                 container.innerHTML = `
                     <table>
                         <thead>
@@ -181,18 +180,18 @@
                 container.innerHTML = '<p style="color: red; text-align: center;">Error: ' + error.message + '</p>';
             }
         }
-
+        
         async function approveTherapist(userId) {
             if (!confirm('Approve this therapist application?')) return;
-
+            
             try {
                 const { error } = await window.supabaseClient
                     .from('profiles')
                     .update({ approved: true })
                     .eq('id', userId);
-
+                
                 if (error) throw error;
-
+                
                 alert('✅ Therapist approved!');
                 await loadApplications();
                 await loadStatistics();
@@ -201,18 +200,18 @@
                 alert('Error: ' + error.message);
             }
         }
-
+        
         async function rejectTherapist(userId) {
             if (!confirm('Reject this therapist application? This will delete their account.')) return;
-
+            
             try {
                 const { error } = await window.supabaseClient
                     .from('profiles')
                     .delete()
                     .eq('id', userId);
-
+                
                 if (error) throw error;
-
+                
                 alert('❌ Application rejected and account deleted.');
                 await loadApplications();
                 await loadStatistics();
@@ -221,52 +220,49 @@
                 alert('Error: ' + error.message);
             }
         }
-
+        
         async function loadBookings() {
             console.log('🔵 Loading bookings...');
             const container = document.getElementById('bookingsTable');
-
+            
             try {
                 const { data: bookings, error } = await window.supabaseClient
                     .from('Bookings')
                     .select('*')
                     .order('session_date', { ascending: false });
-
+                
                 console.log('🔵 Bookings:', bookings);
-
+                
                 if (error) throw error;
-
+                
                 if (!bookings || bookings.length === 0) {
                     container.innerHTML = '<p style="text-align: center; color: #6B7280; padding: 20px;">No bookings yet</p>';
                     return;
                 }
-
-                // FIXED: Get therapist and user details individually
+                
                 const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
                 const userIds = [...new Set(bookings.map(b => b.user_id))].filter(id => id);
-
+                
                 let therapistMap = {};
                 let userMap = {};
-
-                // Load therapists
+                
                 const { data: therapists } = await window.supabaseClient
                     .from('Therapists')
                     .select('id, Name')
                     .in('id', therapistIds);
-
+                
                 therapists?.forEach(t => {
                     therapistMap[t.id] = t;
                 });
-
-                // Load users individually to avoid .in() error
+                
                 for (const userId of userIds) {
                     try {
                         const { data: user } = await window.supabaseClient
                             .from('profiles')
-                            .select('id, fullname')
+                            .select('id, full_name')
                             .eq('id', userId)
                             .maybeSingle();
-
+                        
                         if (user) {
                             userMap[user.id] = user;
                         }
@@ -274,9 +270,9 @@
                         console.warn('Could not load user:', userId);
                     }
                 }
-
+                
                 console.log('🔵 Therapists:', therapistMap, 'Users:', userMap);
-
+                
                 container.innerHTML = `
                     <table>
                         <thead>
@@ -294,10 +290,10 @@
                                 const therapist = therapistMap[b.therapist_id] || {};
                                 const user = userMap[b.user_id] || {};
                                 const statusClass = 'status-' + b.status;
-
+                                
                                 return `
                                     <tr>
-                                        <td>${user.fullname || 'Patient'}</td>
+                                        <td>${user.full_name || 'Patient'}</td>
                                         <td>${therapist.Name || 'Therapist'}</td>
                                         <td>${new Date(b.session_date).toLocaleDateString('en-IN')}</td>
                                         <td>${b.start_time}</td>
@@ -309,7 +305,7 @@
                         </tbody>
                     </table>
                 `;
-
+                
                 console.log('🟢 Loaded', bookings.length, 'bookings');
             } catch (error) {
                 console.error('🔴 Error:', error);
