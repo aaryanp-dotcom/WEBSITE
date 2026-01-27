@@ -114,7 +114,7 @@
                 if (error) throw error;
 
                 therapistData = data;
-                document.getElementById('therapistName').textContent = 'Dr. ' + (data.Name || 'Therapist');
+                document.getElementById('therapistName').textContent = (data.Name || 'Therapist');
 
                 console.log('🟢 Therapist profile loaded');
             } catch (error) {
@@ -159,22 +159,25 @@
                     return;
                 }
 
-                // FIXED: Get patient details with correct syntax
-                const userIds = [...new Set(appointments.map(a => a.user_id))].filter(id => id); // Remove null/undefined
+                // FIXED: Query each patient individually
+                const userIds = [...new Set(appointments.map(a => a.user_id))].filter(id => id);
 
                 let patientMap = {};
 
                 if (userIds.length > 0) {
-                    // Query each user individually to avoid .in() issues
                     for (const userId of userIds) {
-                        const { data: patient } = await window.supabaseClient
-                            .from('profiles')
-                            .select('id, fullname, email, phone')
-                            .eq('id', userId)
-                            .single();
+                        try {
+                            const { data: patient } = await window.supabaseClient
+                                .from('profiles')
+                                .select('id, fullname, email, phone')
+                                .eq('id', userId)
+                                .maybeSingle();
 
-                        if (patient) {
-                            patientMap[patient.id] = patient;
+                            if (patient) {
+                                patientMap[patient.id] = patient;
+                            }
+                        } catch (err) {
+                            console.warn('Could not load patient:', userId);
                         }
                     }
                 }
