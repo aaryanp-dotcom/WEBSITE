@@ -1,925 +1,648 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCare Pro - User Dashboard</title>
-    <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <title>Patient Dashboard - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Dashboard Styles */
+        .dashboard-wrapper {
+            min-height: 100vh;
+            background: #F5F9F8;
+            padding-top: 80px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .dashboard-header {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            color: #2C3E50;
+            margin: 0 0 10px 0;
+        }
+
+        .wave {
+            animation: wave 2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .user-info {
+            color: #6B7280;
+            margin: 0;
+        }
+
+        .current-date {
+            color: #6B7280;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .quick-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 32px;
+            font-weight: 800;
+            color: #5A9B8E;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 12px;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .dashboard-section {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #2C3E50;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-subtitle {
+            color: #6B7280;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .therapists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .therapist-card {
+            background: #F5F9F8;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .therapist-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(90, 155, 142, 0.15);
+        }
+
+        .therapist-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .therapist-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .therapist-info {
+            flex: 1;
+        }
+
+        .therapist-name {
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            color: #2C3E50;
+        }
+
+        .therapist-specialization {
+            color: #5A9B8E;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .therapist-bio {
+            color: #6B7280;
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .booking-form {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #5A9B8E;
+            box-shadow: 0 0 0 3px rgba(90, 155, 142, 0.1);
+        }
+
+        .btn-book {
+            width: 100%;
+            padding: 12px;
+            background: #5A9B8E;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-book:hover {
+            background: #4A8B7E;
+            transform: translateY(-2px);
+        }
+
+        .bookings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .booking-card {
+            background: #F5F9F8;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            gap: 16px;
+        }
+
+        .booking-therapist {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #2C3E50;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-confirmed {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #D1ECF1;
+            color: #0C5460;
+        }
+
+        .status-cancelled {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #C9E4DE;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #F5F9F8;
+            border-radius: 50%;
+            border-top-color: #5A9B8E;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #6B7280;
+            text-align: center;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+    </style>
 </head>
-<body class="theme-light">
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen active">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Loading your wellness dashboard...</p>
-        </div>
-    </div>
-
-    <!-- Notification Center -->
-    <div id="notificationCenter" class="notification-center">
-        <div class="notification-header">
-            <h3>Notifications</h3>
-            <button class="btn-icon" id="markAllRead">
-                <i class="fas fa-check-double"></i>
-            </button>
-            <button class="btn-icon close-notifications">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="notification-list">
-            <!-- Notifications will be populated here -->
-        </div>
-    </div>
-
-    <!-- Main Dashboard Container -->
-    <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-container">
-                    <div class="logo">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h1>MindCare <span class="logo-pro">Pro</span></h1>
-                </div>
-                <button class="btn-icon sidebar-toggle">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-            </div>
-
-            <!-- User Profile Summary -->
-            <div class="user-profile-summary">
-                <div class="profile-avatar">
-                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=667eea&color=fff" alt="Profile" id="userAvatar">
-                    <span class="status-indicator online"></span>
-                </div>
-                <div class="profile-info">
-                    <h3 id="userName">John Doe</h3>
-                    <p class="user-email" id="userEmail">john@example.com</p>
-                    <div class="user-plan">
-                        <span class="plan-badge premium">Premium</span>
-                        <span class="streak-count">
-                            <i class="fas fa-fire"></i> 14 day streak
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav class="sidebar-nav">
-                <ul class="nav-menu">
-                    <li class="nav-item active" data-section="overview">
-                        <a href="#overview">
-                            <i class="fas fa-home"></i>
-                            <span>Overview</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="sessions">
-                        <a href="#sessions">
-                            <i class="fas fa-comments"></i>
-                            <span>My Sessions</span>
-                            <span class="badge badge-primary">3</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="therapists">
-                        <a href="#therapists">
-                            <i class="fas fa-user-md"></i>
-                            <span>Therapists</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="mood-tracker">
-                        <a href="#mood-tracker">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Mood Tracker</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="resources">
-                        <a href="#resources">
-                            <i class="fas fa-book-open"></i>
-                            <span>Resources</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="journal">
-                        <a href="#journal">
-                            <i class="fas fa-book"></i>
-                            <span>Journal</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="goals">
-                        <a href="#goals">
-                            <i class="fas fa-bullseye"></i>
-                            <span>Goals</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="community">
-                        <a href="#community">
-                            <i class="fas fa-users"></i>
-                            <span>Community</span>
-                            <span class="badge badge-success">New</span>
-                        </a>
-                    </li>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧠</span>
+                    <span class="logo-text">MindSpace</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="user-dashboard.html" class="active">Dashboard</a></li>
+                    <li><button onclick="logout()" class="btn-primary">Logout</button></li>
                 </ul>
+            </div>
+        </nav>
 
-                <div class="sidebar-divider"></div>
-
-                <ul class="nav-menu">
-                    <li class="nav-item" data-section="settings">
-                        <a href="#settings">
-                            <i class="fas fa-cog"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="help">
-                        <a href="#help">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Help & Support</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button class="btn btn-primary btn-block" id="quickSessionBtn">
-                    <i class="fas fa-video"></i> Quick Session
-                </button>
-                <button class="btn btn-outline btn-block" id="emergencyBtn">
-                    <i class="fas fa-life-ring"></i> Emergency Help
-                </button>
+        <!-- Dashboard Container -->
+        <main class="dashboard-container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="welcome-title">Welcome back<span class="wave">👋</span></h1>
+                    <p class="user-info" id="userName">Loading...</p>
+                    <p class="current-date" id="currentDate"></p>
+                </div>
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalBookings">0</span>
+                        <span class="stat-label">Total Sessions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="upcomingBookings">0</span>
+                        <span class="stat-label">Upcoming</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Sidebar Footer -->
-            <div class="sidebar-footer">
-                <div class="theme-toggle">
-                    <i class="fas fa-sun"></i>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="themeToggle">
-                        <label for="themeToggle"></label>
-                    </div>
-                    <i class="fas fa-moon"></i>
+            <!-- Find Therapists Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-md"></i> Find Your Therapist
+                    </h2>
+                    <p class="section-subtitle">Browse our qualified mental health professionals</p>
                 </div>
-                <button class="btn-logout" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <button class="btn-icon mobile-menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="search-container">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search sessions, resources, therapists..." class="search-input">
+                <div id="therapistsList" class="therapists-grid">
+                    <div class="loading-text">
+                        <div class="loading"></div>
+                        <p>Loading therapists...</p>
                     </div>
                 </div>
-                
-                <div class="header-right">
-                    <!-- Notification Bell -->
-                    <div class="notification-wrapper">
-                        <button class="btn-icon notification-btn" id="notificationBtn">
-                            <i class="fas fa-bell"></i>
-                            <span class="notification-count">5</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Quick Stats -->
-                    <div class="quick-stats">
-                        <div class="stat-item">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>2 sessions this week</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-heartbeat"></i>
-                            <span>85% wellness score</span>
-                        </div>
-                    </div>
-                    
-                    <!-- User Menu -->
-                    <div class="user-menu-wrapper">
-                        <button class="user-menu-btn" id="userMenuBtn">
-                            <img src="https://ui-avatars.com/api/?name=John+Doe&background=667eea&color=fff" alt="User" class="user-avatar-sm">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="user-dropdown" id="userDropdown">
-                            <div class="dropdown-header">
-                                <img src="https://ui-avatars.com/api/?name=John+Doe&background=667eea&color=fff" alt="User">
-                                <div>
-                                    <h4>John Doe</h4>
-                                    <p>Premium Member</p>
-                                </div>
-                            </div>
-                            <a href="#profile"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="#billing"><i class="fas fa-credit-card"></i> Billing</a>
-                            <a href="#privacy"><i class="fas fa-shield-alt"></i> Privacy</a>
-                            <div class dropdown-divider"></div>
-                            <a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </div>
+            </section>
+
+            <!-- My Bookings Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-alt"></i> My Appointments
+                    </h2>
+                    <p class="section-subtitle">View and manage your bookings</p>
+                </div>
+                <div id="bookingsList" class="bookings-list">
+                    <div class="loading-text">
+                        <div class="loading"></div>
+                        <p>Loading bookings...</p>
                     </div>
                 </div>
-            </header>
-
-            <!-- Dashboard Sections -->
-            <div class="dashboard-sections">
-                <!-- Overview Section (Default) -->
-                <section id="overview" class="dashboard-section active">
-                    <div class="section-header">
-                        <h2>Welcome back, John</h2>
-                        <p class="section-subtitle">Here's your mental wellness overview for today</p>
-                        <div class="section-actions">
-                            <button class="btn btn-primary">
-                                <i class="fas fa-plus"></i> New Session
-                            </button>
-                            <button class="btn btn-outline">
-                                <i class="fas fa-chart-bar"></i> View Reports
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Stats Cards -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon primary">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3>Mental Wellness Score</h3>
-                                <div class="stat-value">85%</div>
-                                <div class="stat-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 85%"></div>
-                                    </div>
-                                    <span class="stat-change positive">+5% this week</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon success">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3>Sessions Completed</h3>
-                                <div class="stat-value">24</div>
-                                <div class="stat-detail">
-                                    <span class="stat-label">Next session in 2 days</span>
-                                    <span class="stat-badge">Scheduled</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon warning">
-                                <i class="fas fa-fire"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3>Current Streak</h3>
-                                <div class="stat-value">14 days</div>
-                                <div class="stat-detail">
-                                    <span class="stat-label">Keep going!</span>
-                                    <span class="stat-badge streak">Active</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-card">
-                            <div class="stat-icon info">
-                                <i class="fas fa-book"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3>Journal Entries</h3>
-                                <div class="stat-value">47</div>
-                                <div class="stat-detail">
-                                    <span class="stat-label">Last entry: Today</span>
-                                    <button class="btn-text">Write now</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Upcoming Sessions -->
-                    <div class="section-row">
-                        <div class="section-col-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>Upcoming Sessions</h3>
-                                    <button class="btn-text">View all</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="sessions-list">
-                                        <div class="session-item upcoming">
-                                            <div class="session-time">
-                                                <div class="session-date">Tomorrow</div>
-                                                <div class="session-hour">10:00 AM</div>
-                                            </div>
-                                            <div class="session-info">
-                                                <div class="therapist-info">
-                                                    <img src="https://ui-avatars.com/api/?name=Dr+Sarah&background=4CAF50&color=fff" alt="Therapist">
-                                                    <div>
-                                                        <h4>Dr. Sarah Johnson</h4>
-                                                        <p>Cognitive Behavioral Therapy</p>
-                                                    </div>
-                                                </div>
-                                                <div class="session-actions">
-                                                    <button class="btn btn-sm btn-primary">Join Session</button>
-                                                    <button class="btn btn-sm btn-outline">Reschedule</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="session-item upcoming">
-                                            <div class="session-time">
-                                                <div class="session-date">Fri, Dec 15</div>
-                                                <div class="session-hour">2:30 PM</div>
-                                            </div>
-                                            <div class="session-info">
-                                                <div class="therapist-info">
-                                                    <img src="https://ui-avatars.com/api/?name=Dr+Michael&background=2196F3&color=fff" alt="Therapist">
-                                                    <div>
-                                                        <h4>Dr. Michael Chen</h4>
-                                                        <p>Mindfulness & Meditation</p>
-                                                    </div>
-                                                </div>
-                                                <div class="session-actions">
-                                                    <button class="btn btn-sm btn-outline">View Details</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Actions Panel -->
-                        <div class="section-col-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>Quick Actions</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="quick-actions-list">
-                                        <button class="quick-action-btn">
-                                            <i class="fas fa-video"></i>
-                                            <span>Start Session</span>
-                                        </button>
-                                        <button class="quick-action-btn">
-                                            <i class="fas fa-book-medical"></i>
-                                            <span>Journal Entry</span>
-                                        </button>
-                                        <button class="quick-action-btn">
-                                            <i class="fas fa-chart-line"></i>
-                                            <span>Mood Check-in</span>
-                                        </button>
-                                        <button class="quick-action-btn">
-                                            <i class="fas fa-file-prescription"></i>
-                                            <span>Progress Report</span>
-                                        </button>
-                                        <button class="quick-action-btn">
-                                            <i class="fas fa-users"></i>
-                                            <span>Join Community</span>
-                                        </button>
-                                        <button class="quick-action-btn">
-                                            <i class="fas fa-dumbbell"></i>
-                                            <span>Wellness Exercises</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mood Tracker & Recent Activity -->
-                    <div class="section-row">
-                        <div class="section-col-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>Mood Trends</h3>
-                                    <div class="time-filter">
-                                        <button class="time-filter-btn active">Week</button>
-                                        <button class="time-filter-btn">Month</button>
-                                        <button class="time-filter-btn">Year</button>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mood-chart-container">
-                                        <canvas id="moodChart"></canvas>
-                                    </div>
-                                    <div class="mood-summary">
-                                        <div class="mood-stat">
-                                            <span class="mood-label">Average Mood</span>
-                                            <span class="mood-value positive">Good</span>
-                                        </div>
-                                        <div class="mood-stat">
-                                            <span class="mood-label">Best Day</span>
-                                            <span class="mood-value">Wednesday</span>
-                                        </div>
-                                        <div class="mood-stat">
-                                            <span class="mood-label">Improvement</span>
-                                            <span class="mood-value positive">+12%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="section-col-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>Recent Activity</h3>
-                                    <button class="btn-text">See all</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="activity-list">
-                                        <div class="activity-item">
-                                            <div class="activity-icon success">
-                                                <i class="fas fa-check-circle"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Completed session with Dr. Sarah</p>
-                                                <span class="activity-time">2 hours ago</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-item">
-                                            <div class="activity-icon primary">
-                                                <i class="fas fa-book"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Added new journal entry</p>
-                                                <span class="activity-time">Yesterday, 3:45 PM</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-item">
-                                            <div class="activity-icon info">
-                                                <i class="fas fa-chart-line"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Mood check-in: Happy</p>
-                                                <span class="activity-time">Dec 10, 9:30 AM</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-item">
-                                            <div class="activity-icon warning">
-                                                <i class="fas fa-bullseye"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Goal milestone reached: Meditation streak</p>
-                                                <span class="activity-time">Dec 9, 5:20 PM</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-item">
-                                            <div class="activity-icon">
-                                                <i class="fas fa-file-download"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Downloaded wellness resource</p>
-                                                <span class="activity-time">Dec 8, 11:15 AM</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Wellness Resources -->
-                    <div class="section-row">
-                        <div class="section-col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>Recommended Resources</h3>
-                                    <button class="btn btn-primary">Browse All</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="resources-grid">
-                                        <div class="resource-card">
-                                            <div class="resource-icon">
-                                                <i class="fas fa-head-side-virus"></i>
-                                            </div>
-                                            <h4>Managing Anxiety</h4>
-                                            <p>Guided exercises and techniques to help manage anxiety in daily life.</p>
-                                            <button class="btn-text">Start Now</button>
-                                        </div>
-                                        <div class="resource-card">
-                                            <div class="resource-icon">
-                                                <i class="fas fa-bed"></i>
-                                            </div>
-                                            <h4>Sleep Better</h4>
-                                            <p>Sleep hygiene tips and relaxation techniques for better sleep.</p>
-                                            <button class="btn-text">Explore</button>
-                                        </div>
-                                        <div class="resource-card">
-                                            <div class="resource-icon">
-                                                <i class="fas fa-users"></i>
-                                            </div>
-                                            <h4>Support Groups</h4>
-                                            <p>Connect with others who share similar experiences and challenges.</p>
-                                            <button class="btn-text">Join Group</button>
-                                        </div>
-                                        <div class="resource-card">
-                                            <div class="resource-icon">
-                                                <i class="fas fa-apple-alt"></i>
-                                            </div>
-                                            <h4>Mindful Eating</h4>
-                                            <p>Learn how mindfulness can transform your relationship with food.</p>
-                                            <button class="btn-text">Read Guide</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- My Sessions Section -->
-                <section id="sessions" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>My Therapy Sessions</h2>
-                        <p class="section-subtitle">Manage your upcoming and past therapy sessions</p>
-                        <div class="section-actions">
-                            <button class="btn btn-primary" id="bookNewSession">
-                                <i class="fas fa-calendar-plus"></i> Book New Session
-                            </button>
-                            <div class="view-toggle">
-                                <button class="view-toggle-btn active" data-view="list">
-                                    <i class="fas fa-list"></i>
-                                </button>
-                                <button class="view-toggle-btn" data-view="calendar">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Session Filters -->
-                    <div class="filters-bar">
-                        <div class="filter-group">
-                            <label>Filter by:</label>
-                            <select class="filter-select">
-                                <option value="all">All Sessions</option>
-                                <option value="upcoming">Upcoming</option>
-                                <option value="past">Past</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Therapist:</label>
-                            <select class="filter-select">
-                                <option value="all">All Therapists</option>
-                                <option value="sarah">Dr. Sarah Johnson</option>
-                                <option value="michael">Dr. Michael Chen</option>
-                                <option value="priya">Dr. Priya Patel</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Date Range:</label>
-                            <input type="date" class="filter-date">
-                            <span>to</span>
-                            <input type="date" class="filter-date">
-                        </div>
-                        <button class="btn btn-outline">
-                            <i class="fas fa-filter"></i> Apply Filters
-                        </button>
-                    </div>
-
-                    <!-- Sessions Content -->
-                    <div class="sessions-content">
-                        <!-- This will be populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Therapists Section -->
-                <section id="therapists" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Our Therapists</h2>
-                        <p class="section-subtitle">Find the right therapist for your needs</p>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Search therapists by specialty, name, or approach...">
-                        </div>
-                    </div>
-
-                    <!-- Therapists Grid -->
-                    <div class="therapists-grid">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Mood Tracker Section -->
-                <section id="mood-tracker" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Mood & Wellness Tracker</h2>
-                        <p class="section-subtitle">Track your emotional wellbeing over time</p>
-                        <button class="btn btn-primary" id="logMoodBtn">
-                            <i class="fas fa-plus"></i> Log Today's Mood
-                        </button>
-                    </div>
-
-                    <!-- Mood Tracker Content -->
-                    <div class="mood-tracker-content">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Journal Section -->
-                <section id="journal" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>My Journal</h2>
-                        <p class="section-subtitle">Your personal space for reflection and growth</p>
-                        <button class="btn btn-primary" id="newJournalEntry">
-                            <i class="fas fa-pen"></i> New Entry
-                        </button>
-                    </div>
-
-                    <!-- Journal Content -->
-                    <div class="journal-content">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Goals Section -->
-                <section id="goals" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>My Wellness Goals</h2>
-                        <p class="section-subtitle">Track and achieve your mental wellness objectives</p>
-                        <button class="btn btn-primary" id="setNewGoal">
-                            <i class="fas fa-bullseye"></i> Set New Goal
-                        </button>
-                    </div>
-
-                    <!-- Goals Content -->
-                    <div class="goals-content">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Community Section -->
-                <section id="community" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Support Community</h2>
-                        <p class="section-subtitle">Connect, share, and grow with others</p>
-                        <div class="section-actions">
-                            <button class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Create Post
-                            </button>
-                            <button class="btn btn-outline">
-                                <i class="fas fa-users"></i> Find Groups
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Community Content -->
-                    <div class="community-content">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Settings Section -->
-                <section id="settings" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Account Settings</h2>
-                        <p class="section-subtitle">Manage your account, privacy, and preferences</p>
-                    </div>
-
-                    <!-- Settings Content -->
-                    <div class="settings-content">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Help Section -->
-                <section id="help" class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Help & Support</h2>
-                        <p class="section-subtitle">Get help, report issues, or contact support</p>
-                    </div>
-
-                    <!-- Help Content -->
-                    <div class="help-content">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </section>
-            </div>
-
-            <!-- Footer -->
-            <footer class="dashboard-footer">
-                <div class="footer-content">
-                    <div class="footer-links">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Cookie Policy</a>
-                        <a href="#">Contact Us</a>
-                        <a href="#">About MindCare</a>
-                    </div>
-                    <div class="footer-copyright">
-                        <p>&copy; 2024 MindCare Pro. All rights reserved.</p>
-                        <p class="footer-version">Version 2.1.4</p>
-                    </div>
-                </div>
-            </footer>
+            </section>
         </main>
-
-        <!-- Right Sidebar (Optional) -->
-        <aside class="right-sidebar">
-            <div class="sidebar-header">
-                <h3>Today's Focus</h3>
-                <button class="btn-icon close-right-sidebar">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- Daily Wellness Tips -->
-            <div class="wellness-tips">
-                <div class="tip-card">
-                    <div class="tip-icon">
-                        <i class="fas fa-wind"></i>
-                    </div>
-                    <h4>Breathing Exercise</h4>
-                    <p>Take 5 minutes for deep breathing. Inhale for 4, hold for 7, exhale for 8.</p>
-                    <button class="btn-text">Start Exercise</button>
-                </div>
-
-                <div class="tip-card">
-                    <div class="tip-icon">
-                        <i class="fas fa-sun"></i>
-                    </div>
-                    <h4>Daily Gratitude</h4>
-                    <p>Write down 3 things you're grateful for today.</p>
-                    <button class="btn-text">Write Now</button>
-                </div>
-            </div>
-
-            <!-- Recent Contacts -->
-            <div class="recent-contacts">
-                <h4>Recent Contacts</h4>
-                <div class="contacts-list">
-                    <div class="contact-item online">
-                        <img src="https://ui-avatars.com/api/?name=Dr+Sarah&background=4CAF50&color=fff" alt="Therapist">
-                        <div class="contact-info">
-                            <h5>Dr. Sarah Johnson</h5>
-                            <p>Available now</p>
-                        </div>
-                        <button class="btn-icon">
-                            <i class="fas fa-comment"></i>
-                        </button>
-                    </div>
-                    <div class="contact-item online">
-                        <img src="https://ui-avatars.com/api/?name=Support&background=FF9800&color=fff" alt="Support">
-                        <div class="contact-info">
-                            <h5>Support Team</h5>
-                            <p>24/7 Available</p>
-                        </div>
-                        <button class="btn-icon">
-                            <i class="fas fa-comment"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Progress Summary -->
-            <div class="progress-summary">
-                <h4>Weekly Progress</h4>
-                <div class="progress-item">
-                    <span>Session Attendance</span>
-                    <div class="progress-bar small">
-                        <div class="progress-fill" style="width: 100%"></div>
-                    </div>
-                    <span>100%</span>
-                </div>
-                <div class="progress-item">
-                    <span>Journal Entries</span>
-                    <div class="progress-bar small">
-                        <div class="progress-fill" style="width: 85%"></div>
-                    </div>
-                    <span>85%</span>
-                </div>
-                <div class="progress-item">
-                    <span>Mood Check-ins</span>
-                    <div class="progress-bar small">
-                        <div class="progress-fill" style="width: 70%"></div>
-                    </div>
-                    <span>70%</span>
-                </div>
-            </div>
-        </aside>
     </div>
 
-    <!-- Modal System -->
-    <div id="modalContainer"></div>
+    <!-- Load Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Load app.js -->
+    <script src="app.js"></script>
 
-    <!-- Toast Notifications -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- Emergency Modal -->
-    <div id="emergencyModal" class="modal">
-        <div class="modal-content emergency-modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-life-ring"></i> Emergency Assistance</h2>
-                <button class="btn-icon close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="emergency-info">
-                    <p class="emergency-alert">If this is a life-threatening emergency, please call 911 immediately.</p>
-                    
-                    <div class="emergency-options">
-                        <div class="emergency-option">
-                            <i class="fas fa-phone-alt"></i>
-                            <div>
-                                <h3>National Suicide Prevention Lifeline</h3>
-                                <p>Call 988 for free, confidential support 24/7</p>
-                                <button class="btn btn-primary">Call Now</button>
-                            </div>
-                        </div>
-                        
-                        <div class="emergency-option">
-                            <i class="fas fa-comment-medical"></i>
-                            <div>
-                                <h3>Crisis Text Line</h3>
-                                <p>Text HOME to 741741 for free crisis support</p>
-                                <button class="btn btn-primary">Text Now</button>
-                            </div>
-                        </div>
-                        
-                        <div class="emergency-option">
-                            <i class="fas fa-user-md"></i>
-                            <div>
-                                <h3>Immediate Therapist Support</h3>
-                                <p>Connect with an available therapist now</p>
-                                <button class="btn btn-primary">Connect Now</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="emergency-resources">
-                        <h4>Additional Resources:</h4>
-                        <ul>
-                            <li><a href="#">Local Crisis Centers</a></li>
-                            <li><a href="#">Emergency Contact Information</a></li>
-                            <li><a href="#">Safety Planning Tools</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/dashboard.js"></script>
     <script>
-        // Initialize dashboard functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the dashboard
-            if (typeof Dashboard !== 'undefined') {
-                const dashboard = new Dashboard('user');
-                dashboard.init();
-            }
-            
-            // Initialize Chart.js for mood chart
-            const moodChartCanvas = document.getElementById('moodChart');
-            if (moodChartCanvas) {
-                const ctx = moodChartCanvas.getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'Mood Score',
-                            data: [7, 8, 9, 7, 6, 8, 9],
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                min: 0,
-                                max: 10,
-                                ticks: {
-                                    stepSize: 2
-                                }
-                            }
-                        }
-                    }
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
+
+        const supabase = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+
+        // Initialize Dashboard
+        async function init() {
+            try {
+                currentUser = JSON.parse(localStorage.getItem('user'));
+                if (!currentUser || currentUser.role !== 'user') {
+                    alert('Access denied. Please login as a user.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Update UI
+                document.getElementById('userName').textContent = currentUser.fullname || 'User';
+                document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-IN', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                 });
+
+                // Load data
+                await loadTherapists();
+                await loadBookings();
+            } catch (error) {
+                console.error('Init error:', error);
+                alert('Error loading dashboard. Please try again.');
             }
-        });
+        }
+
+        // Load Therapists
+        async function loadTherapists() {
+            const container = document.getElementById('therapistsList');
+            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading therapists...</p></div>';
+
+            try {
+                const { data: therapists, error } = await supabase
+                    .from('Therapists')
+                    .select('*')
+                    .eq('approval_status', 'approved')
+                    .eq('Active', true)
+                    .order('Name', { ascending: true });
+
+                if (error) throw error;
+
+                displayTherapists(therapists);
+            } catch (error) {
+                console.error('Error loading therapists:', error);
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">😕</div><h3>Unable to load therapists</h3><p>Please try refreshing the page</p></div>';
+            }
+        }
+
+        // Display Therapists
+        function displayTherapists(therapists) {
+            const container = document.getElementById('therapistsList');
+
+            if (!therapists || therapists.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><h3>No Therapists Available</h3><p>There are currently no therapists available for booking.</p></div>';
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+
+            container.innerHTML = therapists.map(therapist => `
+                <div class="therapist-card">
+                    <div class="therapist-header">
+                        <div class="therapist-avatar">${(therapist.Name || 'T').charAt(0)}</div>
+                        <div class="therapist-info">
+                            <h3 class="therapist-name">Dr. ${therapist.Name || 'Unknown'}</h3>
+                            <p class="therapist-specialization">${therapist.Specialization || 'General Therapy'}</p>
+                            <p class="therapist-bio">${therapist.bio || 'No bio available.'}</p>
+                        </div>
+                    </div>
+                    <div class="booking-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" id="date-${therapist.id}" class="date-input" min="${today}" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Time</label>
+                                <select id="time-${therapist.id}" required>
+                                    <option value="">Select time</option>
+                                    <option value="09:00">9:00 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="14:00">2:00 PM</option>
+                                    <option value="15:00">3:00 PM</option>
+                                    <option value="16:00">4:00 PM</option>
+                                    <option value="17:00">5:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn-book" onclick="bookSession('${therapist.id}', '${therapist.Name}')">
+                            <i class="fas fa-check"></i> Book Session
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Book Session
+        async function bookSession(therapistId, therapistName) {
+            const dateInput = document.getElementById(`date-${therapistId}`);
+            const timeSelect = document.getElementById(`time-${therapistId}`);
+
+            const sessionDate = dateInput.value;
+            const startTime = timeSelect.value;
+
+            if (!sessionDate || !startTime) {
+                alert('Please select date and time');
+                return;
+            }
+
+            if (!confirm(`Book session with Dr. ${therapistName} on ${sessionDate} at ${startTime}?`)) {
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('Bookings')
+                    .insert({
+                        user_id: currentUser.id,
+                        therapist_id: therapistId,
+                        session_date: sessionDate,
+                        start_time: startTime,
+                        status: 'confirmed',
+                        created_at: new Date().toISOString(),
+                        amount: 500
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                alert(`✅ Session booked successfully with Dr. ${therapistName}!`);
+                dateInput.value = '';
+                timeSelect.value = '';
+                await loadBookings();
+            } catch (error) {
+                console.error('Booking error:', error);
+                alert('Error creating booking. Please try again.');
+            }
+        }
+
+        // Load Bookings
+        async function loadBookings() {
+            const container = document.getElementById('bookingsList');
+            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading bookings...</p></div>';
+
+            try {
+                const { data: bookings, error } = await supabase
+                    .from('Bookings')
+                    .select('*, Therapists(Name, Specialization)')
+                    .eq('user_id', currentUser.id)
+                    .order('session_date', { ascending: false });
+
+                if (error) throw error;
+
+                // Update stats
+                document.getElementById('totalBookings').textContent = bookings.length;
+                document.getElementById('upcomingBookings').textContent = bookings.filter(b => b.status === 'confirmed').length;
+
+                displayBookings(bookings);
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">😕</div><h3>Unable to load bookings</h3><p>Please try refreshing the page</p></div>';
+            }
+        }
+
+        // Display Bookings
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookingsList');
+
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><h3>No Bookings Yet</h3><p>You haven\'t booked any sessions yet.</p></div>';
+                return;
+            }
+
+            container.innerHTML = bookings.map(booking => {
+                const therapist = booking.Therapists || {};
+                const date = new Date(booking.session_date).toLocaleDateString('en-IN');
+
+                return `
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div>
+                                <h3 class="booking-therapist">Dr. ${therapist.Name || 'Unknown'}</h3>
+                                <p style="color: #5A9B8E; font-weight: 600; margin: 0;">${therapist.Specialization || 'General Therapy'}</p>
+                            </div>
+                            <span class="status-badge status-${booking.status}">${booking.status.toUpperCase()}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 14px;">
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
+                                <div style="color: #2C3E50;">${date}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
+                                <div style="color: #2C3E50;">${booking.start_time}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
+                                <div style="color: #2C3E50;">₹${booking.amount || 500}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Logout
+        async function logout() {
+            if (!confirm('Are you sure you want to logout?')) return;
+
+            try {
+                await supabase.auth.signOut();
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Error logging out');
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
