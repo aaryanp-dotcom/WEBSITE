@@ -159,18 +159,27 @@
                     return;
                 }
 
-                const userIds = [...new Set(appointments.map(a => a.user_id))];
-                const { data: patients } = await window.supabaseClient
-                    .from('profiles')
-                    .select('id, fullname, email, phone')
-                    .in('id', userIds);
+                // FIXED: Get patient details with correct syntax
+                const userIds = [...new Set(appointments.map(a => a.user_id))].filter(id => id); // Remove null/undefined
 
-                console.log('🔵 Patients:', patients);
+                let patientMap = {};
 
-                const patientMap = {};
-                patients?.forEach(p => {
-                    patientMap[p.id] = p;
-                });
+                if (userIds.length > 0) {
+                    // Query each user individually to avoid .in() issues
+                    for (const userId of userIds) {
+                        const { data: patient } = await window.supabaseClient
+                            .from('profiles')
+                            .select('id, fullname, email, phone')
+                            .eq('id', userId)
+                            .single();
+
+                        if (patient) {
+                            patientMap[patient.id] = patient;
+                        }
+                    }
+                }
+
+                console.log('🟢 Patients loaded:', patientMap);
 
                 container.innerHTML = appointments.map(a => {
                     const patient = patientMap[a.user_id] || {};
