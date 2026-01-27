@@ -39,7 +39,6 @@
         .btn-join:hover { background: #4A8B7E; }
         .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
         
-        /* Profile Modal Styles */
         .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
         .modal-content { background: white; border-radius: 16px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
@@ -118,7 +117,6 @@
         </main>
     </div>
 
-    <!-- Profile Modal -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -172,6 +170,8 @@
         let allBookings = [];
 
         document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔵 Dashboard script started');
+            
             currentUser = JSON.parse(localStorage.getItem('user'));
             console.log('🔵 User dashboard loaded. User:', currentUser);
 
@@ -181,7 +181,6 @@
                 return;
             }
 
-            // Set max date for DOB to today
             const dobInput = document.getElementById('profileDOB');
             dobInput.max = new Date().toISOString().split('T')[0];
 
@@ -200,7 +199,7 @@
                     .select('*')
                     .eq('Active', true);
 
-                console.log('🔵 Therapists:', therapists);
+                console.log('🔵 Therapists data:', therapists);
 
                 if (error) throw error;
 
@@ -210,11 +209,7 @@
                 }
 
                 allTherapists = therapists;
-                
-                // Populate specialty filter
                 populateSpecialtyFilter(therapists);
-                
-                // Display all therapists initially
                 displayTherapists(therapists);
 
                 console.log('🟢 Loaded', therapists.length, 'therapists');
@@ -228,10 +223,8 @@
             const filterSelect = document.getElementById('specialtyFilter');
             const specialties = [...new Set(therapists.map(t => t.Specialization).filter(Boolean))];
             
-            // Clear existing options except "All Specialties"
             filterSelect.innerHTML = '<option value="">All Specialties</option>';
             
-            // Add specialty options
             specialties.sort().forEach(specialty => {
                 const option = document.createElement('option');
                 option.value = specialty;
@@ -318,11 +311,9 @@
 
                 alert('✅ Booking request sent! Waiting for therapist confirmation.');
 
-                // Clear form
                 document.getElementById('date-' + therapistId).value = '';
                 document.getElementById('time-' + therapistId).value = '';
 
-                // Reload bookings
                 await loadBookings();
 
                 console.log('🟢 Booking created:', data);
@@ -342,7 +333,7 @@
                     .select('*')
                     .eq('user_id', currentUser.id);
 
-                console.log('🔵 Bookings:', bookings);
+                console.log('🔵 Bookings data:', bookings);
 
                 if (error) throw error;
 
@@ -352,10 +343,7 @@
                     return;
                 }
 
-                // Store all bookings globally
                 allBookings = bookings;
-
-                // Apply filters and sorting
                 filterAndSortBookings();
 
                 console.log('🟢 Loaded', bookings.length, 'bookings');
@@ -375,21 +363,19 @@
                 return;
             }
 
-            // Filter by status
             let filteredBookings = allBookings;
             if (statusFilter !== 'all') {
                 filteredBookings = allBookings.filter(b => b.status === statusFilter);
             }
 
-            // Sort by SESSION DATE (not created_at)
             filteredBookings.sort((a, b) => {
                 const dateA = new Date(a.session_date);
                 const dateB = new Date(b.session_date);
                 
                 if (sortOrder === 'asc') {
-                    return dateA - dateB; // Upcoming first (earliest date first)
+                    return dateA - dateB;
                 } else {
-                    return dateB - dateA; // Latest first (most recent date first)
+                    return dateB - dateA;
                 }
             });
 
@@ -398,7 +384,6 @@
                 return;
             }
 
-            // Get therapist details
             const therapistIds = [...new Set(filteredBookings.map(b => b.therapist_id))];
             const { data: therapists } = await window.supabaseClient
                 .from('Therapists')
@@ -456,7 +441,6 @@
             }).join('');
         }
 
-        // Profile Modal Functions
         function openProfileModal() {
             document.getElementById('profileModal').classList.add('active');
         }
@@ -465,7 +449,6 @@
             document.getElementById('profileModal').classList.remove('active');
         }
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('profileModal');
             if (event.target === modal) {
@@ -491,7 +474,6 @@
 
                 console.log('🔵 User profile data:', userData);
 
-                // Populate profile fields
                 document.getElementById('profileEmail').textContent = currentUser.email || userData.email || '-';
                 document.getElementById('profileName').value = userData.full_name || '';
                 document.getElementById('profilePhone').value = userData.phone || '';
@@ -504,56 +486,55 @@
             }
         }
 
-       async function saveProfile(event) {
-    event.preventDefault();
-    console.log('🔵 Saving profile...');
+        async function saveProfile(event) {
+            event.preventDefault();
+            console.log('🔵 Saving profile...');
 
-    try {
-        // Try to check if profile exists
-        const { data: existing } = await window.supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single();
+            try {
+                const { data: existing } = await window.supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
 
-        const profileData = {
-            user_id: currentUser.id,
-            full_name: document.getElementById('profileName').value,
-            phone: document.getElementById('profilePhone').value,
-            date_of_birth: document.getElementById('profileDOB').value || null,
-            bio: document.getElementById('profileBio').value,
-            address: document.getElementById('profileAddress').value,
-            email: currentUser.email,
-            role: currentUser.role
-        };
+                const profileData = {
+                    user_id: currentUser.id,
+                    full_name: document.getElementById('profileName').value,
+                    phone: document.getElementById('profilePhone').value,
+                    date_of_birth: document.getElementById('profileDOB').value || null,
+                    bio: document.getElementById('profileBio').value,
+                    address: document.getElementById('profileAddress').value,
+                    email: currentUser.email,
+                    role: currentUser.role
+                };
 
-        let result;
-        if (existing) {
-            // Update existing profile
-            result = await window.supabaseClient
-                .from('profiles')
-                .update(profileData)
-                .eq('user_id', currentUser.id)
-                .select();
-        } else {
-            // Insert new profile - generate UUID in code
-            const newId = crypto.randomUUID();
-            profileData.id = newId;
-            
-            result = await window.supabaseClient
-                .from('profiles')
-                .insert([profileData])
-                .select();
+                let result;
+                if (existing) {
+                    result = await window.supabaseClient
+                        .from('profiles')
+                        .update(profileData)
+                        .eq('user_id', currentUser.id)
+                        .select();
+                } else {
+                    profileData.id = self.crypto.randomUUID();
+                    
+                    result = await window.supabaseClient
+                        .from('profiles')
+                        .insert([profileData])
+                        .select();
+                }
+
+                if (result.error) throw result.error;
+
+                console.log('🟢 Profile saved:', result.data);
+                alert('✅ Profile saved successfully!');
+                closeProfileModal();
+
+            } catch (error) {
+                console.error('🔴 Error saving profile:', error);
+                alert('Error saving profile: ' + error.message);
+            }
         }
-
-        if (result.error) throw result.error;
-
-        console.log('🟢 Profile saved:', result.data);
-        alert('✅ Profile saved successfully!');
-        closeProfileModal();
-
-    } catch (error) {
-        console.error('🔴 Error saving profile:', error);
-        alert('Error saving profile: ' + error.message);
-    }
-}
+    </script>
+</body>
+</html>
