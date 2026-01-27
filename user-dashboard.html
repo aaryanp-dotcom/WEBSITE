@@ -516,8 +516,6 @@
                         .eq('user_id', currentUser.id)
                         .select();
                 } else {
-                    profileData.id = self.crypto.randomUUID();
-                    
                     result = await window.supabaseClient
                         .from('profiles')
                         .insert([profileData])
