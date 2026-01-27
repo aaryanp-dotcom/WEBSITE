@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -373,12 +372,14 @@
 
     <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Load app.js -->
-    <script src="app.js"></script>
 
     <script>
-        // Use global Supabase client
-        const supabase = window.supabaseClient;
+        // Initialize Supabase client
+        const SUPABASE_URL = 'https://hviqxpfnvjsqbdjfbttm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2aXF4cGZudmpzcWJkamZidHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDM0NzIsImV4cCI6MjA4NDQxOTQ3Mn0.P3UWgbYx4MLMJktsXjFsAEtsNpTjqPnO31s2Oyy0BFs';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        console.log('🔵 Supabase client initialized');
 
         document.addEventListener('DOMContentLoaded', function() {
             initLoginForm();
@@ -431,9 +432,13 @@
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
+                console.log('🔵 Login form submitted');
+
                 // Get form values
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
+
+                console.log('🔵 Email:', email);
 
                 // Validate
                 if (!email || !password) {
@@ -452,6 +457,8 @@
                 submitBtn.textContent = '';
 
                 try {
+                    console.log('🔵 Attempting Supabase auth.signInWithPassword...');
+
                     // Sign in with Supabase
                     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                         email: email,
@@ -459,10 +466,14 @@
                     });
 
                     if (authError) {
+                        console.error('🔴 Auth error:', authError);
                         throw new Error(authError.message);
                     }
 
+                    console.log('🟢 Auth successful:', authData.user.id);
+
                     // Get user profile from profiles table
+                    console.log('🔵 Fetching profile...');
                     const { data: profile, error: profileError } = await supabase
                         .from('profiles')
                         .select('*')
@@ -470,8 +481,12 @@
                         .single();
 
                     if (profileError) {
+                        console.error('🔴 Profile error:', profileError);
                         throw new Error('Failed to load user profile');
                     }
+
+                    console.log('🟢 Profile loaded:', profile);
+                    console.log('🟢 User role:', profile.role);
 
                     // Store user data
                     localStorage.setItem('user', JSON.stringify(profile));
@@ -489,17 +504,22 @@
 
                     // Redirect based on role after delay
                     setTimeout(() => {
+                        let redirectUrl = 'user-dashboard.html'; // default
+
                         if (profile.role === 'admin') {
-                            window.location.href = 'admin-dashboard.html';
+                            redirectUrl = 'admin-dashboard.html';
                         } else if (profile.role === 'therapist') {
-                            window.location.href = 'therapist-dashboard.html';
-                        } else {
-                            window.location.href = 'user-dashboard.html';
+                            redirectUrl = 'therapist-dashboard.html';
+                        } else if (profile.role === 'user') {
+                            redirectUrl = 'user-dashboard.html';
                         }
+
+                        console.log('🟢 Redirecting to:', redirectUrl);
+                        window.location.href = redirectUrl;
                     }, 1500);
 
                 } catch (error) {
-                    console.error('Login error:', error);
+                    console.error('🔴 Login error:', error);
                     showMessage(error.message || 'Login failed. Please check your credentials.', 'error');
 
                     // Reset button
