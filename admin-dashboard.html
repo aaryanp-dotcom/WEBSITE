@@ -112,10 +112,16 @@
                 <button class="close-modal" onclick="closeModal('therapistsModal')">&times;</button>
             </div>
             <div class="filter-section">
-                <input type="text" id="therapistSearchInput" class="filter-input" placeholder="Search by name..." oninput="filterTherapistsList()">
-                <select id="therapistSpecFilter" class="filter-select" onchange="filterTherapistsList()">
-                    <option value="">All Specializations</option>
-                </select>
+                <div class="searchable-select" id="therapistSearchWrapper">
+                    <input type="text" id="therapistSearchInput" placeholder="Search by therapist name...">
+                    <i class="fas fa-search dropdown-icon"></i>
+                    <div class="dropdown-list" id="therapistSearchList"></div>
+                </div>
+                <div class="searchable-select" id="therapistSpecWrapper">
+                    <input type="text" id="therapistSpecInput" placeholder="Search by specialization..." readonly onclick="toggleDropdown('therapistSpecWrapper')">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <div class="dropdown-list" id="therapistSpecList"></div>
+                </div>
             </div>
             <div id="therapistsModalContent">
                 <div class="loading">Loading...</div>
@@ -131,7 +137,21 @@
                 <button class="close-modal" onclick="closeModal('patientsModal')">&times;</button>
             </div>
             <div class="filter-section">
-                <input type="text" id="patientSearchInput" class="filter-input" placeholder="Search by name..." oninput="filterPatientsList()">
+                <div class="searchable-select" id="patientSearchWrapper">
+                    <input type="text" id="patientSearchInput" placeholder="Search by patient name...">
+                    <i class="fas fa-search dropdown-icon"></i>
+                    <div class="dropdown-list" id="patientSearchList"></div>
+                </div>
+                <div class="searchable-select" id="patientTherapistWrapper">
+                    <input type="text" id="patientTherapistInput" placeholder="Search by therapist..." readonly onclick="toggleDropdown('patientTherapistWrapper')">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <div class="dropdown-list" id="patientTherapistList"></div>
+                </div>
+                <div class="searchable-select" id="patientSpecWrapper">
+                    <input type="text" id="patientSpecInput" placeholder="Search by specialization..." readonly onclick="toggleDropdown('patientSpecWrapper')">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <div class="dropdown-list" id="patientSpecList"></div>
+                </div>
             </div>
             <div id="patientsModalContent">
                 <div class="loading">Loading...</div>
@@ -201,6 +221,11 @@
         let therapistMap = {};
         let patientMap = {};
         
+        let selectedTherapistName = '';
+        let selectedTherapistSpec = '';
+        let selectedPatientName = '';
+        let selectedPatientTherapist = '';
+        let selectedPatientSpec = '';
         let selectedBookingDoctor = '';
         let selectedRevenueDoctor = '';
         let selectedRevenueSpec = '';
@@ -326,22 +351,33 @@
             const modal = document.getElementById('therapistsModal');
             modal.classList.add('active');
             
-            const specFilter = document.getElementById('therapistSpecFilter');
             const specializations = [...new Set(allTherapists.map(t => t.Specialization).filter(Boolean))];
-            specFilter.innerHTML = '<option value="">All Specializations</option>' + 
-                specializations.map(s => `<option value="${s}">${s}</option>`).join('');
+            const specItems = [
+                { value: '', label: 'All Specializations' },
+                ...specializations.map(s => ({ value: s, label: s }))
+            ];
             
-            document.getElementById('therapistSearchInput').value = '';
+            createSearchableDropdown('therapistSpecWrapper', specItems, function(value) {
+                selectedTherapistSpec = value;
+                filterTherapistsList();
+            }, selectedTherapistSpec);
+            
+            const searchInput = document.getElementById('therapistSearchInput');
+            searchInput.value = selectedTherapistName;
+            searchInput.addEventListener('input', function() {
+                selectedTherapistName = this.value;
+                filterTherapistsList();
+            });
+            
             filterTherapistsList();
         }
         
         function filterTherapistsList() {
-            const searchTerm = document.getElementById('therapistSearchInput').value.toLowerCase();
-            const specFilter = document.getElementById('therapistSpecFilter').value;
+            const searchTerm = selectedTherapistName.toLowerCase();
             
             let filtered = allTherapists.filter(t => {
                 const matchesSearch = !searchTerm || (t.Name || '').toLowerCase().includes(searchTerm);
-                const matchesSpec = !specFilter || t.Specialization === specFilter;
+                const matchesSpec = !selectedTherapistSpec || t.Specialization === selectedTherapistSpec;
                 return matchesSearch && matchesSpec;
             });
             
@@ -386,16 +422,67 @@
             const modal = document.getElementById('patientsModal');
             modal.classList.add('active');
             
-            document.getElementById('patientSearchInput').value = '';
+            const patientBookings = allBookings.filter(b => b.status === 'confirmed');
+            const therapists = [...new Set(patientBookings.map(b => b.therapist_id))];
+            const therapistItems = [
+                { value: '', label: 'All Therapists' },
+                ...therapists.map(id => {
+                    const therapist = therapistMap[id] || {};
+                    return { value: id, label: therapist.Name || 'Therapist' };
+                })
+            ];
+            
+            const specializations = [...new Set(therapists.map(id => therapistMap[id]?.Specialization).filter(Boolean))];
+            const specItems = [
+                { value: '', label: 'All Specializations' },
+                ...specializations.map(s => ({ value: s, label: s }))
+            ];
+            
+            createSearchableDropdown('patientTherapistWrapper', therapistItems, function(value) {
+                selectedPatientTherapist = value;
+                filterPatientsList();
+            }, selectedPatientTherapist);
+            
+            createSearchableDropdown('patientSpecWrapper', specItems, function(value) {
+                selectedPatientSpec = value;
+                filterPatientsList();
+            }, selectedPatientSpec);
+            
+            const searchInput = document.getElementById('patientSearchInput');
+            searchInput.value = selectedPatientName;
+            searchInput.addEventListener('input', function() {
+                selectedPatientName = this.value;
+                filterPatientsList();
+            });
+            
             filterPatientsList();
         }
         
         function filterPatientsList() {
-            const searchTerm = document.getElementById('patientSearchInput').value.toLowerCase();
+            const searchTerm = selectedPatientName.toLowerCase();
             
-            let filtered = allPatients.filter(u => {
-                return !searchTerm || (u.full_name || '').toLowerCase().includes(searchTerm);
-            });
+            let filtered = allPatients;
+            
+            if (searchTerm) {
+                filtered = filtered.filter(p => (p.full_name || '').toLowerCase().includes(searchTerm));
+            }
+            
+            if (selectedPatientTherapist) {
+                const patientIds = allBookings
+                    .filter(b => b.therapist_id === selectedPatientTherapist && b.status === 'confirmed')
+                    .map(b => b.user_id);
+                filtered = filtered.filter(p => patientIds.includes(p.id));
+            }
+            
+            if (selectedPatientSpec) {
+                const therapistIds = allTherapists
+                    .filter(t => t.Specialization === selectedPatientSpec)
+                    .map(t => t.id);
+                const patientIds = allBookings
+                    .filter(b => therapistIds.includes(b.therapist_id) && b.status === 'confirmed')
+                    .map(b => b.user_id);
+                filtered = filtered.filter(p => patientIds.includes(p.id));
+            }
             
             displayPatientsList(filtered);
         }
