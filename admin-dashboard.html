@@ -233,7 +233,7 @@
         
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
-            console.log('🔵 Admin dashboard loaded. Patient:', currentUser);
+            console.log('🔵 Admin dashboard loaded. User:', currentUser);
             
             if (!currentUser || currentUser.role !== 'admin') {
                 alert('Access denied. Admin role required.');
@@ -272,20 +272,22 @@
             const input = wrapper.querySelector('input');
             const list = wrapper.querySelector('.dropdown-list');
             
+            let selectedValue = currentValue;
             input.value = currentValue;
-            input.removeAttribute('readonly');
             
             function renderItems(filteredItems) {
                 list.innerHTML = filteredItems.map(item => `
-                    <div class="dropdown-item ${item.value === currentValue ? 'selected' : ''}" data-value="${item.value}">
+                    <div class="dropdown-item ${item.value === selectedValue ? 'selected' : ''}" data-value="${item.value}">
                         ${item.label}
                     </div>
                 `).join('');
                 
                 list.querySelectorAll('.dropdown-item').forEach(item => {
-                    item.addEventListener('click', function() {
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
                         const value = this.getAttribute('data-value');
                         const label = this.textContent.trim();
+                        selectedValue = value;
                         input.value = label;
                         input.setAttribute('readonly', 'readonly');
                         list.classList.remove('active');
@@ -296,6 +298,15 @@
             
             renderItems(items);
             
+            input.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (this.hasAttribute('readonly')) {
+                    this.removeAttribute('readonly');
+                    this.select();
+                    list.classList.add('active');
+                }
+            });
+            
             input.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
                 const filtered = items.filter(item => 
@@ -305,9 +316,13 @@
                 list.classList.add('active');
             });
             
-            input.addEventListener('focus', function() {
-                this.removeAttribute('readonly');
-                list.classList.add('active');
+            input.addEventListener('blur', function() {
+                setTimeout(() => {
+                    this.setAttribute('readonly', 'readonly');
+                    if (!selectedValue) {
+                        this.value = '';
+                    }
+                }, 200);
             });
         }
         
@@ -337,7 +352,7 @@
                     .reduce((sum, b) => sum + (b.amount || 700), 0);
                 document.getElementById('totalRevenue').textContent = '₹' + revenue;
                 
-                console.log('🟢 Stats loaded');
+                console.log('🟢 Stats loaded - Therapists:', allTherapists.length, 'Patients:', allPatients.length);
             } catch (error) {
                 console.error('🔴 Error loading statistics:', error);
             }
@@ -509,11 +524,11 @@
                     <tbody>
                         ${patients.map(u => `
                             <tr>
-                                <td>${u.full_name || 'N/A'}</td>
-                                <td>${u.email || 'N/A'}</td>
-                                <td>${u.phone || 'N/A'}</td>
-                                <td>${u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString('en-IN') : 'N/A'}</td>
-                                <td>${u.address || 'N/A'}</td>
+                                <td>${u.full_name || '<em style="color: #9CA3AF;">Not Set</em>'}</td>
+                                <td>${u.email || '<em style="color: #9CA3AF;">Not Set</em>'}</td>
+                                <td>${u.phone || '<em style="color: #9CA3AF;">Not Set</em>'}</td>
+                                <td>${u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString('en-IN') : '<em style="color: #9CA3AF;">Not Set</em>'}</td>
+                                <td>${u.address || '<em style="color: #9CA3AF;">Not Set</em>'}</td>
                             </tr>
                         `).join('')}
                     </tbody>
