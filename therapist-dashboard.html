@@ -739,6 +739,90 @@
             }
         }
         
+        async function confirmAppointment(appointmentId) {
+            const meetingLink = document.getElementById('meeting-link-' + appointmentId).value.trim();
+            
+            if (!meetingLink) {
+                alert('Please enter a meeting link');
+                return;
+            }
+            
+            console.log('🔵 Confirming appointment:', appointmentId);
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({
+                        status: 'confirmed',
+                        meeting_link: meetingLink
+                    })
+                    .eq('id', appointmentId)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Appointment confirmed:', data);
+                alert('✅ Appointment confirmed!');
+                await loadAppointments();
+                
+            } catch (error) {
+                console.error('🔴 Error confirming appointment:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function rejectAppointment(appointmentId) {
+            if (!confirm('Are you sure you want to reject this appointment?')) {
+                return;
+            }
+            
+            console.log('🔵 Rejecting appointment:', appointmentId);
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({ status: 'rejected' })
+                    .eq('id', appointmentId)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Appointment rejected:', data);
+                alert('✅ Appointment rejected');
+                await loadAppointments();
+                
+            } catch (error) {
+                console.error('🔴 Error rejecting appointment:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function markComplete(appointmentId) {
+            if (!confirm('Mark this session as completed?')) {
+                return;
+            }
+            
+            console.log('🔵 Marking appointment complete:', appointmentId);
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({ status: 'completed' })
+                    .eq('id', appointmentId)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Appointment marked complete:', data);
+                alert('✅ Session marked as completed!');
+                await loadAppointments();
+                
+            } catch (error) {
+                console.error('🔴 Error marking complete:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
         async function approveReschedule(appointmentId, newDate, newTime) {
             console.log('🔵 Approving reschedule:', appointmentId);
             
@@ -802,6 +886,8 @@
         
         function openRescheduleModal(bookingId) {
             currentRescheduleBookingId = bookingId;
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('rescheduleDate').min = today;
             document.getElementById('rescheduleModal').classList.add('active');
         }
         
@@ -816,11 +902,11 @@
         async function submitTherapistReschedule(event) {
             event.preventDefault();
             console.log('🔵 Submitting therapist reschedule...');
-
+            
             const newDate = document.getElementById('rescheduleDate').value;
             const newTime = document.getElementById('rescheduleTime').value;
             const reason = document.getElementById('rescheduleReason').value;
-
+            
             try {
                 const { data, error } = await window.supabaseClient
                     .from('Bookings')
@@ -828,109 +914,21 @@
                         therapist_reschedule_requested: true,
                         therapist_reschedule_date: newDate,
                         therapist_reschedule_time: newTime,
-                        therapist_reschedule_reason: reason || null,
-                        reschedule_requested: false,
-                        reschedule_new_date: null,
-                        reschedule_new_start_time: null,
-                        reschedule_reason: null
+                        therapist_reschedule_reason: reason || null
                     })
                     .eq('id', currentRescheduleBookingId)
                     .select();
-
+                
                 if (error) throw error;
-
-                console.log('🟢 Therapist reschedule sent:', data);
+                
+                console.log('🟢 Reschedule request sent:', data);
                 alert('✅ Reschedule request sent to patient!');
                 
                 closeRescheduleModal();
                 await loadAppointments();
-
-            } catch (error) {
-                console.error('🔴 Reschedule error:', error);
-                alert('Error: ' + error.message);
-            }
-        }
-        
-        async function confirmAppointment(appointmentId) {
-            const meetingLink = document.getElementById('meeting-link-' + appointmentId).value.trim();
-            
-            if (!meetingLink) {
-                alert('Please enter a meeting link');
-                return;
-            }
-            
-            console.log('🔵 Confirming appointment:', appointmentId);
-            
-            try {
-                const { data, error } = await window.supabaseClient
-                    .from('Bookings')
-                    .update({
-                        status: 'confirmed',
-                        meeting_link: meetingLink
-                    })
-                    .eq('id', appointmentId)
-                    .select();
-                
-                if (error) throw error;
-                
-                console.log('🟢 Appointment confirmed:', data);
-                alert('✅ Appointment confirmed!');
-                await loadAppointments();
                 
             } catch (error) {
-                console.error('🔴 Error confirming:', error);
-                alert('Error: ' + error.message);
-            }
-        }
-        
-        async function rejectAppointment(appointmentId) {
-            if (!confirm('Are you sure you want to reject this appointment?')) {
-                return;
-            }
-            
-            console.log('🔵 Rejecting appointment:', appointmentId);
-            
-            try {
-                const { data, error } = await window.supabaseClient
-                    .from('Bookings')
-                    .update({ status: 'rejected' })
-                    .eq('id', appointmentId)
-                    .select();
-                
-                if (error) throw error;
-                
-                console.log('🟢 Appointment rejected:', data);
-                alert('✅ Appointment rejected');
-                await loadAppointments();
-                
-            } catch (error) {
-                console.error('🔴 Error rejecting:', error);
-                alert('Error: ' + error.message);
-            }
-        }
-        
-        async function markComplete(appointmentId) {
-            if (!confirm('Mark this session as complete?')) {
-                return;
-            }
-            
-            console.log('🔵 Marking appointment complete:', appointmentId);
-            
-            try {
-                const { data, error } = await window.supabaseClient
-                    .from('Bookings')
-                    .update({ status: 'completed' })
-                    .eq('id', appointmentId)
-                    .select();
-                
-                if (error) throw error;
-                
-                console.log('🟢 Appointment marked complete:', data);
-                alert('✅ Session marked as complete!');
-                await loadAppointments();
-                
-            } catch (error) {
-                console.error('🔴 Error marking complete:', error);
+                console.error('🔴 Error sending reschedule:', error);
                 alert('Error: ' + error.message);
             }
         }
@@ -952,14 +950,9 @@
         async function saveNextSessionNotes(event) {
             event.preventDefault();
             console.log('🔵 Saving next session notes...');
-
+            
             const notes = document.getElementById('sessionNotes').value.trim();
-
-            if (!notes) {
-                alert('Please enter some notes');
-                return;
-            }
-
+            
             try {
                 const { data, error } = await window.supabaseClient
                     .from('Bookings')
@@ -968,15 +961,15 @@
                     })
                     .eq('id', currentNotesBookingId)
                     .select();
-
+                
                 if (error) throw error;
-
-                console.log('🟢 Next session notes saved:', data);
-                alert('✅ Preparation notes saved!');
+                
+                console.log('🟢 Notes saved:', data);
+                alert('✅ Next session notes saved!');
                 
                 closeNotesModal();
                 await loadAppointments();
-
+                
             } catch (error) {
                 console.error('🔴 Error saving notes:', error);
                 alert('Error: ' + error.message);
