@@ -14,9 +14,9 @@
         .therapists-section { margin-bottom: 40px; }
         .section-title { font-size: 24px; color: #2C3E50; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .filter-container { display: flex; align-items: center; gap: 10px; }
+        .filter-container { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .filter-label { color: #6B7280; font-weight: 600; font-size: 14px; }
-        .filter-select { padding: 10px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; min-width: 200px; }
+        .filter-select { padding: 10px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; min-width: 180px; }
         .therapists-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .therapist-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 25px; transition: transform 0.2s, box-shadow 0.2s; }
         .therapist-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -93,7 +93,24 @@
             </section>
 
             <section class="bookings-section">
-                <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Bookings</h2>
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Bookings</h2>
+                    <div class="filter-container">
+                        <label class="filter-label">Sort by:</label>
+                        <select id="dateSortFilter" class="filter-select" onchange="filterAndSortBookings()">
+                            <option value="desc">Newest First</option>
+                            <option value="asc">Oldest First</option>
+                        </select>
+                        
+                        <label class="filter-label">Status:</label>
+                        <select id="statusFilter" class="filter-select" onchange="filterAndSortBookings()">
+                            <option value="all">All Bookings</option>
+                            <option value="confirmed">Confirmed Only</option>
+                            <option value="pending">Pending Only</option>
+                            <option value="rejected">Rejected Only</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="bookingsList" class="bookings-list">
                     <div class="loading">Loading bookings...</div>
                 </div>
@@ -152,6 +169,7 @@
     <script>
         let currentUser = null;
         let allTherapists = [];
+        let allBookings = [];
 
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
@@ -318,8 +336,7 @@
                 const { data: bookings, error } = await window.supabaseClient
                     .from('Bookings')
                     .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('session_date', { ascending: false });
+                    .eq('user_id', currentUser.id);
 
                 console.log('🔵 Bookings:', bookings);
 
@@ -327,71 +344,112 @@
 
                 if (!bookings || bookings.length === 0) {
                     container.innerHTML = '<div class="empty-state">No bookings yet. Book your first session above!</div>';
+                    allBookings = [];
                     return;
                 }
 
-                // Get therapist details
-                const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
-                const { data: therapists } = await window.supabaseClient
-                    .from('Therapists')
-                    .select('id, Name, Specialization')
-                    .in('id', therapistIds);
+                // Store all bookings globally
+                allBookings = bookings;
 
-                const therapistMap = {};
-                therapists.forEach(t => {
-                    therapistMap[t.id] = t;
-                });
-
-                container.innerHTML = bookings.map(b => {
-                    const therapist = therapistMap[b.therapist_id] || {};
-                    const statusClass = 'status-' + b.status;
-
-                    return `
-                        <div class="booking-card">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                                <div>
-                                    <h3 style="font-size: 20px; font-weight: 700; color: #2C3E50; margin: 0 0 5px 0;">
-                                        ${therapist.Name || 'Therapist'}
-                                    </h3>
-                                    <p style="color: #5A9B8E; margin: 0; font-weight: 600;">${therapist.Specialization || ''}</p>
-                                </div>
-                                <span class="status-badge ${statusClass}">${b.status.toUpperCase()}</span>
-                            </div>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px;">
-                                <div>
-                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
-                                    <div style="color: #2C3E50;">${new Date(b.session_date).toLocaleDateString('en-IN')}</div>
-                                </div>
-                                <div>
-                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
-                                    <div style="color: #2C3E50;">${b.start_time}</div>
-                                </div>
-                                <div>
-                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
-                                    <div style="color: #2C3E50;">₹${b.amount || 700}</div>
-                                </div>
-                            </div>
-                            ${b.status === 'confirmed' && b.meeting_link ? `
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
-                                    <a href="${b.meeting_link}" target="_blank" class="btn-join">
-                                        <i class="fas fa-video"></i> Join Meeting
-                                    </a>
-                                </div>
-                            ` : ''}
-                            ${b.status === 'pending' ? `
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; color: #6B7280; font-size: 13px;">
-                                    <i class="fas fa-clock"></i> Waiting for therapist confirmation...
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('');
+                // Apply filters and sorting
+                filterAndSortBookings();
 
                 console.log('🟢 Loaded', bookings.length, 'bookings');
             } catch (error) {
                 console.error('🔴 Error loading bookings:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
+        }
+
+        async function filterAndSortBookings() {
+            const container = document.getElementById('bookingsList');
+            const sortOrder = document.getElementById('dateSortFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            if (!allBookings || allBookings.length === 0) {
+                container.innerHTML = '<div class="empty-state">No bookings yet. Book your first session above!</div>';
+                return;
+            }
+
+            // Filter by status
+            let filteredBookings = allBookings;
+            if (statusFilter !== 'all') {
+                filteredBookings = allBookings.filter(b => b.status === statusFilter);
+            }
+
+            // Sort by date
+            filteredBookings.sort((a, b) => {
+                const dateA = new Date(a.session_date);
+                const dateB = new Date(b.session_date);
+                
+                if (sortOrder === 'asc') {
+                    return dateA - dateB; // Oldest first
+                } else {
+                    return dateB - dateA; // Newest first
+                }
+            });
+
+            if (filteredBookings.length === 0) {
+                container.innerHTML = '<div class="empty-state">No bookings match the selected filters</div>';
+                return;
+            }
+
+            // Get therapist details
+            const therapistIds = [...new Set(filteredBookings.map(b => b.therapist_id))];
+            const { data: therapists } = await window.supabaseClient
+                .from('Therapists')
+                .select('id, Name, Specialization')
+                .in('id', therapistIds);
+
+            const therapistMap = {};
+            therapists.forEach(t => {
+                therapistMap[t.id] = t;
+            });
+
+            container.innerHTML = filteredBookings.map(b => {
+                const therapist = therapistMap[b.therapist_id] || {};
+                const statusClass = 'status-' + b.status;
+
+                return `
+                    <div class="booking-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <div>
+                                <h3 style="font-size: 20px; font-weight: 700; color: #2C3E50; margin: 0 0 5px 0;">
+                                    ${therapist.Name || 'Therapist'}
+                                </h3>
+                                <p style="color: #5A9B8E; margin: 0; font-weight: 600;">${therapist.Specialization || ''}</p>
+                            </div>
+                            <span class="status-badge ${statusClass}">${b.status.toUpperCase()}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px;">
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
+                                <div style="color: #2C3E50;">${new Date(b.session_date).toLocaleDateString('en-IN')}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
+                                <div style="color: #2C3E50;">${b.start_time}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
+                                <div style="color: #2C3E50;">₹${b.amount || 700}</div>
+                            </div>
+                        </div>
+                        ${b.status === 'confirmed' && b.meeting_link ? `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                                <a href="${b.meeting_link}" target="_blank" class="btn-join">
+                                    <i class="fas fa-video"></i> Join Meeting
+                                </a>
+                            </div>
+                        ` : ''}
+                        ${b.status === 'pending' ? `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; color: #6B7280; font-size: 13px;">
+                                <i class="fas fa-clock"></i> Waiting for therapist confirmation...
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
         }
 
         // Profile Modal Functions
@@ -416,7 +474,7 @@
             
             try {
                 const { data: userData, error } = await window.supabaseClient
-                    .from('users')
+                    .from('Users')
                     .select('*')
                     .eq('id', currentUser.id)
                     .single();
@@ -452,7 +510,7 @@
 
             try {
                 const { data, error } = await window.supabaseClient
-                    .from('users')
+                    .from('Users')
                     .update(profileData)
                     .eq('id', currentUser.id)
                     .select();
