@@ -144,7 +144,7 @@
                 
                 <div class="form-group">
                     <label class="form-label">Date of Birth</label>
-                    <input type="date" id="profileDOB" class="form-input" max="<?php echo date('Y-m-d'); ?>">
+                    <input type="date" id="profileDOB" class="form-input">
                 </div>
                 
                 <div class="form-group">
@@ -492,8 +492,8 @@
                 console.log('🔵 User profile data:', userData);
 
                 // Populate profile fields
-                document.getElementById('profileEmail').textContent = currentUser.email || '-';
-                document.getElementById('profileName').value = userData.name || '';
+                document.getElementById('profileEmail').textContent = currentUser.email || userData.email || '-';
+                document.getElementById('profileName').value = userData.full_name || '';
                 document.getElementById('profilePhone').value = userData.phone || '';
                 document.getElementById('profileDOB').value = userData.date_of_birth || '';
                 document.getElementById('profileBio').value = userData.bio || '';
@@ -510,15 +510,17 @@
 
             const profileData = {
                 user_id: currentUser.id,
-                name: document.getElementById('profileName').value,
+                full_name: document.getElementById('profileName').value,
                 phone: document.getElementById('profilePhone').value,
                 date_of_birth: document.getElementById('profileDOB').value || null,
                 bio: document.getElementById('profileBio').value,
-                address: document.getElementById('profileAddress').value
+                address: document.getElementById('profileAddress').value,
+                email: currentUser.email,
+                role: currentUser.role
             };
 
             try {
-                // Try to update first
+                // Try to check if profile exists
                 const { data: existing } = await window.supabaseClient
                     .from('profiles')
                     .select('*')
