@@ -19,7 +19,7 @@
         .therapist-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 8px 0; }
         .therapist-spec { color: #5A9B8E; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
         .booking-form { display: grid; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; }
-        .form-input { padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; }
+        .form-input { padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; width: 100%; }
         .btn-book { padding: 12px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .btn-book:hover { background: #4A8B7E; }
         .bookings-list { display: flex; flex-direction: column; gap: 16px; }
@@ -68,7 +68,7 @@
 
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
-            console.log('🔵 Current user:', currentUser);
+            console.log('🔵 User dashboard loaded. User:', currentUser);
 
             if (!currentUser) {
                 alert('Please login first');
@@ -92,23 +92,24 @@
                     .eq('approval_status', 'approved')
                     .eq('Active', true);
 
-                console.log('🔵 Therapists:', data, 'Error:', error);
+                console.log('🔵 Therapists query result:', data);
 
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    container.innerHTML = '<div class="empty-state">No therapists available</div>';
+                    container.innerHTML = '<div class="empty-state">No therapists available yet</div>';
                     return;
                 }
 
                 const today = new Date().toISOString().split('T')[0];
                 container.innerHTML = data.map(t => `
                     <div class="therapist-card">
-                        <h3 class="therapist-name">Dr. ${t.Name}</h3>
-                        <p class="therapist-spec">${t.Specialization}</p>
+                        <h3 class="therapist-name">Dr. ${t.Name || 'Unknown'}</h3>
+                        <p class="therapist-spec">${t.Specialization || 'General Therapy'}</p>
+                        <p style="color: #6B7280; font-size: 13px; margin-bottom: 12px;">${t.bio || 'Experienced therapist'}</p>
                         <div class="booking-form">
-                            <input type="date" id="date-${t.id}" class="form-input" min="${today}">
-                            <select id="time-${t.id}" class="form-input">
+                            <input type="date" id="date-${t.id}" class="form-input" min="${today}" required>
+                            <select id="time-${t.id}" class="form-input" required>
                                 <option value="">Select time</option>
                                 <option value="09:00">9:00 AM</option>
                                 <option value="10:00">10:00 AM</option>
@@ -117,29 +118,33 @@
                                 <option value="15:00">3:00 PM</option>
                                 <option value="16:00">4:00 PM</option>
                             </select>
-                            <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}')">Book Session</button>
+                            <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}')">
+                                <i class="fas fa-check"></i> Book Session
+                            </button>
                         </div>
                     </div>
                 `).join('');
 
                 console.log('🟢 Loaded', data.length, 'therapists');
             } catch (error) {
-                console.error('🔴 Error:', error);
+                console.error('🔴 Error loading therapists:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
         }
 
         async function bookSession(therapistId, therapistName) {
-            const date = document.getElementById(\`date-\${therapistId}\`).value;
-            const time = document.getElementById(\`time-\${therapistId}\`).value;
+            const date = document.getElementById('date-' + therapistId).value;
+            const time = document.getElementById('time-' + therapistId).value;
 
             if (!date || !time) {
-                alert('Please select date and time');
+                alert('Please select both date and time');
                 return;
             }
 
+            console.log('🔵 Creating booking:', { therapistId, date, time });
+
             try {
-                const { error } = await window.supabaseClient
+                const { data, error } = await window.supabaseClient
                     .from('Bookings')
                     .insert({
                         user_id: currentUser.id,
@@ -147,56 +152,100 @@
                         session_date: date,
                         start_time: time,
                         status: 'confirmed',
-                        amount: 500
-                    });
+                        amount: 500,
+                        created_at: new Date().toISOString()
+                    })
+                    .select();
+
+                console.log('🔵 Booking result:', data, error);
 
                 if (error) throw error;
 
-                alert('✅ Booked with Dr. ' + therapistName + '!');
+                alert('✅ Session booked successfully with Dr. ' + therapistName + '!');
+
+                // Clear form
+                document.getElementById('date-' + therapistId).value = '';
+                document.getElementById('time-' + therapistId).value = '';
+
+                // Reload bookings
                 await loadBookings();
             } catch (error) {
                 console.error('🔴 Booking error:', error);
-                alert('Error: ' + error.message);
+                alert('Error booking session: ' + error.message);
             }
         }
 
         async function loadBookings() {
-            console.log('🔵 Loading bookings...');
+            console.log('🔵 Loading bookings for user:', currentUser.id);
             const container = document.getElementById('bookingsList');
 
             try {
-                const { data, error } = await window.supabaseClient
+                // Get bookings WITHOUT JOIN
+                const { data: bookings, error: bookingsError } = await window.supabaseClient
                     .from('Bookings')
-                    .select(\`
-                        *,
-                        Therapists (Name, Specialization)
-                    \`)
+                    .select('*')
                     .eq('user_id', currentUser.id)
                     .order('session_date', { ascending: false });
 
-                console.log('🔵 Bookings:', data, 'Error:', error);
+                console.log('🔵 Bookings result:', bookings);
 
-                if (error) throw error;
+                if (bookingsError) throw bookingsError;
 
-                if (!data || data.length === 0) {
-                    container.innerHTML = '<div class="empty-state">No bookings yet</div>';
+                if (!bookings || bookings.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No bookings yet. Book your first session above!</div>';
                     return;
                 }
 
-                container.innerHTML = data.map(b => \`
-                    <div class="booking-card">
-                        <h3>Dr. \${b.Therapists?.Name || 'Unknown'}</h3>
-                        <p><strong>Date:</strong> \${new Date(b.session_date).toLocaleDateString()}</p>
-                        <p><strong>Time:</strong> \${b.start_time}</p>
-                        <p><strong>Status:</strong> \${b.status}</p>
-                        <p><strong>Fee:</strong> ₹\${b.amount}</p>
-                    </div>
-                \`).join('');
+                // Get therapist details separately
+                const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
+                const { data: therapists } = await window.supabaseClient
+                    .from('Therapists')
+                    .select('id, Name, Specialization')
+                    .in('id', therapistIds);
 
-                console.log('🟢 Loaded', data.length, 'bookings');
+                console.log('🔵 Therapists for bookings:', therapists);
+
+                // Create a map for quick lookup
+                const therapistMap = {};
+                therapists?.forEach(t => {
+                    therapistMap[t.id] = t;
+                });
+
+                container.innerHTML = bookings.map(b => {
+                    const therapist = therapistMap[b.therapist_id] || {};
+                    return `
+                        <div class="booking-card">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                                <div>
+                                    <h3 style="margin: 0 0 5px 0; font-size: 18px; color: #2C3E50;">Dr. ${therapist.Name || 'Unknown'}</h3>
+                                    <p style="margin: 0; color: #5A9B8E; font-weight: 600;">${therapist.Specialization || ''}</p>
+                                </div>
+                                <span style="background: #D4EDDA; color: #155724; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">
+                                    ${b.status.toUpperCase()}
+                                </span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; font-size: 14px;">
+                                <div>
+                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
+                                    <div style="color: #2C3E50;">${new Date(b.session_date).toLocaleDateString('en-IN')}</div>
+                                </div>
+                                <div>
+                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
+                                    <div style="color: #2C3E50;">${b.start_time}</div>
+                                </div>
+                                <div>
+                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
+                                    <div style="color: #2C3E50;">₹${b.amount || 500}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                console.log('🟢 Loaded', bookings.length, 'bookings');
             } catch (error) {
-                console.error('🔴 Error:', error);
-                container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
+                console.error('🔴 Error loading bookings:', error);
+                container.innerHTML = '<div class="empty-state">Error loading bookings: ' + error.message + '</div>';
             }
         }
     </script>
