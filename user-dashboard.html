@@ -18,12 +18,19 @@
         .therapist-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
         .therapist-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 8px 0; }
         .therapist-spec { color: #5A9B8E; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+        .therapist-fee { color: #2C3E50; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
         .booking-form { display: grid; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; }
         .form-input { padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; width: 100%; }
         .btn-book { padding: 12px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .btn-book:hover { background: #4A8B7E; }
         .bookings-list { display: flex; flex-direction: column; gap: 16px; }
         .booking-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
+        .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-confirmed { background: #D4EDDA; color: #155724; }
+        .status-rejected { background: #F8D7DA; color: #721C24; }
+        .meeting-link { display: inline-block; padding: 10px 20px; background: #5A9B8E; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px; }
+        .meeting-link:hover { background: #4A8B7E; }
         .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
     </style>
 </head>
@@ -92,7 +99,7 @@
                     .eq('approval_status', 'approved')
                     .eq('Active', true);
 
-                console.log('🔵 Therapists query result:', data);
+                console.log('🔵 Therapists:', data);
 
                 if (error) throw error;
 
@@ -106,6 +113,7 @@
                     <div class="therapist-card">
                         <h3 class="therapist-name">Dr. ${t.Name || 'Unknown'}</h3>
                         <p class="therapist-spec">${t.Specialization || 'General Therapy'}</p>
+                        <p class="therapist-fee">₹${t.fee || 700} per session</p>
                         <p style="color: #6B7280; font-size: 13px; margin-bottom: 12px;">${t.bio || 'Experienced therapist'}</p>
                         <div class="booking-form">
                             <input type="date" id="date-${t.id}" class="form-input" min="${today}" required>
@@ -118,7 +126,7 @@
                                 <option value="15:00">3:00 PM</option>
                                 <option value="16:00">4:00 PM</option>
                             </select>
-                            <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}')">
+                            <button class="btn-book" onclick="bookSession('${t.id}', '${t.Name}', ${t.fee || 700})">
                                 <i class="fas fa-check"></i> Book Session
                             </button>
                         </div>
@@ -127,12 +135,12 @@
 
                 console.log('🟢 Loaded', data.length, 'therapists');
             } catch (error) {
-                console.error('🔴 Error loading therapists:', error);
+                console.error('🔴 Error:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
         }
 
-        async function bookSession(therapistId, therapistName) {
+        async function bookSession(therapistId, therapistName, fee) {
             const date = document.getElementById('date-' + therapistId).value;
             const time = document.getElementById('time-' + therapistId).value;
 
@@ -141,7 +149,7 @@
                 return;
             }
 
-            console.log('🔵 Creating booking:', { therapistId, date, time });
+            console.log('🔵 Creating booking:', { therapistId, date, time, fee });
 
             try {
                 const { data, error } = await window.supabaseClient
@@ -151,8 +159,8 @@
                         therapist_id: therapistId,
                         session_date: date,
                         start_time: time,
-                        status: 'confirmed',
-                        amount: 500,
+                        status: 'pending',
+                        amount: fee,
                         created_at: new Date().toISOString()
                     })
                     .select();
@@ -161,13 +169,11 @@
 
                 if (error) throw error;
 
-                alert('✅ Session booked successfully with Dr. ' + therapistName + '!');
+                alert('✅ Booking request sent to Dr. ' + therapistName + '!\nThey will confirm and provide the meeting link.');
 
-                // Clear form
                 document.getElementById('date-' + therapistId).value = '';
                 document.getElementById('time-' + therapistId).value = '';
 
-                // Reload bookings
                 await loadBookings();
             } catch (error) {
                 console.error('🔴 Booking error:', error);
@@ -180,14 +186,13 @@
             const container = document.getElementById('bookingsList');
 
             try {
-                // Get bookings WITHOUT JOIN
                 const { data: bookings, error: bookingsError } = await window.supabaseClient
                     .from('Bookings')
                     .select('*')
                     .eq('user_id', currentUser.id)
                     .order('session_date', { ascending: false });
 
-                console.log('🔵 Bookings result:', bookings);
+                console.log('🔵 Bookings:', bookings);
 
                 if (bookingsError) throw bookingsError;
 
@@ -196,16 +201,12 @@
                     return;
                 }
 
-                // Get therapist details separately
                 const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
                 const { data: therapists } = await window.supabaseClient
                     .from('Therapists')
                     .select('id, Name, Specialization')
                     .in('id', therapistIds);
 
-                console.log('🔵 Therapists for bookings:', therapists);
-
-                // Create a map for quick lookup
                 const therapistMap = {};
                 therapists?.forEach(t => {
                     therapistMap[t.id] = t;
@@ -213,6 +214,8 @@
 
                 container.innerHTML = bookings.map(b => {
                     const therapist = therapistMap[b.therapist_id] || {};
+                    const statusClass = 'status-' + b.status;
+
                     return `
                         <div class="booking-card">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
@@ -220,11 +223,9 @@
                                     <h3 style="margin: 0 0 5px 0; font-size: 18px; color: #2C3E50;">Dr. ${therapist.Name || 'Unknown'}</h3>
                                     <p style="margin: 0; color: #5A9B8E; font-weight: 600;">${therapist.Specialization || ''}</p>
                                 </div>
-                                <span style="background: #D4EDDA; color: #155724; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">
-                                    ${b.status.toUpperCase()}
-                                </span>
+                                <span class="status-badge ${statusClass}">${b.status.toUpperCase()}</span>
                             </div>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; font-size: 14px;">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; font-size: 14px; margin-bottom: 15px;">
                                 <div>
                                     <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
                                     <div style="color: #2C3E50;">${new Date(b.session_date).toLocaleDateString('en-IN')}</div>
@@ -235,17 +236,26 @@
                                 </div>
                                 <div>
                                     <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
-                                    <div style="color: #2C3E50;">₹${b.amount || 500}</div>
+                                    <div style="color: #2C3E50;">₹${b.amount || 700}</div>
                                 </div>
                             </div>
+                            ${b.status === 'confirmed' && b.meeting_link ? `
+                                <div style="padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                                    <a href="${b.meeting_link}" target="_blank" class="meeting-link">
+                                        <i class="fas fa-video"></i> Join Meeting
+                                    </a>
+                                </div>
+                            ` : ''}
+                            ${b.status === 'pending' ? '<p style="color: #856404; font-size: 13px; margin-top: 10px;"><i class="fas fa-clock"></i> Waiting for therapist confirmation</p>' : ''}
+                            ${b.status === 'rejected' ? '<p style="color: #721C24; font-size: 13px; margin-top: 10px;"><i class="fas fa-times-circle"></i> This booking was not confirmed</p>' : ''}
                         </div>
                     `;
                 }).join('');
 
                 console.log('🟢 Loaded', bookings.length, 'bookings');
             } catch (error) {
-                console.error('🔴 Error loading bookings:', error);
-                container.innerHTML = '<div class="empty-state">Error loading bookings: ' + error.message + '</div>';
+                console.error('🔴 Error:', error);
+                container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
         }
     </script>
