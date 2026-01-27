@@ -449,6 +449,7 @@
                 console.log('🟢 Auth user created:', authData.user.id);
 
                 if (authData.user) {
+                    // Create profile in profiles table
                     const { error: profileError } = await supabaseClient
                         .from('profiles')
                         .insert({
@@ -469,6 +470,7 @@
 
                     console.log('🟢 Profile created successfully');
 
+                    // Create therapist record in Therapists table
                     const { error: therapistError } = await supabaseClient
                         .from('Therapists')
                         .insert({
@@ -477,15 +479,15 @@
                             email: email,
                             phone: phone,
                             Specialization: specialization,
-                            Experience: experience,
+                            bio: bio,
                             qualifications: qualifications,
-                            description: bio,
-                            Active: false,
-                            approved: false
+                            Active: true,
+                            approval_status: 'pending'
                         });
 
                     if (therapistError) {
                         console.error('🔴 Therapist record error:', therapistError);
+                        throw new Error('Failed to create therapist record. Please contact support.');
                     } else {
                         console.log('🟢 Therapist record created');
                     }
