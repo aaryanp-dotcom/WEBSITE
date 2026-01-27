@@ -180,6 +180,10 @@
             color: #721C24;
             border: 1px solid #F5C6CB;
         }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -276,8 +280,8 @@
     <script src="app.js"></script>
 
     <script>
-        // Use supabase client from app.js (already initialized)
-        const supabase = window.supabaseClient;
+        // Get supabase client from app.js
+        const supabaseClient = window.supabaseClient;
 
         function showAlert(message, type) {
             const alertDiv = document.getElementById('alertMessage');
@@ -323,7 +327,7 @@
                 console.log('🔵 Starting user signup...');
 
                 // 1. Sign up with Supabase Auth
-                const { data: authData, error: authError } = await supabase.auth.signUp({
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -342,7 +346,7 @@
 
                 // 2. Create profile in profiles table
                 if (authData.user) {
-                    const { error: profileError } = await supabase
+                    const { error: profileError } = await supabaseClient
                         .from('profiles')
                         .insert({
                             user_id: authData.user.id,
@@ -376,11 +380,6 @@
                 submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
             }
         });
-
-        // Add spin animation
-        const style = document.createElement('style');
-        style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
