@@ -51,9 +51,9 @@
         .info-box-title { font-weight: 700; color: #2C3E50; margin-bottom: 8px; font-size: 14px; }
         .info-box-text { color: #4B5563; font-size: 13px; line-height: 1.5; }
         
-        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: white; border-radius: 16px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; border-radius: 16px; padding: 40px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .modal-title { font-size: 28px; font-weight: 700; color: #2C3E50; margin: 0; }
         .close-modal { background: none; border: none; font-size: 28px; color: #6B7280; cursor: pointer; }
@@ -63,10 +63,15 @@
         .form-label { font-weight: 600; color: #2C3E50; font-size: 14px; }
         .btn-save { padding: 14px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; transition: background 0.3s; }
         .btn-save:hover { background: #4A8B7E; }
-        .profile-info { background: #F5F9F8; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-        .profile-info-label { color: #6B7280; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
-        .profile-info-value { color: #2C3E50; font-size: 16px; font-weight: 600; }
+        .profile-picture-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .profile-picture-preview { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #5A9B8E; }
+        .profile-picture-placeholder { width: 150px; height: 150px; border-radius: 50%; background: #E5E7EB; display: flex; align-items: center; justify-content: center; font-size: 60px; color: #6B7280; border: 4px solid #E5E7EB; }
+        .file-input-wrapper { position: relative; display: inline-block; }
+        .file-input-wrapper input[type=file] { display: none; }
+        .file-input-label { padding: 10px 20px; background: #5A9B8E; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-block; }
+        .file-input-label:hover { background: #4A8B7E; }
         .action-buttons { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; flex-wrap: wrap; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     </style>
 </head>
 <body>
@@ -146,19 +151,85 @@
             </div>
             
             <form class="profile-form" onsubmit="saveProfile(event)">
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" id="profileName" class="form-input" placeholder="Enter your full name" required>
+                <!-- Profile Picture Upload -->
+                <div class="profile-picture-container">
+                    <div id="profilePicturePreview">
+                        <div class="profile-picture-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="profilePictureInput" accept="image/*" onchange="handleProfilePictureChange(event)">
+                        <label for="profilePictureInput" class="file-input-label">
+                            <i class="fas fa-camera"></i> Upload Photo
+                        </label>
+                    </div>
+                    <div style="text-align: center; color: #6B7280; font-size: 12px;">
+                        Max size: 2MB | JPG, PNG, GIF
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="profileName" class="form-input" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="profileEmail" class="form-input" readonly style="background: #F5F9F8;">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="profilePhone" class="form-input" placeholder="+91 XXXXX XXXXX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" id="profileDOB" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select id="profileGender" class="form-select">
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Non-binary">Non-binary</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" id="profileCity" class="form-input" placeholder="Enter your city">
+                    </div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="profileEmail" class="form-input" readonly style="background: #F5F9F8;">
+                    <label class="form-label">Address</label>
+                    <textarea id="profileAddress" class="form-textarea" placeholder="Enter your complete address" style="min-height: 60px;"></textarea>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" id="profilePhone" class="form-input" placeholder="Enter your phone number">
+                <div style="border-top: 2px solid #E5E7EB; padding-top: 20px; margin-top: 10px;">
+                    <h3 style="color: #2C3E50; font-size: 18px; margin-bottom: 15px;">Emergency Contact</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Contact Name</label>
+                            <input type="text" id="profileEmergencyName" class="form-input" placeholder="Full name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Contact Phone</label>
+                            <input type="tel" id="profileEmergencyPhone" class="form-input" placeholder="+91 XXXXX XXXXX">
+                        </div>
+                    </div>
                 </div>
                 
                 <button type="submit" class="btn-save">
@@ -215,6 +286,7 @@
         let currentUserProfile = null;
         let allTherapists = [];
         let currentRescheduleBookingId = null;
+        let uploadedProfilePicture = null;
         
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
@@ -360,7 +432,7 @@
             try {
                 // Check for booking conflicts (same date + time slot)
                 const { data: conflictingBookings, error: conflictError } = await window.supabaseClient
-                    .from('Bookings')
+                    .from('bookings')
                     .select('*')
                     .eq('user_id', currentUser.id)
                     .eq('session_date', date)
@@ -402,7 +474,7 @@
                 console.log('🔵 Creating booking:', bookingData);
 
                 const { data, error } = await window.supabaseClient
-                    .from('Bookings')
+                    .from('bookings')
                     .insert([bookingData])
                     .select();
 
@@ -433,7 +505,7 @@
             
             try {
                 let query = window.supabaseClient
-                    .from('Bookings')
+                    .from('bookings')
                     .select('*')
                     .eq('user_id', currentUser.id);
                 
@@ -610,12 +682,40 @@
             });
         }
         
+        function handleProfilePictureChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File size must be less than 2MB');
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            uploadedProfilePicture = file;
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profilePicturePreview').innerHTML = `
+                    <img src="${e.target.result}" class="profile-picture-preview" alt="Profile">
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+        
         async function acceptTherapistReschedule(bookingId, newDate, newTime) {
             console.log('🔵 Accepting therapist reschedule:', bookingId);
             
             try {
                 const { data, error } = await window.supabaseClient
-                    .from('Bookings')
+                    .from('bookings')
                     .update({
                         session_date: newDate,
                         start_time: newTime,
@@ -664,7 +764,7 @@
             
             try {
                 const { data, error } = await window.supabaseClient
-                    .from('Bookings')
+                    .from('bookings')
                     .update({
                         reschedule_requested: true,
                         reschedule_new_date: newDate,
@@ -701,7 +801,7 @@
             
             try {
                 const { data, error } = await window.supabaseClient
-                    .from('Bookings')
+                    .from('bookings')
                     .delete()
                     .eq('id', bookingId)
                     .select();
@@ -723,11 +823,25 @@
                 document.getElementById('profileName').value = currentUserProfile.full_name || '';
                 document.getElementById('profileEmail').value = currentUser.email;
                 document.getElementById('profilePhone').value = currentUserProfile.phone || '';
+                document.getElementById('profileDOB').value = currentUserProfile.date_of_birth || '';
+                document.getElementById('profileGender').value = currentUserProfile.gender || '';
+                document.getElementById('profileCity').value = currentUserProfile.city || '';
+                document.getElementById('profileAddress').value = currentUserProfile.address || '';
+                document.getElementById('profileEmergencyName').value = currentUserProfile.emergency_contact_name || '';
+                document.getElementById('profileEmergencyPhone').value = currentUserProfile.emergency_contact_phone || '';
+                
+                // Display existing profile picture if available
+                if (currentUserProfile.profile_picture_url) {
+                    document.getElementById('profilePicturePreview').innerHTML = `
+                        <img src="${currentUserProfile.profile_picture_url}" class="profile-picture-preview" alt="Profile">
+                    `;
+                }
             }
             document.getElementById('profileModal').classList.add('active');
         }
         
         function closeProfileModal() {
+            uploadedProfilePicture = null;
             document.getElementById('profileModal').classList.remove('active');
         }
         
@@ -736,9 +850,44 @@
             console.log('🔵 Saving profile...');
             
             try {
+                let profilePictureUrl = currentUserProfile?.profile_picture_url || null;
+                
+                // Upload profile picture if selected
+                if (uploadedProfilePicture) {
+                    console.log('🔵 Uploading profile picture...');
+                    
+                    const fileExt = uploadedProfilePicture.name.split('.').pop();
+                    const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+                    const filePath = `${fileName}`;
+                    
+                    const { data: uploadData, error: uploadError } = await window.supabaseClient.storage
+                        .from('profile-pictures')
+                        .upload(filePath, uploadedProfilePicture, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+                    
+                    if (uploadError) throw uploadError;
+                    
+                    // Get public URL
+                    const { data: urlData } = window.supabaseClient.storage
+                        .from('profile-pictures')
+                        .getPublicUrl(filePath);
+                    
+                    profilePictureUrl = urlData.publicUrl;
+                    console.log('🟢 Profile picture uploaded:', profilePictureUrl);
+                }
+                
                 const profileData = {
                     full_name: document.getElementById('profileName').value,
-                    phone: document.getElementById('profilePhone').value
+                    phone: document.getElementById('profilePhone').value,
+                    date_of_birth: document.getElementById('profileDOB').value || null,
+                    gender: document.getElementById('profileGender').value || null,
+                    city: document.getElementById('profileCity').value || null,
+                    address: document.getElementById('profileAddress').value || null,
+                    emergency_contact_name: document.getElementById('profileEmergencyName').value || null,
+                    emergency_contact_phone: document.getElementById('profileEmergencyPhone').value || null,
+                    profile_picture_url: profilePictureUrl
                 };
                 
                 const { data, error } = await window.supabaseClient
