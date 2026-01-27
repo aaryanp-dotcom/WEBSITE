@@ -278,7 +278,6 @@
     <script src="app.js"></script>
 
     <script>
-        // Wait for app.js to load, then use the global supabaseClient
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔵 Login page loaded');
             console.log('🔵 Supabase client available:', !!window.supabaseClient);
@@ -318,7 +317,6 @@
                 try {
                     console.log('🔵 Attempting login for:', email);
 
-                    // Use the global supabaseClient from app.js
                     const { data: authData, error: authError } = await window.supabaseClient.auth.signInWithPassword({
                         email: email,
                         password: password
@@ -328,11 +326,11 @@
 
                     console.log('🟢 Auth successful');
 
-                    // Get profile - FIXED: Changed from .eq('id') to .eq('user_id')
+                    // Get profile using user_id
                     const { data: profile, error: profileError } = await window.supabaseClient
                         .from('profiles')
                         .select('*')
-                        .eq('user_id', authData.user.id)  // ✅ FIXED HERE
+                        .eq('user_id', authData.user.id)
                         .single();
 
                     if (profileError) {
@@ -342,8 +340,12 @@
 
                     console.log('🟢 Profile loaded. Role:', profile.role);
 
-                    // Store user
-                    localStorage.setItem('user', JSON.stringify(profile));
+                    // Store user with auth_id for future use
+                    const userToStore = {
+                        ...profile,
+                        auth_id: authData.user.id
+                    };
+                    localStorage.setItem('user', JSON.stringify(userToStore));
 
                     // Show success
                     successDiv.textContent = 'Login successful! Redirecting...';
