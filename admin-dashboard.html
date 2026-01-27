@@ -6,1105 +6,279 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - MindSpace</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Dashboard Layout */
-        .dashboard-wrapper {
-            min-height: 100vh;
-            background: #F5F9F8;
-        }
-
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        @media (min-width: 768px) {
-            .dashboard-container {
-                padding: 40px 50px;
-            }
-        }
-
-        /* Header Styles */
-        .dashboard-header {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            border: 1px solid #E5E7EB;
-        }
-
-        .dashboard-header h1 {
-            color: #5A9B8E;
-            font-size: 2.5rem;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-
-        .admin-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .admin-avatar {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #C9E4DE 0%, #A8D5BA 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2C3E50;
-        }
-
-        .admin-details h3 {
-            color: #2C3E50;
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .admin-details p {
-            color: #6B7280;
-            font-size: 0.875rem;
-        }
-
-        .btn-logout {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 30px 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            border: 1px solid #E5E7EB;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(90, 155, 142, 0.1);
-        }
-
-        .stat-card .icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #5A9B8E;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2C3E50;
-            margin-bottom: 10px;
-            line-height: 1;
-        }
-
-        .stat-label {
-            color: #6B7280;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        /* Content Sections */
-        .content-section {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-            border: 1px solid #E5E7EB;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .section-title {
-            color: #2C3E50;
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title .icon {
-            font-size: 1.25rem;
-            color: #5A9B8E;
-        }
-
-        .refresh-btn {
-            background: #F5F9F8;
-            color: #5A9B8E;
-            padding: 10px 20px;
-            border: 1px solid #C9E4DE;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .refresh-btn:hover {
-            background: #E8F3EF;
-        }
-
-        /* Applications List */
-        .applications-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .application-card {
-            background: #F5F9F8;
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 4px solid #5A9B8E;
-            transition: transform 0.3s ease;
-        }
-
-        .application-card:hover {
-            transform: translateX(5px);
-        }
-
-        .application-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .therapist-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #2C3E50;
-        }
-
-        .therapist-specialization {
-            color: #5A9B8E;
-            font-weight: 600;
-            margin-top: 5px;
-            font-size: 0.95rem;
-        }
-
-        .application-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .detail-label {
-            color: #6B7280;
-            font-size: 0.75rem;
-            margin-bottom: 5px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-value {
-            color: #2C3E50;
-            font-weight: 600;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        .application-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            padding-top: 20px;
-            border-top: 1px solid #E5E7EB;
-        }
-
-        .btn-approve {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-approve:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
-        }
-
-        .btn-reject {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-reject:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(244, 67, 54, 0.3);
-        }
-
-        /* Bookings List */
-        .bookings-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .booking-card {
-            background: #F5F9F8;
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 4px solid #5A9B8E;
-            transition: transform 0.3s ease;
-        }
-
-        .booking-card:hover {
-            transform: translateX(5px);
-        }
-
-        .booking-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .booking-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #2C3E50;
-        }
-
-        .booking-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-pending {
-            background: #FFF3CD;
-            color: #856404;
-            border: 1px solid #FFEAA7;
-        }
-
-        .status-approved {
-            background: #D4EDDA;
-            color: #155724;
-            border: 1px solid #C3E6CB;
-        }
-
-        .status-rejected {
-            background: #F8D7DA;
-            color: #721C24;
-            border: 1px solid #F5C6CB;
-        }
-
-        .status-confirmed {
-            background: #D4EDDA;
-            color: #155724;
-            border: 1px solid #C3E6CB;
-        }
-
-        .status-completed {
-            background: #D1ECF1;
-            color: #0C5460;
-            border: 1px solid #BEE5EB;
-        }
-
-        .status-cancelled {
-            background: #F8D7DA;
-            color: #721C24;
-            border: 1px solid #F5C6CB;
-        }
-
-        /* Empty States */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6B7280;
-        }
-
-        .empty-state .icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #C9E4DE;
-        }
-
-        .empty-state h3 {
-            color: #2C3E50;
-            font-size: 1.25rem;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .empty-state p {
-            color: #6B7280;
-            font-size: 1rem;
-            max-width: 400px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-
-        /* Loading States */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #F5F9F8;
-            border-radius: 50%;
-            border-top-color: #5A9B8E;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: #6B7280;
-            text-align: center;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .admin-info {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .content-section {
-                padding: 25px 20px;
-            }
-
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .application-header,
-            .booking-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .application-actions {
-                width: 100%;
-            }
-
-            .btn-approve,
-            .btn-reject {
-                flex: 1;
-                justify-content: center;
-            }
-        }
-
-        /* Filter Controls */
-        .filter-controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            border: 1px solid #E5E7EB;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: #6B7280;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn.active {
-            background: #5A9B8E;
-            color: white;
-            border-color: #5A9B8E;
-        }
-
-        .filter-btn:hover:not(.active) {
-            background: #F5F9F8;
-            border-color: #5A9B8E;
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .action-btn {
-            padding: 15px 25px;
-            border: 1px solid #E5E7EB;
-            background: white;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #2C3E50;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .action-btn:hover {
-            background: #F5F9F8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border-color: #5A9B8E;
-        }
-
-        .action-btn .icon {
-            font-size: 1.25rem;
-            color: #5A9B8E;
-        }
+        .dashboard-wrapper { min-height: 100vh; background: #F5F9F8; }
+        .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+        .dashboard-header { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .dashboard-title { font-size: 32px; color: #5A9B8E; font-weight: 700; margin: 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-number { font-size: 36px; font-weight: 800; color: #5A9B8E; }
+        .stat-label { font-size: 12px; color: #6B7280; text-transform: uppercase; margin-top: 8px; }
+        .content-section { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; color: #2C3E50; margin: 0 0 20px 0; }
+        .applications-list, .bookings-list { display: flex; flex-direction: column; gap: 16px; }
+        .application-card, .booking-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
+        .therapist-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 8px 0; }
+        .btn-approve { padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-right: 10px; }
+        .btn-reject { padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-approve:hover { background: #45a049; }
+        .btn-reject:hover { background: #d32f2f; }
+        .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-approved { background: #D4EDDA; color: #155724; }
+        .status-confirmed { background: #D4EDDA; color: #155724; }
+        .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
     </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
-        <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-container">
-                <a href="index.html" class="logo">
-                    <span class="logo-icon">🧠</span>
-                    <span class="logo-text">MindSpace</span>
-                </a>
+                <a href="index.html" class="logo"><span class="logo-icon">🧠</span><span class="logo-text">MindSpace</span></a>
                 <ul class="nav-links">
                     <li><a href="admin-dashboard.html" class="active">Admin Dashboard</a></li>
-                    <li><button onclick="logout()" class="btn-logout">
-                        <span class="icon">🚪</span>
-                        Logout
-                    </button></li>
+                    <li><button onclick="logout()" class="btn-primary">Logout</button></li>
                 </ul>
             </div>
         </nav>
 
-        <!-- Dashboard Container -->
         <main class="dashboard-container">
-            <!-- Dashboard Header -->
             <div class="dashboard-header">
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <p style="color: #6B7280; margin-top: 10px; font-size: 1rem;">Manage users, therapists, and bookings</p>
-                </div>
-                <div class="admin-info">
-                    <div class="admin-avatar">A</div>
-                    <div class="admin-details">
-                        <h3 id="adminName">Administrator</h3>
-                        <p id="lastLogin">Last login: Today, 10:30 AM</p>
-                    </div>
-                </div>
+                <h1 class="dashboard-title">Admin Dashboard</h1>
+                <p style="color: #6B7280; margin: 10px 0 0 0;">Manage users, therapists, and bookings</p>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button class="action-btn" onclick="loadPendingApplications()">
-                    <span class="icon">🔍</span>
-                    Refresh Applications
-                </button>
-                <button class="action-btn" onclick="loadAllBookings()">
-                    <span class="icon">🔄</span>
-                    Refresh Bookings
-                </button>
-                <button class="action-btn" onclick="exportData()">
-                    <span class="icon">📊</span>
-                    Export Data
-                </button>
-                <button class="action-btn" onclick="showAnalytics()">
-                    <span class="icon">📈</span>
-                    View Analytics
-                </button>
-            </div>
-
-            <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="icon">👥</div>
                     <div class="stat-number" id="totalUsers">0</div>
                     <div class="stat-label">Total Users</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">👨‍⚕️</div>
                     <div class="stat-number" id="totalTherapists">0</div>
                     <div class="stat-label">Active Therapists</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">📝</div>
                     <div class="stat-number" id="pendingApplications">0</div>
                     <div class="stat-label">Pending Applications</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">📅</div>
                     <div class="stat-number" id="totalBookings">0</div>
                     <div class="stat-label">Total Bookings</div>
                 </div>
-                <div class="stat-card">
-                    <div class="icon">✅</div>
-                    <div class="stat-number" id="completedSessions">0</div>
-                    <div class="stat-label">Completed Sessions</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon">💰</div>
-                    <div class="stat-number" id="totalRevenue">₹0</div>
-                    <div class="stat-label">Total Revenue</div>
-                </div>
             </div>
 
-            <!-- Applications Section -->
             <section class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="icon">🔍</span>
-                        Pending Therapist Applications
-                        <span id="applicationsCount" class="status-badge status-pending" style="margin-left: 10px;">0</span>
-                    </h2>
-                    <button class="refresh-btn" onclick="loadPendingApplications()">
-                        <span class="icon">🔄</span>
-                        Refresh
-                    </button>
-                </div>
+                <h2 class="section-title"><i class="fas fa-user-md"></i> Pending Therapist Applications</h2>
                 <div id="applicationsList" class="applications-list">
-                    <div class="loading-text">
-                        <div class="loading"></div>
-                        <p>Loading applications...</p>
-                    </div>
+                    <div class="loading">Loading applications...</div>
                 </div>
             </section>
 
-            <!-- Bookings Section -->
             <section class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="icon">📅</span>
-                        Recent Bookings
-                    </h2>
-                    <div class="filter-controls">
-                        <button class="filter-btn active" onclick="filterBookings('all')">All</button>
-                        <button class="filter-btn" onclick="filterBookings('confirmed')">Confirmed</button>
-                        <button class="filter-btn" onclick="filterBookings('pending')">Pending</button>
-                        <button class="filter-btn" onclick="filterBookings('completed')">Completed</button>
-                        <button class="filter-btn" onclick="filterBookings('cancelled')">Cancelled</button>
-                    </div>
-                </div>
+                <h2 class="section-title"><i class="fas fa-calendar"></i> Recent Bookings</h2>
                 <div id="bookingsList" class="bookings-list">
-                    <div class="loading-text">
-                        <div class="loading"></div>
-                        <p>Loading bookings...</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- System Status Section -->
-            <section class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="icon">⚙️</span>
-                        System Status
-                    </h2>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                    <div class="detail-item">
-                        <span class="detail-label">Database</span>
-                        <span class="detail-value" id="dbStatus">🟢 Connected</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">API Response Time</span>
-                        <span class="detail-value" id="apiResponse">~120ms</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Last Backup</span>
-                        <span class="detail-value" id="lastBackup">Today, 02:00 AM</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Storage Usage</span>
-                        <span class="detail-value" id="storageUsage">45% (2.3GB/5GB)</span>
-                    </div>
+                    <div class="loading">Loading bookings...</div>
                 </div>
             </section>
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
     <script>
-        // Use global Supabase client from app.js
-        const supabase = window.supabaseClient;
-
-        // Global variables
-        let allBookings = [];
         let currentUser = null;
 
-        // Initialize Dashboard
-        async function init() {
-            try {
-                currentUser = JSON.parse(localStorage.getItem('user'));
+        document.addEventListener('DOMContentLoaded', async function() {
+            currentUser = JSON.parse(localStorage.getItem('user'));
+            console.log('🔵 Current user:', currentUser);
 
-                if (!currentUser || currentUser.role !== 'admin') {
-                    alert('Access denied. Admin role required.');
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                // Update admin info
-                document.getElementById('adminName').textContent = currentUser.fullname || 'Administrator';
-                document.getElementById('lastLogin').textContent = `Last login: ${new Date().toLocaleString('en-IN', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}`;
-
-                await loadStatistics();
-                await loadPendingApplications();
-                await loadAllBookings();
-                updateSystemStatus();
-
-            } catch (error) {
-                console.error('Initialization error:', error);
-                alert('Error loading dashboard. Please try again.');
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Access denied. Admin role required.');
+                window.location.href = 'login.html';
+                return;
             }
-        }
 
-        // Load Dashboard Statistics
+            await loadStatistics();
+            await loadPendingApplications();
+            await loadAllBookings();
+        });
+
         async function loadStatistics() {
             try {
                 // Total Users
-                const { count: usersCount } = await supabase
+                const { count: usersCount } = await window.supabaseClient
                     .from('profiles')
                     .select('*', { count: 'exact', head: true })
                     .eq('role', 'user');
                 document.getElementById('totalUsers').textContent = usersCount || 0;
 
                 // Total Therapists
-                const { count: therapistsCount } = await supabase
+                const { count: therapistsCount } = await window.supabaseClient
                     .from('Therapists')
                     .select('*', { count: 'exact', head: true })
-                    .eq('approvalstatus', 'approved');
+                    .eq('approval_status', 'approved');
                 document.getElementById('totalTherapists').textContent = therapistsCount || 0;
 
                 // Pending Applications
-                const { count: pendingCount } = await supabase
+                const { count: pendingCount } = await window.supabaseClient
                     .from('Therapists')
                     .select('*', { count: 'exact', head: true })
-                    .eq('approvalstatus', 'pending');
+                    .eq('approval_status', 'pending');
                 document.getElementById('pendingApplications').textContent = pendingCount || 0;
-                document.getElementById('applicationsCount').textContent = pendingCount || 0;
 
                 // Total Bookings
-                const { count: bookingsCount } = await supabase
+                const { count: bookingsCount } = await window.supabaseClient
                     .from('Bookings')
                     .select('*', { count: 'exact', head: true });
                 document.getElementById('totalBookings').textContent = bookingsCount || 0;
 
-                // Completed Sessions
-                const { count: completedCount } = await supabase
-                    .from('Bookings')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'completed');
-                document.getElementById('completedSessions').textContent = completedCount || 0;
-
-                // Calculate Revenue
-                const revenue = (bookingsCount || 0) * 500;
-                document.getElementById('totalRevenue').textContent = `₹${revenue.toLocaleString('en-IN')}`;
-
+                console.log('🟢 Stats loaded');
             } catch (error) {
-                console.error('Error loading statistics:', error);
-                showNotification('Error loading statistics', 'error');
+                console.error('🔴 Error loading stats:', error);
             }
         }
 
-        // Load Pending Applications
         async function loadPendingApplications() {
+            console.log('🔵 Loading pending applications...');
             const container = document.getElementById('applicationsList');
-            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading applications...</p></div>';
 
             try {
-                const { data: applications, error } = await supabase
+                const { data, error } = await window.supabaseClient
                     .from('Therapists')
                     .select('*')
-                    .eq('approvalstatus', 'pending')
-                    .order('createdat', { ascending: false });
+                    .eq('approval_status', 'pending')
+                    .order('created_at', { ascending: false });
+
+                console.log('🔵 Applications:', data, 'Error:', error);
 
                 if (error) throw error;
-                displayApplications(applications);
 
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No pending applications</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(app => `
+                    <div class="application-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <div>
+                                <h3 class="therapist-name">Dr. ${app.Name}</h3>
+                                <p style="color: #5A9B8E; font-weight: 600;">${app.Specialization}</p>
+                            </div>
+                            <span class="status-badge status-pending">PENDING</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                            <div><strong>Email:</strong> ${app.email || 'N/A'}</div>
+                            <div><strong>Phone:</strong> ${app.phone || 'N/A'}</div>
+                            <div><strong>Experience:</strong> ${app.experience || '0'} years</div>
+                        </div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                            <button class="btn-approve" onclick="approveApplication('${app.id}')">✓ Approve</button>
+                            <button class="btn-reject" onclick="rejectApplication('${app.id}')">✕ Reject</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                console.log('🟢 Loaded', data.length, 'applications');
             } catch (error) {
-                console.error('Error loading applications:', error);
-                container.innerHTML = '<div class="empty-state"><div class="icon">😕</div><h3>Unable to load applications</h3><p>Please try refreshing the page</p></div>';
+                console.error('🔴 Error:', error);
+                container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
         }
 
-        // Display Applications
-        function displayApplications(applications) {
-            const container = document.getElementById('applicationsList');
-
-            if (!applications || applications.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><h3>No pending applications</h3><p>All therapist applications have been processed</p></div>';
-                return;
-            }
-
-            container.innerHTML = applications.map(app => `
-                <div class="application-card">
-                    <div class="application-header">
-                        <div>
-                            <div class="therapist-name">Dr. ${app.Name || 'N/A'}</div>
-                            <div class="therapist-specialization">${app.Specialization || 'Not specified'}</div>
-                        </div>
-                        <span class="status-badge status-pending">PENDING</span>
-                    </div>
-                    <div class="application-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Email</span>
-                            <span class="detail-value">${app.email || 'Not provided'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Phone</span>
-                            <span class="detail-value">${app.phone || 'Not provided'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Qualifications</span>
-                            <span class="detail-value">${app.qualifications || 'Not provided'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Experience</span>
-                            <span class="detail-value">${app.experience || 'Not specified'} years</span>
-                        </div>
-                    </div>
-                    <div class="detail-item" style="margin-bottom: 20px;">
-                        <span class="detail-label">Bio</span>
-                        <span class="detail-value">${app.bio || 'No bio provided'}</span>
-                    </div>
-                    <div class="application-actions">
-                        <button class="btn-approve" onclick="approveApplication('${app.id}')">
-                            <span class="icon">✓</span>
-                            Approve Application
-                        </button>
-                        <button class="btn-reject" onclick="rejectApplication('${app.id}')">
-                            <span class="icon">✕</span>
-                            Reject Application
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Approve Application
         async function approveApplication(therapistId) {
-            if (!confirm('Are you sure you want to approve this therapist application?\n\nOnce approved, they will be able to accept bookings.')) return;
+            if (!confirm('Approve this therapist application?')) return;
 
             try {
-                const { error } = await supabase
+                const { error } = await window.supabaseClient
                     .from('Therapists')
-                    .update({ 
-                        approvalstatus: 'approved', 
-                        Active: true
+                    .update({
+                        approval_status: 'approved',
+                        Active: true,
+                        approved_at: new Date().toISOString()
                     })
                     .eq('id', therapistId);
 
                 if (error) throw error;
 
-                showNotification('✅ Therapist approved successfully!', 'success');
+                alert('✅ Therapist approved!');
                 await loadStatistics();
                 await loadPendingApplications();
-
             } catch (error) {
-                console.error('Error approving therapist:', error);
-                showNotification('Error approving application', 'error');
+                console.error('🔴 Error:', error);
+                alert('Error: ' + error.message);
             }
         }
 
-        // Reject Application
         async function rejectApplication(therapistId) {
-            const reason = prompt('Please provide a reason for rejection:', '');
-            if (reason === null) return;
-            if (!reason.trim()) {
-                alert('Please provide a reason for rejection');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to reject this application?\n\nReason: ${reason}`)) return;
+            const reason = prompt('Reason for rejection:');
+            if (!reason) return;
 
             try {
-                const { error } = await supabase
+                const { error } = await window.supabaseClient
                     .from('Therapists')
-                    .update({ 
-                        approvalstatus: 'rejected', 
-                        Active: false
+                    .update({
+                        approval_status: 'rejected',
+                        Active: false,
+                        rejection_reason: reason
                     })
                     .eq('id', therapistId);
 
                 if (error) throw error;
 
-                showNotification('❌ Application rejected', 'info');
+                alert('❌ Application rejected');
                 await loadStatistics();
                 await loadPendingApplications();
-
             } catch (error) {
-                console.error('Error rejecting therapist:', error);
-                showNotification('Error rejecting application', 'error');
+                console.error('🔴 Error:', error);
+                alert('Error: ' + error.message);
             }
         }
 
-        // Load All Bookings
         async function loadAllBookings() {
+            console.log('🔵 Loading bookings...');
             const container = document.getElementById('bookingsList');
-            container.innerHTML = '<div class="loading-text"><div class="loading"></div><p>Loading bookings...</p></div>';
 
             try {
-                const { data: bookings, error } = await supabase
+                const { data, error } = await window.supabaseClient
                     .from('Bookings')
-                    .select('*')
-                    .order('sessiondate', { ascending: false })
+                    .select('*, Therapists(Name), profiles(fullname)')
+                    .order('session_date', { ascending: false })
                     .limit(20);
 
+                console.log('🔵 Bookings:', data, 'Error:', error);
+
                 if (error) throw error;
 
-                allBookings = bookings || [];
-                displayBookings(allBookings);
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No bookings yet</div>';
+                    return;
+                }
 
-            } catch (error) {
-                console.error('Error loading bookings:', error);
-                container.innerHTML = '<div class="empty-state"><div class="icon">😕</div><h3>Unable to load bookings</h3><p>Please try refreshing the page</p></div>';
-            }
-        }
-
-        // Display Bookings
-        async function displayBookings(bookings) {
-            const container = document.getElementById('bookingsList');
-
-            if (!bookings || bookings.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="icon">📅</div><h3>No bookings found</h3><p>There are no bookings in the system yet</p></div>';
-                return;
-            }
-
-            // Get therapist and user names
-            const therapistIds = [...new Set(bookings.map(b => b.therapistid))];
-            const userIds = [...new Set(bookings.map(b => b.userid))];
-
-            const { data: therapists } = await supabase
-                .from('Therapists')
-                .select('id, Name')
-                .in('id', therapistIds);
-
-            const { data: users } = await supabase
-                .from('profiles')
-                .select('id, fullname')
-                .in('id', userIds);
-
-            container.innerHTML = bookings.map(booking => {
-                const therapist = therapists?.find(t => t.id === booking.therapistid);
-                const user = users?.find(u => u.id === booking.userid);
-                const date = new Date(booking.sessiondate).toLocaleDateString('en-IN', { 
-                    weekday: 'short',
-                    day: 'numeric', 
-                    month: 'short', 
-                    year: 'numeric' 
-                });
-
-                return `
+                container.innerHTML = data.map(b => `
                     <div class="booking-card">
-                        <div class="booking-header">
-                            <div class="booking-title">
-                                ${user?.fullname || 'User'} → Dr. ${therapist?.Name || 'Therapist'}
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <h3>${b.profiles?.fullname || 'User'} → Dr. ${b.Therapists?.Name || 'Therapist'}</h3>
                             </div>
-                            <span class="status-badge status-${booking.status}">
-                                ${booking.status.toUpperCase()}
-                            </span>
+                            <span class="status-badge status-${b.status}">${b.status.toUpperCase()}</span>
                         </div>
-                        <div class="booking-info">
-                            <div class="detail-item">
-                                <span class="detail-label">Date & Time</span>
-                                <span class="detail-value">${date} at ${booking.starttime}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Duration</span>
-                                <span class="detail-value">${booking.duration || '60'} minutes</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Booking ID</span>
-                                <span class="detail-value">#${booking.id.substring(0, 8)}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Amount</span>
-                                <span class="detail-value">₹${booking.amount || '500'}</span>
-                            </div>
-                        </div>
-                        <div style="margin-top: 15px; font-size: 0.875rem; color: #6B7280;">
-                            Created: ${new Date(booking.createdat).toLocaleString('en-IN')}
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                            <div><strong>Date:</strong> ${new Date(b.session_date).toLocaleDateString()}</div>
+                            <div><strong>Time:</strong> ${b.start_time}</div>
+                            <div><strong>Amount:</strong> ₹${b.amount}</div>
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
+                `).join('');
 
-        // Filter Bookings
-        function filterBookings(status) {
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            let filteredBookings = allBookings;
-            if (status !== 'all') {
-                filteredBookings = allBookings.filter(booking => booking.status === status);
-            }
-            displayBookings(filteredBookings);
-        }
-
-        // Update System Status
-        async function updateSystemStatus() {
-            try {
-                const startTime = Date.now();
-                const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
-                const endTime = Date.now();
-
-                document.getElementById('apiResponse').textContent = `~${endTime - startTime}ms`;
-                document.getElementById('dbStatus').textContent = error ? '🔴 Error' : '🟢 Connected';
-
+                console.log('🟢 Loaded', data.length, 'bookings');
             } catch (error) {
-                console.error('Error updating system status:', error);
+                console.error('🔴 Error:', error);
+                container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
         }
-
-        // Export Data
-        function exportData() {
-            alert('Export functionality would be implemented here.\n\nThis would generate CSV/Excel reports of all data.');
-        }
-
-        // Show Analytics
-        function showAnalytics() {
-            alert('Analytics dashboard would be shown here.\n\nThis would include charts and insights about platform usage.');
-        }
-
-        // Show Notification
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
-                color: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                font-weight: 600;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Initialize dashboard when page loads
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
