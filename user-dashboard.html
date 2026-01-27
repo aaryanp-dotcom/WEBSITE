@@ -338,6 +338,15 @@
             
             isProfileComplete = required.every(field => field && field.toString().trim() !== '');
             
+            console.log('🔵 Profile complete check:', {
+                full_name: currentUserProfile.full_name,
+                phone: currentUserProfile.phone,
+                date_of_birth: currentUserProfile.date_of_birth,
+                gender: currentUserProfile.gender,
+                city: currentUserProfile.city,
+                isComplete: isProfileComplete
+            });
+            
             if (!isProfileComplete) {
                 document.getElementById('profileIncompleteBanner').style.display = 'block';
             } else {
@@ -349,15 +358,44 @@
         
         async function loadUserProfile() {
             console.log('🔵 Loading user profile...');
+            console.log('🔵 Current user ID:', currentUser.id);
             
             try {
-                const { data, error } = await window.supabaseClient
+                // Try with single() first
+                let { data, error } = await window.supabaseClient
                     .from('profiles')
                     .select('*')
                     .eq('user_id', currentUser.id)
-                    .single();
+                    .maybeSingle();  // Changed from .single() to .maybeSingle()
                 
-                if (error) throw error;
+                console.log('🔵 Profile query result:', { data, error });
+                
+                if (error) {
+                    console.error('🔴 Profile query error:', error);
+                    throw error;
+                }
+                
+                if (!data) {
+                    console.log('🟡 No profile found, creating one...');
+                    // Create profile if it doesn't exist
+                    const { data: newProfile, error: createError } = await window.supabaseClient
+                        .from('profiles')
+                        .insert([{
+                            user_id: currentUser.id,
+                            email: currentUser.email,
+                            full_name: null,
+                            phone: null,
+                            date_of_birth: null,
+                            gender: null,
+                            city: null
+                        }])
+                        .select()
+                        .single();
+                    
+                    if (createError) throw createError;
+                    data = newProfile;
+                    console.log('🟢 Profile created:', data);
+                }
                 
                 currentUserProfile = data;
                 document.getElementById('userName').textContent = data.full_name || currentUser.email;
@@ -562,6 +600,8 @@
             const sortBy = document.getElementById('bookingSortFilter').value;
             const statusFilter = document.getElementById('bookingStatusFilter').value;
             
+            console.log('🔵 Filters:', { sortBy, statusFilter, userId: currentUser.id });
+            
             try {
                 let query = window.supabaseClient
                     .from('Bookings')
@@ -582,7 +622,7 @@
                 
                 const { data: bookings, error } = await query;
                 
-                console.log('🔵 Bookings:', bookings);
+                console.log('🔵 Bookings query result:', { bookings, error, count: bookings?.length });
                 
                 if (error) throw error;
                 
@@ -956,6 +996,8 @@
                     emergency_contact_phone: document.getElementById('profileEmergencyPhone').value || null,
                     profile_picture_url: profilePictureUrl
                 };
+                
+                console.log('🔵 Updating profile with data:', profileData);
                 
                 const { data, error } = await window.supabaseClient
                     .from('profiles')
