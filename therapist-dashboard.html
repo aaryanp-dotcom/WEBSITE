@@ -12,11 +12,19 @@
         .dashboard-header { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
         .welcome-title { font-size: 32px; color: #2C3E50; margin: 0 0 10px 0; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .stat-card.active { border: 2px solid #5A9B8E; box-shadow: 0 4px 12px rgba(90,155,142,0.2); }
         .stat-number { font-size: 36px; font-weight: 800; color: #5A9B8E; display: block; }
         .stat-label { font-size: 12px; color: #6B7280; text-transform: uppercase; margin-top: 8px; display: block; }
         .dashboard-section { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
         .section-title { font-size: 24px; color: #2C3E50; margin: 0 0 20px 0; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
+        .search-box { flex: 1; min-width: 250px; position: relative; }
+        .search-input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6B7280; }
+        .filter-select { padding: 12px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; min-width: 150px; }
         .appointments-list { display: flex; flex-direction: column; gap: 16px; }
         .appointment-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
         .patient-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 4px 0; }
@@ -53,6 +61,9 @@
         .form-select { padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; width: 100%; }
         .btn-save { padding: 14px; background: #5A9B8E; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; transition: background 0.3s; width: 100%; }
         .btn-save:hover { background: #4A8B7E; }
+        .profile-info { background: #F5F9F8; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .profile-info-label { color: #6B7280; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .profile-info-value { color: #2C3E50; font-size: 16px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -62,6 +73,7 @@
                 <a href="index.html" class="logo"><span class="logo-icon">🧠</span><span class="logo-text">MindSpace</span></a>
                 <ul class="nav-links">
                     <li><a href="therapist-dashboard.html" class="active">Dashboard</a></li>
+                    <li><a href="#" onclick="openProfileModal(); return false;">My Profile</a></li>
                     <li><button onclick="logout()" class="btn-primary">Logout</button></li>
                 </ul>
             </div>
@@ -74,19 +86,19 @@
             </div>
             
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card" onclick="filterByStatus('all')">
                     <span class="stat-number" id="totalAppointments">0</span>
                     <span class="stat-label">Total Appointments</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="filterByStatus('pending')">
                     <span class="stat-number" id="pendingCount">0</span>
                     <span class="stat-label">Pending Requests</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="filterByStatus('confirmed')">
                     <span class="stat-number" id="confirmedCount">0</span>
                     <span class="stat-label">Confirmed</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="filterByStatus('completed')">
                     <span class="stat-number" id="completedCount">0</span>
                     <span class="stat-label">Completed</span>
                 </div>
@@ -97,12 +109,109 @@
             </div>
             
             <section class="dashboard-section">
-                <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Appointments</h2>
-                <div id="appointmentsList" class="appointments-list">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Appointments</h2>
+                </div>
+                
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search by patient name or email..." oninput="applyFilters()">
+                    </div>
+                    <select id="statusFilter" class="filter-select" onchange="applyFilters()">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <select id="dateFilter" class="filter-select" onchange="applyFilters()">
+                        <option value="all">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="past">Past</option>
+                    </select>
+                    <select id="sortFilter" class="filter-select" onchange="applyFilters()">
+                        <option value="date-asc">Date (Oldest First)</option>
+                        <option value="date-desc">Date (Newest First)</option>
+                        <option value="amount-asc">Amount (Low to High)</option>
+                        <option value="amount-desc">Amount (High to Low)</option>
+                    </select>
+                </div>
+                
+                <div id="appointmentsList" class="appointments-list" style="margin-top: 20px;">
                     <div class="loading">Loading appointments...</div>
                 </div>
             </section>
         </main>
+    </div>
+    
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">My Profile</h2>
+                <button class="close-modal" onclick="closeProfileModal()">&times;</button>
+            </div>
+            
+            <form onsubmit="saveTherapistProfile(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="profileName" class="form-input" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="profileEmail" class="form-input" placeholder="Enter your email" readonly style="background: #F5F9F8;">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Specialization</label>
+                    <select id="profileSpecialization" class="form-select" required>
+                        <option value="">Select specialization</option>
+                        <option value="Clinical Psychology">Clinical Psychology</option>
+                        <option value="Counseling Psychology">Counseling Psychology</option>
+                        <option value="Child Psychology">Child Psychology</option>
+                        <option value="Marriage & Family Therapy">Marriage & Family Therapy</option>
+                        <option value="Cognitive Behavioral Therapy">Cognitive Behavioral Therapy</option>
+                        <option value="Trauma Therapy">Trauma Therapy</option>
+                        <option value="Addiction Counseling">Addiction Counseling</option>
+                        <option value="Career Counseling">Career Counseling</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Session Fee (₹)</label>
+                    <input type="number" id="profileFee" class="form-input" placeholder="Enter session fee" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Bio / About Me</label>
+                    <textarea id="profileBio" class="form-textarea" placeholder="Tell patients about yourself, your experience, and approach..." style="min-height: 120px;"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" id="profilePhone" class="form-input" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Years of Experience</label>
+                    <input type="number" id="profileExperience" class="form-input" placeholder="Years of experience" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">License Number</label>
+                    <input type="text" id="profileLicense" class="form-input" placeholder="Professional license number">
+                </div>
+                
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Save Profile
+                </button>
+            </form>
+        </div>
     </div>
     
     <!-- Reschedule Modal -->
@@ -183,6 +292,9 @@
         let therapistData = null;
         let currentRescheduleBookingId = null;
         let currentNotesBookingId = null;
+        let allAppointments = [];
+        let userMap = {};
+        let currentStatusFilter = 'all';
         
         document.addEventListener('DOMContentLoaded', async function() {
             currentUser = JSON.parse(localStorage.getItem('user'));
@@ -230,10 +342,8 @@
         }
         
         function canMarkComplete(sessionDate, sessionTime) {
-            // Parse session date and time
             const sessionDateTime = new Date(sessionDate);
             
-            // Parse time (e.g., "02:00 PM")
             if (sessionTime) {
                 const timeParts = sessionTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
                 if (timeParts) {
@@ -241,7 +351,6 @@
                     const minutes = parseInt(timeParts[2]);
                     const period = timeParts[3].toUpperCase();
                     
-                    // Convert to 24-hour format
                     if (period === 'PM' && hours !== 12) {
                         hours += 12;
                     } else if (period === 'AM' && hours === 12) {
@@ -252,14 +361,90 @@
                 }
             }
             
-            // Get current time
             const now = new Date();
-            
-            // Calculate time difference in hours
             const timeDiff = (sessionDateTime - now) / (1000 * 60 * 60);
             
-            // Allow marking complete if within 24 hours of session time
             return timeDiff <= 24;
+        }
+        
+        function filterByStatus(status) {
+            currentStatusFilter = status;
+            document.getElementById('statusFilter').value = status === 'all' ? 'all' : status;
+            
+            // Update active stat card
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            let filtered = [...allAppointments];
+            
+            // Status filter
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(apt => apt.status === statusFilter);
+            }
+            
+            // Search filter
+            if (searchTerm) {
+                filtered = filtered.filter(apt => {
+                    const user = userMap[apt.user_id] || {};
+                    const name = (user.full_name || '').toLowerCase();
+                    const email = (user.email || '').toLowerCase();
+                    return name.includes(searchTerm) || email.includes(searchTerm);
+                });
+            }
+            
+            // Date filter
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (dateFilter === 'today') {
+                filtered = filtered.filter(apt => {
+                    const aptDate = new Date(apt.session_date);
+                    aptDate.setHours(0, 0, 0, 0);
+                    return aptDate.getTime() === today.getTime();
+                });
+            } else if (dateFilter === 'week') {
+                const weekFromNow = new Date(today);
+                weekFromNow.setDate(weekFromNow.getDate() + 7);
+                filtered = filtered.filter(apt => {
+                    const aptDate = new Date(apt.session_date);
+                    return aptDate >= today && aptDate <= weekFromNow;
+                });
+            } else if (dateFilter === 'month') {
+                const monthFromNow = new Date(today);
+                monthFromNow.setMonth(monthFromNow.getMonth() + 1);
+                filtered = filtered.filter(apt => {
+                    const aptDate = new Date(apt.session_date);
+                    return aptDate >= today && aptDate <= monthFromNow;
+                });
+            } else if (dateFilter === 'upcoming') {
+                filtered = filtered.filter(apt => new Date(apt.session_date) >= today);
+            } else if (dateFilter === 'past') {
+                filtered = filtered.filter(apt => new Date(apt.session_date) < today);
+            }
+            
+            // Sort
+            if (sortFilter === 'date-asc') {
+                filtered.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+            } else if (sortFilter === 'date-desc') {
+                filtered.sort((a, b) => new Date(b.session_date) - new Date(a.session_date));
+            } else if (sortFilter === 'amount-asc') {
+                filtered.sort((a, b) => (a.amount || 0) - (b.amount || 0));
+            } else if (sortFilter === 'amount-desc') {
+                filtered.sort((a, b) => (b.amount || 0) - (a.amount || 0));
+            }
+            
+            displayAppointments(filtered);
         }
         
         async function loadAppointments() {
@@ -288,6 +473,8 @@
                     return;
                 }
                 
+                allAppointments = appointments;
+                
                 // Calculate stats
                 const total = appointments.length;
                 const pending = appointments.filter(a => a.status === 'pending').length;
@@ -306,167 +493,177 @@
                     .select('user_id, full_name, email')
                     .in('user_id', userIds);
                 
-                const userMap = {};
+                userMap = {};
                 if (users) {
                     users.forEach(u => {
                         userMap[u.user_id] = u;
                     });
                 }
                 
-                // Display appointments
-                container.innerHTML = appointments.map(apt => {
-                    const user = userMap[apt.user_id] || {};
-                    const statusClass = 'status-' + apt.status;
-                    const hasRescheduleRequest = apt.reschedule_requested === true;
-                    const canComplete = canMarkComplete(apt.session_date, apt.start_time);
-                    
-                    return `
-                        <div class="appointment-card">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                                <div>
-                                    <h3 class="patient-name">${user.full_name || 'Patient'}</h3>
-                                    <p class="patient-email">${user.email || 'No email available'}</p>
-                                    <span class="status-badge ${statusClass}">${apt.status.toUpperCase()}</span>
-                                    ${hasRescheduleRequest ? `
-                                        <span class="status-badge" style="background: #FFA500; color: white; margin-left: 8px;">
-                                            <i class="fas fa-clock"></i> RESCHEDULE REQUEST
-                                        </span>
-                                    ` : ''}
-                                </div>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px;">
-                                <div>
-                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
-                                    <div style="color: #2C3E50;">${formatDate(apt.session_date)}</div>
-                                </div>
-                                <div>
-                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
-                                    <div style="color: #2C3E50;">${apt.start_time || '10:00 AM'}</div>
-                                </div>
-                                <div>
-                                    <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
-                                    <div style="color: #2C3E50;">₹${apt.amount || 0}</div>
-                                </div>
-                            </div>
-                            
-                            ${apt.problem_description ? `
-                                <div class="info-box">
-                                    <div class="info-box-title"><i class="fas fa-comment-medical"></i> Patient's Concern</div>
-                                    <div class="info-box-text">${apt.problem_description}</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${hasRescheduleRequest ? `
-                                <div style="margin-top: 15px; padding: 15px; background: #FFF3CD; border-radius: 8px; border-left: 4px solid #FFA500;">
-                                    <div style="font-weight: 700; color: #856404; margin-bottom: 10px;">
-                                        <i class="fas fa-info-circle"></i> Patient Requested Reschedule
-                                    </div>
-                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px; margin-bottom: 10px;">
-                                        <div>
-                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">NEW DATE</div>
-                                            <div style="color: #2C3E50; font-weight: 700;">${formatDate(apt.reschedule_new_date)}</div>
-                                        </div>
-                                        <div>
-                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">NEW TIME</div>
-                                            <div style="color: #2C3E50; font-weight: 700;">${apt.reschedule_new_start_time || 'N/A'}</div>
-                                        </div>
-                                    </div>
-                                    ${apt.reschedule_reason ? `
-                                        <div style="margin-top: 10px;">
-                                            <div style="color: #856404; font-weight: 600; margin-bottom: 4px; font-size: 12px;">REASON</div>
-                                            <div style="color: #2C3E50; font-size: 13px;">${apt.reschedule_reason}</div>
-                                        </div>
-                                    ` : ''}
-                                    <div style="margin-top: 15px; display: flex; gap: 10px;">
-                                        <button class="btn-confirm" onclick="approveReschedule('${apt.id}', '${apt.reschedule_new_date}', '${apt.reschedule_new_start_time}')">
-                                            <i class="fas fa-check"></i> Approve Reschedule
-                                        </button>
-                                        <button class="btn-reject" onclick="rejectReschedule('${apt.id}')">
-                                            <i class="fas fa-times"></i> Reject
-                                        </button>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            
-                            ${apt.next_session_notes ? `
-                                <div style="margin-top: 15px; padding: 15px; background: #E0F2F1; border-radius: 8px; border-left: 4px solid #5A9B8E;">
-                                    <div style="font-weight: 700; color: #2C3E50; margin-bottom: 8px; font-size: 14px;">
-                                        <i class="fas fa-clipboard-list"></i> Next Session Agenda
-                                    </div>
-                                    <div style="color: #4B5563; font-size: 13px; line-height: 1.5;">${apt.next_session_notes}</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${apt.status === 'pending' && !hasRescheduleRequest ? `
-                                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
-                                    <input type="text" 
-                                           id="meeting-link-${apt.id}" 
-                                           class="form-input" 
-                                           placeholder="Enter meeting link (e.g., Google Meet, Zoom)" 
-                                           style="margin-bottom: 10px;">
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        <button class="btn-confirm" onclick="confirmAppointment('${apt.id}')">
-                                            <i class="fas fa-check"></i> Confirm & Add Link
-                                        </button>
-                                        <button class="btn-reschedule" onclick="openRescheduleModal('${apt.id}')">
-                                            <i class="fas fa-calendar-alt"></i> Suggest Different Time
-                                        </button>
-                                        <button class="btn-reject" onclick="rejectAppointment('${apt.id}')">
-                                            <i class="fas fa-times"></i> Reject
-                                        </button>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            
-                            ${apt.status === 'confirmed' ? `
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
-                                    ${apt.meeting_link ? `
-                                        <div style="margin-bottom: 15px;">
-                                            <div style="color: #6B7280; font-size: 12px; margin-bottom: 5px;">MEETING LINK</div>
-                                            <div style="color: #5A9B8E; word-break: break-all;">
-                                                <a href="${apt.meeting_link}" target="_blank" style="color: #5A9B8E; text-decoration: underline;">
-                                                    ${apt.meeting_link}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        ${canComplete ? `
-                                            <button class="btn-complete" onclick="markComplete('${apt.id}')">
-                                                <i class="fas fa-check-circle"></i> Mark Complete
-                                            </button>
-                                        ` : `
-                                            <button class="btn-complete" style="background: #9CA3AF; cursor: not-allowed;" disabled title="Available 24 hours before session">
-                                                <i class="fas fa-clock"></i> Complete (Available 24hrs before)
-                                            </button>
-                                        `}
-                                        <button class="btn-reschedule" onclick="openRescheduleModal('${apt.id}')">
-                                            <i class="fas fa-calendar-alt"></i> Suggest Reschedule
-                                        </button>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            
-                            ${apt.status === 'completed' ? `
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
-                                    <div style="color: #10B981; font-size: 14px; font-weight: 600; margin-bottom: 10px;">
-                                        <i class="fas fa-check-circle"></i> Session Completed
-                                    </div>
-                                    <button class="btn-confirm" onclick="openNotesModal('${apt.id}', '${apt.next_session_notes || ''}')">
-                                        <i class="fas fa-clipboard-list"></i> ${apt.next_session_notes ? 'Edit' : 'Add'} Next Session Notes
-                                    </button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('');
+                applyFilters();
                 
                 console.log('🟢 Loaded', appointments.length, 'appointments');
             } catch (error) {
                 console.error('🔴 Error loading appointments:', error);
                 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
             }
+        }
+        
+        function displayAppointments(appointments) {
+            const container = document.getElementById('appointmentsList');
+            
+            if (appointments.length === 0) {
+                container.innerHTML = '<div class="empty-state">No appointments found matching your filters</div>';
+                return;
+            }
+            
+            container.innerHTML = appointments.map(apt => {
+                const user = userMap[apt.user_id] || {};
+                const statusClass = 'status-' + apt.status;
+                const hasRescheduleRequest = apt.reschedule_requested === true;
+                const canComplete = canMarkComplete(apt.session_date, apt.start_time);
+                
+                return `
+                    <div class="appointment-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <div>
+                                <h3 class="patient-name">${user.full_name || 'Patient'}</h3>
+                                <p class="patient-email">${user.email || 'No email available'}</p>
+                                <span class="status-badge ${statusClass}">${apt.status.toUpperCase()}</span>
+                                ${hasRescheduleRequest ? `
+                                    <span class="status-badge" style="background: #FFA500; color: white; margin-left: 8px;">
+                                        <i class="fas fa-clock"></i> RESCHEDULE REQUEST
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px;">
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">DATE</div>
+                                <div style="color: #2C3E50;">${formatDate(apt.session_date)}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">TIME</div>
+                                <div style="color: #2C3E50;">${apt.start_time || '10:00 AM'}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; margin-bottom: 4px;">FEE</div>
+                                <div style="color: #2C3E50;">₹${apt.amount || 0}</div>
+                            </div>
+                        </div>
+                        
+                        ${apt.problem_description ? `
+                            <div class="info-box">
+                                <div class="info-box-title"><i class="fas fa-comment-medical"></i> Patient's Concern</div>
+                                <div class="info-box-text">${apt.problem_description}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${hasRescheduleRequest ? `
+                            <div style="margin-top: 15px; padding: 15px; background: #FFF3CD; border-radius: 8px; border-left: 4px solid #FFA500;">
+                                <div style="font-weight: 700; color: #856404; margin-bottom: 10px;">
+                                    <i class="fas fa-info-circle"></i> Patient Requested Reschedule
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 14px; margin-bottom: 10px;">
+                                    <div>
+                                        <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">NEW DATE</div>
+                                        <div style="color: #2C3E50; font-weight: 700;">${formatDate(apt.reschedule_new_date)}</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #856404; font-weight: 600; margin-bottom: 4px;">NEW TIME</div>
+                                        <div style="color: #2C3E50; font-weight: 700;">${apt.reschedule_new_start_time || 'N/A'}</div>
+                                    </div>
+                                </div>
+                                ${apt.reschedule_reason ? `
+                                    <div style="margin-top: 10px;">
+                                        <div style="color: #856404; font-weight: 600; margin-bottom: 4px; font-size: 12px;">REASON</div>
+                                        <div style="color: #2C3E50; font-size: 13px;">${apt.reschedule_reason}</div>
+                                    </div>
+                                ` : ''}
+                                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                    <button class="btn-confirm" onclick="approveReschedule('${apt.id}', '${apt.reschedule_new_date}', '${apt.reschedule_new_start_time}')">
+                                        <i class="fas fa-check"></i> Approve Reschedule
+                                    </button>
+                                    <button class="btn-reject" onclick="rejectReschedule('${apt.id}')">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${apt.next_session_notes ? `
+                            <div style="margin-top: 15px; padding: 15px; background: #E0F2F1; border-radius: 8px; border-left: 4px solid #5A9B8E;">
+                                <div style="font-weight: 700; color: #2C3E50; margin-bottom: 8px; font-size: 14px;">
+                                    <i class="fas fa-clipboard-list"></i> Next Session Agenda
+                                </div>
+                                <div style="color: #4B5563; font-size: 13px; line-height: 1.5;">${apt.next_session_notes}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${apt.status === 'pending' && !hasRescheduleRequest ? `
+                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                                <input type="text" 
+                                       id="meeting-link-${apt.id}" 
+                                       class="form-input" 
+                                       placeholder="Enter meeting link (e.g., Google Meet, Zoom)" 
+                                       style="margin-bottom: 10px;">
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button class="btn-confirm" onclick="confirmAppointment('${apt.id}')">
+                                        <i class="fas fa-check"></i> Confirm & Add Link
+                                    </button>
+                                    <button class="btn-reschedule" onclick="openRescheduleModal('${apt.id}')">
+                                        <i class="fas fa-calendar-alt"></i> Suggest Different Time
+                                    </button>
+                                    <button class="btn-reject" onclick="rejectAppointment('${apt.id}')">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${apt.status === 'confirmed' ? `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                                ${apt.meeting_link ? `
+                                    <div style="margin-bottom: 15px;">
+                                        <div style="color: #6B7280; font-size: 12px; margin-bottom: 5px;">MEETING LINK</div>
+                                        <div style="color: #5A9B8E; word-break: break-all;">
+                                            <a href="${apt.meeting_link}" target="_blank" style="color: #5A9B8E; text-decoration: underline;">
+                                                ${apt.meeting_link}
+                                            </a>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    ${canComplete ? `
+                                        <button class="btn-complete" onclick="markComplete('${apt.id}')">
+                                            <i class="fas fa-check-circle"></i> Mark Complete
+                                        </button>
+                                    ` : `
+                                        <button class="btn-complete" style="background: #9CA3AF; cursor: not-allowed;" disabled title="Available 24 hours before session">
+                                            <i class="fas fa-clock"></i> Complete (Available 24hrs before)
+                                        </button>
+                                    `}
+                                    <button class="btn-reschedule" onclick="openRescheduleModal('${apt.id}')">
+                                        <i class="fas fa-calendar-alt"></i> Suggest Reschedule
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${apt.status === 'completed' ? `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                                <div style="color: #10B981; font-size: 14px; font-weight: 600; margin-bottom: 10px;">
+                                    <i class="fas fa-check-circle"></i> Session Completed
+                                </div>
+                                <button class="btn-confirm" onclick="openNotesModal('${apt.id}', \`${apt.next_session_notes || ''}\`)">
+                                    <i class="fas fa-clipboard-list"></i> ${apt.next_session_notes ? 'Edit' : 'Add'} Next Session Notes
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
         }
         
         function formatDate(dateString) {
@@ -485,6 +682,61 @@
             document.getElementById('confirmedCount').textContent = confirmed;
             document.getElementById('completedCount').textContent = completed;
             document.getElementById('totalRevenue').textContent = '₹' + revenue;
+        }
+        
+        function openProfileModal() {
+            if (therapistData) {
+                document.getElementById('profileEmail').value = therapistData.email || '';
+                document.getElementById('profileName').value = therapistData.Name || '';
+                document.getElementById('profileSpecialization').value = therapistData.Specialization || '';
+                document.getElementById('profileFee').value = therapistData.fee || '';
+                document.getElementById('profileBio').value = therapistData.bio || '';
+                document.getElementById('profilePhone').value = therapistData.phone || '';
+                document.getElementById('profileExperience').value = therapistData.experience || '';
+                document.getElementById('profileLicense').value = therapistData.license || '';
+            }
+            document.getElementById('profileModal').classList.add('active');
+        }
+        
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+        
+        async function saveTherapistProfile(event) {
+            event.preventDefault();
+            console.log('🔵 Saving therapist profile...');
+            
+            try {
+                const profileData = {
+                    Name: document.getElementById('profileName').value,
+                    Specialization: document.getElementById('profileSpecialization').value,
+                    fee: parseInt(document.getElementById('profileFee').value),
+                    bio: document.getElementById('profileBio').value,
+                    phone: document.getElementById('profilePhone').value,
+                    experience: document.getElementById('profileExperience').value,
+                    license: document.getElementById('profileLicense').value
+                };
+                
+                const { data, error } = await window.supabaseClient
+                    .from('Therapists')
+                    .update(profileData)
+                    .eq('id', therapistData.id)
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log('🟢 Profile updated:', data);
+                alert('✅ Profile updated successfully!');
+                
+                therapistData = { ...therapistData, ...profileData };
+                document.getElementById('therapistName').textContent = profileData.Name;
+                
+                closeProfileModal();
+                
+            } catch (error) {
+                console.error('🔴 Error saving profile:', error);
+                alert('Error: ' + error.message);
+            }
         }
         
         async function approveReschedule(appointmentId, newDate, newTime) {
@@ -732,9 +984,13 @@
         }
         
         window.onclick = function(event) {
+            const profileModal = document.getElementById('profileModal');
             const rescheduleModal = document.getElementById('rescheduleModal');
             const notesModal = document.getElementById('notesModal');
             
+            if (event.target === profileModal) {
+                closeProfileModal();
+            }
             if (event.target === rescheduleModal) {
                 closeRescheduleModal();
             }
