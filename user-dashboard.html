@@ -1,3 +1,5 @@
+
+user-dashboard-updated.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,6 +79,11 @@
 .file-input-label:hover { background: #4A8B7E; }
 .action-buttons { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; flex-wrap: wrap; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.danger-zone { border-top: 2px solid #EF4444; padding-top: 20px; margin-top: 20px; }
+.danger-zone h3 { color: #DC2626; font-size: 18px; margin-bottom: 10px; }
+.danger-zone p { color: #6B7280; font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
+.btn-delete-account { background: #EF4444; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; transition: background 0.3s; }
+.btn-delete-account:hover { background: #DC2626; }
 </style>
 </head>
 <body>
@@ -91,11 +98,13 @@
 </ul>
 </div>
 </nav>
+
 <main class="dashboard-container">
 <div class="dashboard-header">
 <h1 class="welcome-title">Welcome Back!</h1>
 <p id="userName" style="color: #6B7280;">Loading...</p>
 </div>
+
 <!-- Profile Incomplete Warning -->
 <div id="profileIncompleteBanner" style="display: none;" class="profile-incomplete-banner">
 <h3><i class="fas fa-exclamation-triangle"></i> Complete Your Profile</h3>
@@ -104,6 +113,7 @@
 <i class="fas fa-user-edit"></i> Complete Profile Now
 </button>
 </div>
+
 <section class="therapists-section">
 <div class="section-header">
 <h2 class="section-title"><i class="fas fa-user-md"></i> Find a Therapist</h2>
@@ -126,6 +136,7 @@
 <div class="loading">Loading therapists...</div>
 </div>
 </section>
+
 <section class="bookings-section">
 <div class="section-header">
 <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Bookings</h2>
@@ -151,6 +162,7 @@
 </section>
 </main>
 </div>
+
 <!-- Profile Modal -->
 <div id="profileModal" class="modal">
 <div class="modal-content">
@@ -176,6 +188,7 @@
 Max size: 2MB | JPG, PNG, GIF
 </div>
 </div>
+
 <div class="form-row">
 <div class="form-group">
 <label class="form-label">Full Name *</label>
@@ -186,6 +199,7 @@ Max size: 2MB | JPG, PNG, GIF
 <input type="email" id="profileEmail" class="form-input" readonly style="background: #F5F9F8;">
 </div>
 </div>
+
 <div class="form-row">
 <div class="form-group">
 <label class="form-label">Phone Number *</label>
@@ -196,6 +210,7 @@ Max size: 2MB | JPG, PNG, GIF
 <input type="date" id="profileDOB" class="form-input" required>
 </div>
 </div>
+
 <div class="form-row">
 <div class="form-group">
 <label class="form-label">Gender *</label>
@@ -212,10 +227,12 @@ Max size: 2MB | JPG, PNG, GIF
 <input type="text" id="profileCity" class="form-input" placeholder="Enter your city" required>
 </div>
 </div>
+
 <div class="form-group">
 <label class="form-label">Address</label>
 <textarea id="profileAddress" class="form-textarea" placeholder="Enter your complete address" style="min-height: 60px;"></textarea>
 </div>
+
 <div style="border-top: 2px solid #E5E7EB; padding-top: 20px; margin-top: 10px;">
 <h3 style="color: #2C3E50; font-size: 18px; margin-bottom: 15px;">Emergency Contact (Optional)</h3>
 <div class="form-row">
@@ -229,12 +246,23 @@ Max size: 2MB | JPG, PNG, GIF
 </div>
 </div>
 </div>
+
 <button type="submit" class="btn-save">
 <i class="fas fa-save"></i> Save Profile
 </button>
+
+<!-- Danger Zone - Delete Account -->
+<div class="danger-zone">
+<h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+<p>Once you delete your account, there is no going back. This action cannot be undone and will permanently remove all your data including bookings and session history.</p>
+<button type="button" class="btn-delete-account" onclick="confirmDeleteAccount()">
+<i class="fas fa-trash-alt"></i> Delete My Account
+</button>
+</div>
 </form>
 </div>
 </div>
+
 <!-- Reschedule Modal -->
 <div id="rescheduleModal" class="modal">
 <div class="modal-content">
@@ -270,6 +298,53 @@ Max size: 2MB | JPG, PNG, GIF
 </form>
 </div>
 </div>
+
+<!-- Delete Account Confirmation Modal -->
+<div id="deleteAccountModal" class="modal">
+<div class="modal-content" style="max-width: 500px;">
+<div class="modal-header">
+<h2 class="modal-title" style="color: #DC2626;">
+<i class="fas fa-exclamation-circle"></i> Delete Account
+</h2>
+<button class="close-modal" onclick="closeDeleteAccountModal()">&times;</button>
+</div>
+<div style="padding: 20px 0;">
+<p style="color: #2C3E50; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+Are you sure you want to delete your account? This action will:
+</p>
+<ul style="color: #6B7280; font-size: 14px; line-height: 1.8; margin-bottom: 25px; padding-left: 25px;">
+<li>Permanently delete your profile and personal information</li>
+<li>Cancel all pending and confirmed bookings</li>
+<li>Remove all your session history</li>
+<li>Revoke access to your account immediately</li>
+</ul>
+<div style="background: #FEE2E2; border: 2px solid #EF4444; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+<p style="color: #991B1B; font-weight: 700; margin: 0; font-size: 14px;">
+⚠️ This action cannot be undone!
+</p>
+</div>
+<div class="form-group">
+<label class="form-label" style="color: #DC2626;">
+Type "DELETE" to confirm:
+</label>
+<input type="text" id="deleteConfirmation" class="form-input" 
+placeholder="Type DELETE in capital letters" 
+style="border-color: #EF4444;">
+</div>
+<div style="display: flex; gap: 10px; margin-top: 25px;">
+<button type="button" onclick="closeDeleteAccountModal()" 
+style="flex: 1; padding: 14px; background: #6B7280; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.3s;">
+<i class="fas fa-times"></i> Cancel
+</button>
+<button type="button" onclick="executeDeleteAccount()" 
+style="flex: 1; padding: 14px; background: #EF4444; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.3s;">
+<i class="fas fa-trash-alt"></i> Yes, Delete Forever
+</button>
+</div>
+</div>
+</div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 <script>
@@ -279,14 +354,17 @@ let allTherapists = [];
 let currentRescheduleBookingId = null;
 let uploadedProfilePicture = null;
 let isProfileComplete = false;
+
 document.addEventListener('DOMContentLoaded', async function() {
 currentUser = JSON.parse(localStorage.getItem('user'));
 console.log('🔵 User dashboard loaded. User:', currentUser);
+
 if (!currentUser || currentUser.role !== 'user') {
 alert('Please login as a user to access this page');
 window.location.href = 'login.html';
 return;
 }
+
 // Set max date for DOB (18 years ago) and min date for future dates
 const today = new Date();
 const maxDOB = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
@@ -297,12 +375,15 @@ if (input.id !== 'profileDOB') {
 input.min = minFuture;
 }
 });
+
 await loadUserProfile();
 await loadTherapists();
 await loadBookings();
 });
+
 function checkProfileComplete() {
 if (!currentUserProfile) return false;
+
 const required = [
 currentUserProfile.full_name,
 currentUserProfile.phone,
@@ -310,7 +391,9 @@ currentUserProfile.date_of_birth,
 currentUserProfile.gender,
 currentUserProfile.city
 ];
+
 isProfileComplete = required.every(field => field && field.toString().trim() !== '');
+
 console.log('🔵 Profile complete check:', {
 full_name: currentUserProfile.full_name,
 phone: currentUserProfile.phone,
@@ -319,16 +402,20 @@ gender: currentUserProfile.gender,
 city: currentUserProfile.city,
 isComplete: isProfileComplete
 });
+
 if (!isProfileComplete) {
 document.getElementById('profileIncompleteBanner').style.display = 'block';
 } else {
 document.getElementById('profileIncompleteBanner').style.display = 'none';
 }
+
 return isProfileComplete;
 }
+
 async function loadUserProfile() {
 console.log('🔵 Loading user profile...');
 console.log('🔵 Current user ID:', currentUser.id);
+
 try {
 // Try with maybeSingle()
 let { data, error } = await window.supabaseClient
@@ -336,11 +423,14 @@ let { data, error } = await window.supabaseClient
 .select('*')
 .eq('user_id', currentUser.id)
 .maybeSingle();
+
 console.log('🔵 Profile query result:', { data, error });
+
 if (error) {
 console.error('🔴 Profile query error:', error);
 throw error;
 }
+
 if (!data) {
 console.log('🟡 No profile found, creating one...');
 // Create profile if it doesn't exist
@@ -363,10 +453,12 @@ profile_picture_url: null
 }])
 .select()
 .single();
+
 if (createError) throw createError;
 data = newProfile;
 console.log('🟢 Profile created:', data);
 }
+
 currentUserProfile = data;
 document.getElementById('userName').textContent = data.full_name || currentUser.email;
 checkProfileComplete();
@@ -377,20 +469,26 @@ document.getElementById('userName').textContent = currentUser.email;
 document.getElementById('profileIncompleteBanner').style.display = 'block';
 }
 }
+
 async function loadTherapists() {
 console.log('🔵 Loading therapists...');
 const container = document.getElementById('therapistsGrid');
+
 try {
 const { data: therapists, error } = await window.supabaseClient
 .from('Therapists')
 .select('*')
 .order('Name', { ascending: true });
+
 console.log('🔵 Therapists ', therapists);
+
 if (error) throw error;
+
 if (!therapists || therapists.length === 0) {
 container.innerHTML = '<div class="empty-state">No therapists available at the moment</div>';
 return;
 }
+
 allTherapists = therapists;
 displayTherapists(therapists);
 console.log('🟢 Loaded', therapists.length, 'therapists');
@@ -399,9 +497,11 @@ console.error('🔴 Error loading therapists:', error);
 container.innerHTML = '<div class="empty-state">Error loading therapists: ' + error.message + '</div>';
 }
 }
+
 function displayTherapists(therapists) {
 const container = document.getElementById('therapistsGrid');
 const bookingDisabled = !isProfileComplete;
+
 container.innerHTML = therapists.map(t => `
 <div class="therapist-card">
 <h3 class="therapist-name">Dr. ${t.Name || 'Therapist'}</h3>
@@ -446,6 +546,7 @@ required></textarea>
 </div>
 `).join('');
 }
+
 function filterTherapists() {
 const specialization = document.getElementById('specializationFilter').value;
 if (specialization === 'all') {
@@ -455,24 +556,30 @@ const filtered = allTherapists.filter(t => t.Specialization === specialization);
 displayTherapists(filtered);
 }
 }
+
 async function bookSession(therapistId, therapistName, fee) {
 if (!isProfileComplete) {
 alert('⚠️ Please complete your profile before booking a session');
 openProfileModal();
 return;
 }
+
 const date = document.getElementById('date-' + therapistId).value;
 const time = document.getElementById('time-' + therapistId).value;
 const problemDesc = document.getElementById('problem-' + therapistId).value.trim();
+
 if (!date || !time) {
 alert('Please select both date and time');
 return;
 }
+
 if (!problemDesc) {
 alert('Please describe what you\'d like to work on');
 return;
 }
+
 console.log('🔵 Booking session:', { therapistId, date, time, problemDesc });
+
 try {
 // Check for booking conflicts (same date + time slot)
 const { data: conflictingBookings, error: conflictError } = await window.supabaseClient
@@ -482,11 +589,14 @@ const { data: conflictingBookings, error: conflictError } = await window.supabas
 .eq('session_date', date)
 .eq('start_time', time)
 .in('status', ['pending', 'confirmed']);
+
 if (conflictError) throw conflictError;
+
 if (conflictingBookings && conflictingBookings.length > 0) {
 alert('⚠️ You already have a booking at this time slot. Please choose a different time.');
 return;
 }
+
 // Calculate session end time (assuming 1-hour sessions)
 const startHour = parseInt(time.split(':')[0]);
 const isPM = time.includes('PM');
@@ -495,6 +605,7 @@ if (isPM && startHour !== 12) {
 endHour = (startHour + 1) % 12;
 }
 const endTime = endHour + ':00 ' + (isPM ? 'PM' : 'AM');
+
 // Create booking
 const bookingData = {
 user_id: currentUser.id,
@@ -508,18 +619,24 @@ patient_name: currentUserProfile?.full_name || currentUser.email,
 patient_email: currentUser.email,
 problem_description: problemDesc
 };
+
 console.log('🔵 Creating booking:', bookingData);
+
 const { data, error } = await window.supabaseClient
 .from('Bookings')
 .insert([bookingData])
 .select();
+
 if (error) throw error;
+
 console.log('🟢 Booking created:', data);
 alert('✅ Session booked successfully! The therapist will confirm your appointment soon.');
+
 // Clear form
 document.getElementById('date-' + therapistId).value = '';
 document.getElementById('time-' + therapistId).value = '';
 document.getElementById('problem-' + therapistId).value = '';
+
 // Reload bookings
 await loadBookings();
 } catch (error) {
@@ -527,29 +644,37 @@ console.error('🔴 Booking error:', error);
 alert('Error booking session: ' + error.message);
 }
 }
+
 async function loadBookings() {
 console.log('🔵 Loading bookings...');
 const container = document.getElementById('bookingsList');
 const sortBy = document.getElementById('bookingSortFilter').value;
 const statusFilter = document.getElementById('bookingStatusFilter').value;
+
 console.log('🔵 Filters:', { sortBy, statusFilter, userId: currentUser.id });
+
 try {
 let query = window.supabaseClient
 .from('Bookings')
 .select('*')
 .eq('user_id', currentUser.id);
+
 // Apply status filter
 if (statusFilter !== 'all') {
 query = query.eq('status', statusFilter);
 }
+
 // Apply sorting
 if (sortBy === 'upcoming') {
 query = query.order('session_date', { ascending: true });
 } else {
 query = query.order('session_date', { ascending: false });
 }
+
 const { data: bookings, error } = await query;
+
 console.log('🔵 Bookings query result:', { bookings, error, count: bookings?.length });
+
 // DEBUG: Log user_id values in bookings for troubleshooting
 if (bookings && bookings.length > 0) {
 console.log('🔵 Sample booking user_ids:', bookings.slice(0, 3).map(b => ({ id: b.id, user_id: b.user_id })));
@@ -557,28 +682,34 @@ console.log('🔵 Sample booking user_ids:', bookings.slice(0, 3).map(b => ({ id
 const userIdMatches = bookings.every(b => b.user_id === currentUser.id);
 console.log('🔵 All user_id matches current user:', userIdMatches);
 }
+
 if (error) throw error;
+
 if (!bookings || bookings.length === 0) {
 container.innerHTML = '<div class="empty-state">No bookings found</div>';
 return;
 }
+
 // Get therapist details
 const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
 const { data: therapists } = await window.supabaseClient
 .from('Therapists')
 .select('id, Name, Specialization')
 .in('id', therapistIds);
+
 const therapistMap = {};
 if (therapists) {
 therapists.forEach(t => {
 therapistMap[t.id] = t;
 });
 }
+
 // Display bookings
 container.innerHTML = bookings.map(booking => {
 const therapist = therapistMap[booking.therapist_id] || {};
 const statusClass = 'status-' + booking.status;
 const hasTherapistReschedule = booking.therapist_reschedule_requested === true;
+
 return `
 <div class="booking-card">
 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
@@ -692,12 +823,14 @@ ${booking.status === 'completed' ? `
 </div>
 `;
 }).join('');
+
 console.log('🟢 Loaded', bookings.length, 'bookings');
 } catch (error) {
 console.error('🔴 Error loading bookings:', error);
 container.innerHTML = '<div class="empty-state">Error: ' + error.message + '</div>';
 }
 }
+
 function formatDate(dateString) {
 if (!dateString) return 'N/A';
 const date = new Date(dateString);
@@ -707,20 +840,25 @@ month: 'short',
 day: 'numeric'
 });
 }
+
 function handleProfilePictureChange(event) {
 const file = event.target.files[0];
 if (!file) return;
+
 // Validate file size (2MB max)
 if (file.size > 2 * 1024 * 1024) {
 alert('File size must be less than 2MB');
 return;
 }
+
 // Validate file type
 if (!file.type.startsWith('image/')) {
 alert('Please select an image file');
 return;
 }
+
 uploadedProfilePicture = file;
+
 // Preview image
 const reader = new FileReader();
 reader.onload = function(e) {
@@ -730,8 +868,10 @@ document.getElementById('profilePicturePreview').innerHTML = `
 };
 reader.readAsDataURL(file);
 }
+
 async function acceptTherapistReschedule(bookingId, newDate, newTime) {
 console.log('🔵 Accepting therapist reschedule:', bookingId);
+
 try {
 const { data, error } = await window.supabaseClient
 .from('Bookings')
@@ -745,7 +885,9 @@ therapist_reschedule_reason: null
 })
 .eq('id', bookingId)
 .select();
+
 if (error) throw error;
+
 console.log('🟢 Reschedule accepted:', data);
 alert('✅ Reschedule accepted! Your session has been updated.');
 await loadBookings();
@@ -754,12 +896,14 @@ console.error('🔴 Error accepting reschedule:', error);
 alert('Error: ' + error.message);
 }
 }
+
 function openRescheduleModal(bookingId) {
 currentRescheduleBookingId = bookingId;
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('rescheduleDate').min = today;
 document.getElementById('rescheduleModal').classList.add('active');
 }
+
 function closeRescheduleModal() {
 currentRescheduleBookingId = null;
 document.getElementById('rescheduleDate').value = '';
@@ -767,12 +911,15 @@ document.getElementById('rescheduleTime').value = '';
 document.getElementById('rescheduleReason').value = '';
 document.getElementById('rescheduleModal').classList.remove('active');
 }
+
 async function submitReschedule(event) {
 event.preventDefault();
 console.log('🔵 Submitting reschedule request...');
+
 const newDate = document.getElementById('rescheduleDate').value;
 const newTime = document.getElementById('rescheduleTime').value;
 const reason = document.getElementById('rescheduleReason').value;
+
 try {
 const { data, error } = await window.supabaseClient
 .from('Bookings')
@@ -788,7 +935,9 @@ therapist_reschedule_reason: null
 })
 .eq('id', currentRescheduleBookingId)
 .select();
+
 if (error) throw error;
+
 console.log('🟢 Reschedule request sent:', data);
 alert('✅ Reschedule request sent to therapist!');
 closeRescheduleModal();
@@ -798,18 +947,23 @@ console.error('🔴 Error requesting reschedule:', error);
 alert('Error: ' + error.message);
 }
 }
+
 async function cancelBooking(bookingId) {
 if (!confirm('Are you sure you want to cancel this booking?')) {
 return;
 }
+
 console.log('🔵 Cancelling booking:', bookingId);
+
 try {
 const { data, error } = await window.supabaseClient
 .from('Bookings')
 .delete()
 .eq('id', bookingId)
 .select();
+
 if (error) throw error;
+
 console.log('🟢 Booking cancelled:', data);
 alert('✅ Booking cancelled successfully');
 await loadBookings();
@@ -818,8 +972,10 @@ console.error('🔴 Error cancelling booking:', error);
 alert('Error: ' + error.message);
 }
 }
+
 function openProfileModal() {
 console.log('🔵 Opening profile modal. Current profile:', currentUserProfile);
+
 if (currentUserProfile) {
 document.getElementById('profileName').value = currentUserProfile.full_name || '';
 document.getElementById('profileEmail').value = currentUser.email;
@@ -830,6 +986,7 @@ document.getElementById('profileCity').value = currentUserProfile.city || '';
 document.getElementById('profileAddress').value = currentUserProfile.address || '';
 document.getElementById('profileEmergencyName').value = currentUserProfile.emergency_contact_name || '';
 document.getElementById('profileEmergencyPhone').value = currentUserProfile.emergency_contact_phone || '';
+
 // Display existing profile picture if available
 if (currentUserProfile.profile_picture_url) {
 document.getElementById('profilePicturePreview').innerHTML = `
@@ -843,37 +1000,47 @@ document.getElementById('profilePicturePreview').innerHTML = `
 `;
 }
 }
+
 document.getElementById('profileModal').classList.add('active');
 }
+
 function closeProfileModal() {
 uploadedProfilePicture = null;
 document.getElementById('profileModal').classList.remove('active');
 }
+
 async function saveProfile(event) {
 event.preventDefault();
 console.log('🔵 Saving profile...');
+
 try {
 let profilePictureUrl = currentUserProfile?.profile_picture_url || null;
+
 // Upload profile picture if selected
 if (uploadedProfilePicture) {
 console.log('🔵 Uploading profile picture...');
 const fileExt = uploadedProfilePicture.name.split('.').pop();
 const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
 const filePath = `${fileName}`;
+
 const { data: uploadData, error: uploadError } = await window.supabaseClient.storage
 .from('profile-pictures')
 .upload(filePath, uploadedProfilePicture, {
 cacheControl: '3600',
 upsert: true
 });
+
 if (uploadError) throw uploadError;
+
 // Get public URL
 const { data: urlData } = window.supabaseClient.storage
 .from('profile-pictures')
 .getPublicUrl(filePath);
+
 profilePictureUrl = urlData.publicUrl;
 console.log('🟢 Profile picture uploaded:', profilePictureUrl);
 }
+
 const profileData = {
 full_name: document.getElementById('profileName').value.trim(),
 phone: document.getElementById('profilePhone').value.trim(),
@@ -885,14 +1052,18 @@ emergency_contact_name: document.getElementById('profileEmergencyName').value.tr
 emergency_contact_phone: document.getElementById('profileEmergencyPhone').value.trim() || null,
 profile_picture_url: profilePictureUrl
 };
+
 console.log('🔵 Updating profile with ', profileData);
+
 const { data, error } = await window.supabaseClient
 .from('profiles')
 .update(profileData)
 .eq('user_id', currentUser.id)
 .select()
 .single();
+
 if (error) throw error;
+
 console.log('🟢 Profile updated:', data);
 alert('✅ Profile updated successfully!');
 currentUserProfile = data;
@@ -905,14 +1076,107 @@ console.error('🔴 Error saving profile:', error);
 alert('Error: ' + error.message);
 }
 }
+
+// Delete Account Functions
+function confirmDeleteAccount() {
+document.getElementById('deleteAccountModal').classList.add('active');
+document.getElementById('deleteConfirmation').value = '';
+}
+
+function closeDeleteAccountModal() {
+document.getElementById('deleteAccountModal').classList.remove('active');
+document.getElementById('deleteConfirmation').value = '';
+}
+
+async function executeDeleteAccount() {
+const confirmation = document.getElementById('deleteConfirmation').value;
+
+if (confirmation !== 'DELETE') {
+alert('❌ Please type "DELETE" exactly as shown to confirm account deletion.');
+return;
+}
+
+console.log('🔵 Initiating account deletion for user:', currentUser.id);
+
+try {
+// 1. Delete all user bookings
+console.log('🔵 Deleting user bookings...');
+const { error: bookingsError } = await window.supabaseClient
+.from('Bookings')
+.delete()
+.eq('user_id', currentUser.id);
+
+if (bookingsError) {
+console.error('🔴 Error deleting bookings:', bookingsError);
+throw bookingsError;
+}
+console.log('🟢 Bookings deleted');
+
+// 2. Delete profile picture from storage if exists
+if (currentUserProfile?.profile_picture_url) {
+console.log('🔵 Deleting profile picture...');
+try {
+const fileName = currentUserProfile.profile_picture_url.split('/').pop();
+const { error: storageError } = await window.supabaseClient.storage
+.from('profile-pictures')
+.remove([fileName]);
+
+if (storageError) {
+console.warn('🟡 Could not delete profile picture:', storageError);
+}
+} catch (storageErr) {
+console.warn('🟡 Profile picture deletion failed:', storageErr);
+}
+}
+
+// 3. Delete user profile
+console.log('🔵 Deleting user profile...');
+const { error: profileError } = await window.supabaseClient
+.from('profiles')
+.delete()
+.eq('user_id', currentUser.id);
+
+if (profileError) {
+console.error('🔴 Error deleting profile:', profileError);
+throw profileError;
+}
+console.log('🟢 Profile deleted');
+
+// 4. Sign out user (this effectively revokes access)
+console.log('🔵 Signing out user...');
+await window.supabaseClient.auth.signOut();
+
+console.log('🟢 Account deletion completed successfully');
+
+// Clear local storage
+localStorage.removeItem('user');
+localStorage.clear();
+
+alert('✅ Your account has been permanently deleted. You will now be redirected to the homepage.');
+
+// Redirect to homepage
+window.location.href = 'index.html';
+
+} catch (error) {
+console.error('🔴 Error during account deletion:', error);
+alert('❌ Error deleting account: ' + error.message + '\n\nPlease contact support if the problem persists.');
+}
+}
+
+// Update window click handler to include delete modal
 window.onclick = function(event) {
 const profileModal = document.getElementById('profileModal');
 const rescheduleModal = document.getElementById('rescheduleModal');
+const deleteModal = document.getElementById('deleteAccountModal');
+
 if (event.target === profileModal) {
 closeProfileModal();
 }
 if (event.target === rescheduleModal) {
 closeRescheduleModal();
+}
+if (event.target === deleteModal) {
+closeDeleteAccountModal();
 }
 }
 </script>
