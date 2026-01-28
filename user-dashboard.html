@@ -287,10 +287,15 @@ alert('Please login as a user to access this page');
 window.location.href = 'login.html';
 return;
 }
-// Set min date for booking
-const today = new Date().toISOString().split('T')[0];
+// Set max date for DOB (18 years ago) and min date for future dates
+const today = new Date();
+const maxDOB = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+const minFuture = today.toISOString().split('T')[0];
+document.getElementById('profileDOB').max = maxDOB.toISOString().split('T')[0];
 document.querySelectorAll('input[type="date"]').forEach(input => {
-input.min = today;
+if (input.id !== 'profileDOB') {
+input.min = minFuture;
+}
 });
 await loadUserProfile();
 await loadTherapists();
@@ -347,6 +352,7 @@ email: currentUser.email,
 role: currentUser.role,
 full_name: null,
 phone: null,
+date_of_date: null,
 date_of_birth: null,
 gender: null,
 city: null,
@@ -379,7 +385,7 @@ const { data: therapists, error } = await window.supabaseClient
 .from('Therapists')
 .select('*')
 .order('Name', { ascending: true });
-console.log('🔵 Therapists data:', therapists);
+console.log('🔵 Therapists ', therapists);
 if (error) throw error;
 if (!therapists || therapists.length === 0) {
 container.innerHTML = '<div class="empty-state">No therapists available at the moment</div>';
@@ -547,6 +553,9 @@ console.log('🔵 Bookings query result:', { bookings, error, count: bookings?.l
 // DEBUG: Log user_id values in bookings for troubleshooting
 if (bookings && bookings.length > 0) {
 console.log('🔵 Sample booking user_ids:', bookings.slice(0, 3).map(b => ({ id: b.id, user_id: b.user_id })));
+// Verify user_id matches
+const userIdMatches = bookings.every(b => b.user_id === currentUser.id);
+console.log('🔵 All user_id matches current user:', userIdMatches);
 }
 if (error) throw error;
 if (!bookings || bookings.length === 0) {
@@ -876,7 +885,7 @@ emergency_contact_name: document.getElementById('profileEmergencyName').value.tr
 emergency_contact_phone: document.getElementById('profileEmergencyPhone').value.trim() || null,
 profile_picture_url: profilePictureUrl
 };
-console.log('🔵 Updating profile with data:', profileData);
+console.log('🔵 Updating profile with ', profileData);
 const { data, error } = await window.supabaseClient
 .from('profiles')
 .update(profileData)
@@ -886,7 +895,7 @@ const { data, error } = await window.supabaseClient
 if (error) throw error;
 console.log('🟢 Profile updated:', data);
 alert('✅ Profile updated successfully!');
-currentUserProfile = data[0] || data;
+currentUserProfile = data;
 document.getElementById('userName').textContent = currentUserProfile.full_name || currentUser.email;
 checkProfileComplete();
 displayTherapists(allTherapists);
