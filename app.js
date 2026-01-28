@@ -1,3 +1,4 @@
+/* Copy the app.js content exactly as provided */
 // MindSpace - Main Application JavaScript
 
 // Supabase Configuration
