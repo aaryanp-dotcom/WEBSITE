@@ -361,12 +361,11 @@
             console.log('🔵 Current user ID:', currentUser.id);
             
             try {
-                // Try with single() first
                 let { data, error } = await window.supabaseClient
                     .from('profiles')
                     .select('*')
                     .eq('user_id', currentUser.id)
-                    .maybeSingle();  // Changed from .single() to .maybeSingle()
+                    .maybeSingle();
                 
                 console.log('🔵 Profile query result:', { data, error });
                 
@@ -377,23 +376,30 @@
                 
                 if (!data) {
                     console.log('🟡 No profile found, creating one...');
-                    // Create profile if it doesn't exist
+                    // Create profile if it doesn't exist - include ALL required fields
                     const { data: newProfile, error: createError } = await window.supabaseClient
                         .from('profiles')
                         .insert([{
                             user_id: currentUser.id,
                             email: currentUser.email,
-                            role: currentUser.role,
+                            role: currentUser.role,  // CRITICAL: This was missing
                             full_name: null,
                             phone: null,
                             date_of_birth: null,
                             gender: null,
-                            city: null
+                            city: null,
+                            address: null,
+                            emergency_contact_name: null,
+                            emergency_contact_phone: null,
+                            profile_picture_url: null
                         }])
                         .select()
                         .single();
                     
-                    if (createError) throw createError;
+                    if (createError) {
+                        console.error('🔴 Profile creation error:', createError);
+                        throw createError;
+                    }
                     data = newProfile;
                     console.log('🟢 Profile created:', data);
                 }
@@ -604,6 +610,15 @@
             console.log('🔵 Filters:', { sortBy, statusFilter, userId: currentUser.id });
             
             try {
+                // Debug: Check if we can fetch any bookings at all
+                const { data: debugData, error: debugError } = await window.supabaseClient
+                    .from('Bookings')
+                    .select('id, user_id, status, session_date')
+                    .limit(5);
+                
+                console.log('🔵 Debug - First 5 bookings in database:', debugData);
+                
+                // Now get bookings for current user
                 let query = window.supabaseClient
                     .from('Bookings')
                     .select('*')
@@ -611,7 +626,7 @@
                 
                 // Apply status filter
                 if (statusFilter !== 'all') {
-                    query = query.eq('status', statusFilter);
+                    query = query.eq('status', statusFilter.toLowerCase()); // Ensure lowercase
                 }
                 
                 // Apply sorting
@@ -623,12 +638,20 @@
                 
                 const { data: bookings, error } = await query;
                 
-                console.log('🔵 Bookings query result:', { bookings, error, count: bookings?.length });
+                console.log('🔵 Bookings query result:', { 
+                    bookings, 
+                    error, 
+                    count: bookings?.length,
+                    queryConditions: {
+                        userId: currentUser.id,
+                        statusFilter: statusFilter !== 'all' ? statusFilter : 'all'
+                    }
+                });
                 
                 if (error) throw error;
                 
                 if (!bookings || bookings.length === 0) {
-                    container.innerHTML = '<div class="empty-state">No bookings found</div>';
+                    container.innerHTML = '<div class="empty-state">No bookings found. Try changing the status filter or book your first session.</div>';
                     return;
                 }
                 
@@ -927,7 +950,21 @@
         }
         
         function openProfileModal() {
+            console.log('🔵 Opening profile modal with data:', currentUserProfile);
+            
             if (currentUserProfile) {
+                // Log what we're setting to debug
+                console.log('Profile data being set:', {
+                    name: currentUserProfile.full_name || '',
+                    phone: currentUserProfile.phone || '',
+                    dob: currentUserProfile.date_of_birth || '',
+                    gender: currentUserProfile.gender || '',
+                    city: currentUserProfile.city || '',
+                    address: currentUserProfile.address || '',
+                    emergencyName: currentUserProfile.emergency_contact_name || '',
+                    emergencyPhone: currentUserProfile.emergency_contact_phone || ''
+                });
+                
                 document.getElementById('profileName').value = currentUserProfile.full_name || '';
                 document.getElementById('profileEmail').value = currentUser.email;
                 document.getElementById('profilePhone').value = currentUserProfile.phone || '';
@@ -942,6 +979,12 @@
                 if (currentUserProfile.profile_picture_url) {
                     document.getElementById('profilePicturePreview').innerHTML = `
                         <img src="${currentUserProfile.profile_picture_url}" class="profile-picture-preview" alt="Profile">
+                    `;
+                } else {
+                    document.getElementById('profilePicturePreview').innerHTML = `
+                        <div class="profile-picture-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
                     `;
                 }
             }
@@ -1011,9 +1054,11 @@
                 console.log('🟢 Profile updated:', data);
                 alert('✅ Profile updated successfully!');
                 
+                // Update currentUserProfile with new data
                 currentUserProfile = { ...currentUserProfile, ...profileData };
-                document.getElementById('userName').textContent = profileData.full_name;
+                document.getElementById('userName').textContent = profileData.full_name || currentUser.email;
                 
+                // Refresh profile check and therapists display
                 checkProfileComplete();
                 displayTherapists(allTherapists);
                 
