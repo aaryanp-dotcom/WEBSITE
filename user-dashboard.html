@@ -1,536 +1,576 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - MindSpace</title>
-    <link rel="stylesheet" href="style.css">
+    <title>My Dashboard - MindSpace</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+
     <style>
-        .dashboard-wrapper { min-height: 100vh; background: #F5F9F8; padding-top: 80px; }
-        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
-        .dashboard-header { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
-        .welcome-title { font-size: 32px; color: #2C3E50; margin: 0 0 10px 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .stat-card.active { border: 2px solid #5A9B8E; box-shadow: 0 4px 12px rgba(90,155,142,0.2); }
-        .stat-number { font-size: 36px; font-weight: 800; color: #5A9B8E; display: block; }
-        .stat-label { font-size: 12px; color: #6B7280; text-transform: uppercase; margin-top: 8px; display: block; }
-        .dashboard-section { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
-        .section-title { font-size: 24px; color: #2C3E50; margin: 0 0 20px 0; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(90,155,142,0.3); }
-        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
-        .search-box { flex: 1; min-width: 250px; position: relative; }
-        .search-input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6B7280; }
-        .filter-select { padding: 12px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; min-width: 150px; }
-        .appointments-list { display: flex; flex-direction: column; gap: 16px; }
-        .appointment-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
-        .therapist-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 4px 0; }
-        .therapist-spec { font-size: 14px; color: #6B7280; margin: 0 0 8px 0; }
-        .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
-        .status-pending { background: #FFF3CD; color: #856404; }
-        .status-confirmed { background: #D4EDDA; color: #155724; }
-        .status-completed { background: #D1ECF1; color: #0C5460; }
-        .status-cancelled { background: #F8D7DA; color: #721C24; }
-        .status-rejected { background: #F8D7DA; color: #721C24; }
-        .btn-cancel { padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-right: 10px; }
-        .btn-cancel:hover { background: #d32f2f; }
-        .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
-        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: white; border-radius: 16px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .modal-title { font-size: 24px; font-weight: 700; color: #2C3E50; margin: 0; }
-        .btn-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280; padding: 0; width: 32px; height: 32px; }
-        .btn-close:hover { color: #2C3E50; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; margin-bottom: 8px; color: #2C3E50; font-weight: 600; font-size: 14px; }
-        .form-input, .form-textarea, .form-select { padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; width: 100%; font-family: inherit; font-size: 14px; }
-        .form-textarea { resize: vertical; min-height: 100px; }
-        .btn-secondary { padding: 12px 24px; background: #E5E7EB; color: #4B5563; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; margin-right: 10px; }
-        .btn-secondary:hover { background: #D1D5DB; }
+        .dashboard-wrapper {
+            min-height: 100vh;
+            background-color: var(--color-neutral-50);
+            padding-top: var(--navbar-height);
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-2xl) var(--space-xl);
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, rgba(123, 165, 145, 0.15) 0%, rgba(45, 95, 93, 0.08) 100%);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-3xl);
+            margin-bottom: var(--space-2xl);
+            text-align: center;
+        }
+
+        .welcome-section h1 {
+            font-size: var(--font-size-3xl);
+            color: var(--color-neutral-700);
+            margin-bottom: var(--space-md);
+        }
+
+        .welcome-section p {
+            color: var(--color-neutral-500);
+            font-size: var(--font-size-lg);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid var(--color-neutral-100);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-primary);
+        }
+
+        .action-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-lg);
+            font-size: var(--font-size-2xl);
+            color: white;
+        }
+
+        .action-card h3 {
+            font-size: var(--font-size-lg);
+            color: var(--color-neutral-700);
+            margin-bottom: var(--space-sm);
+        }
+
+        .action-card p {
+            color: var(--color-neutral-500);
+            font-size: var(--font-size-sm);
+            margin-bottom: 0;
+        }
+
+        .section {
+            background: white;
+            border: 1px solid var(--color-neutral-100);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--color-neutral-100);
+        }
+
+        .section-title {
+            font-size: var(--font-size-2xl);
+            color: var(--color-neutral-700);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .section-title i {
+            color: var(--color-primary);
+        }
+
+        .booking-card {
+            background: var(--color-neutral-50);
+            border: 1px solid var(--color-neutral-100);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            transition: all var(--transition-base);
+        }
+
+        .booking-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--space-lg);
+        }
+
+        .therapist-info {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .therapist-avatar {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            color: white;
+            font-size: var(--font-size-lg);
+        }
+
+        .therapist-details h4 {
+            font-size: var(--font-size-lg);
+            color: var(--color-neutral-700);
+            margin-bottom: var(--space-xs);
+        }
+
+        .therapist-details p {
+            font-size: var(--font-size-sm);
+            color: var(--color-neutral-500);
+            margin-bottom: 0;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--color-neutral-600);
+            font-size: var(--font-size-sm);
+        }
+
+        .detail-item i {
+            color: var(--color-primary);
+            width: 20px;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pending {
+            background-color: rgba(212, 165, 116, 0.15);
+            color: var(--color-warning);
+        }
+
+        .status-confirmed {
+            background-color: rgba(95, 138, 119, 0.15);
+            color: var(--color-success);
+        }
+
+        .status-cancelled {
+            background-color: rgba(199, 123, 115, 0.15);
+            color: var(--color-error);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-4xl) var(--space-xl);
+            color: var(--color-neutral-400);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: var(--font-size-xl);
+            color: var(--color-neutral-500);
+            margin-bottom: var(--space-md);
+        }
+
+        .empty-state p {
+            margin-bottom: var(--space-xl);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: var(--space-lg);
+            }
+
+            .welcome-section {
+                padding: var(--space-2xl);
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-header {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+
+            .booking-details {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <span class="logo-icon">🧠</span>
-                <span class="logo-text">MindSpace</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="user-dashboard.html" class="active">Dashboard</a></li>
-                <li><a href="find-therapist.html">Find Therapist</a></li>
-                <li><a href="#" onclick="openProfileModal()">Profile</a></li>
-                <li><a href="#" onclick="logout()" class="btn-logout">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
-
     <div class="dashboard-wrapper">
-        <div class="dashboard-container">
-            <!-- Dashboard Header -->
-            <div class="dashboard-header">
-                <h1 class="welcome-title" id="welcomeMessage">Welcome back, User!</h1>
-                <p style="color: #6B7280; font-size: 14px;">Manage your therapy sessions and track your progress</p>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧠</span>
+                    <span class="logo-text">MindSpace</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="user-dashboard.html" class="active">My Dashboard</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><button onclick="logout()" class="btn btn-primary btn-sm">Logout</button></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="dashboard-container">
+            <div class="welcome-section">
+                <h1>Welcome back, <span id="userName">User</span>!</h1>
+                <p>Your mental wellness journey continues here</p>
             </div>
 
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card" onclick="filterByStatus('all')">
-                    <span class="stat-number" id="totalBookings">0</span>
-                    <span class="stat-label">Total Sessions</span>
-                </div>
-                <div class="stat-card" onclick="filterByStatus('pending')">
-                    <span class="stat-number" id="pendingBookings">0</span>
-                    <span class="stat-label">Pending</span>
-                </div>
-                <div class="stat-card" onclick="filterByStatus('confirmed')">
-                    <span class="stat-number" id="confirmedBookings">0</span>
-                    <span class="stat-label">Upcoming</span>
-                </div>
-                <div class="stat-card" onclick="filterByStatus('completed')">
-                    <span class="stat-number" id="completedBookings">0</span>
-                    <span class="stat-label">Completed</span>
-                </div>
-            </div>
-
-            <!-- My Sessions Section -->
-            <div class="dashboard-section">
-                <div class="section-header">
-                    <h2 class="section-title">My Sessions</h2>
-                    <a href="find-therapist.html" class="btn-primary">
-                        <i class="fas fa-plus"></i> Book New Session
-                    </a>
-                </div>
-                
-                <!-- Filter Bar -->
-                <div class="filter-bar">
-                    <div class="search-box">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Search by therapist name..." onkeyup="searchSessions()">
+            <div class="quick-actions">
+                <div class="action-card" onclick="window.location.href='find-therapist.html'">
+                    <div class="action-icon">
+                        <i class="fas fa-search"></i>
                     </div>
-                    <select id="statusFilter" class="filter-select" onchange="filterSessions()">
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                    <select id="dateFilter" class="filter-select" onchange="filterSessions()">
-                        <option value="all">All Dates</option>
-                        <option value="upcoming">Upcoming</option>
-                        <option value="past">Past</option>
-                    </select>
+                    <h3>Find a Therapist</h3>
+                    <p>Browse our network of licensed professionals</p>
                 </div>
 
-                <!-- Sessions List -->
-                <div id="sessionsList" class="appointments-list">
-                    <div class="loading">Loading sessions...</div>
+                <div class="action-card" onclick="window.location.href='book-session.html'">
+                    <div class="action-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h3>Book a Session</h3>
+                    <p>Schedule your next appointment</p>
+                </div>
+
+                <div class="action-card" onclick="window.location.href='profile.html'">
+                    <div class="action-icon">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                    <h3>Update Profile</h3>
+                    <p>Manage your personal information</p>
                 </div>
             </div>
-        </div>
+
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        Upcoming Sessions
+                    </h2>
+                </div>
+                <div id="upcomingSessions">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar"></i>
+                        <h3>No upcoming sessions</h3>
+                        <p>Book your first session to get started on your wellness journey</p>
+                        <a href="find-therapist.html" class="btn btn-primary">Find a Therapist</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Past Sessions
+                    </h2>
+                </div>
+                <div id="pastSessions">
+                    <div class="empty-state">
+                        <i class="fas fa-clock"></i>
+                        <h3>No past sessions</h3>
+                        <p>Your session history will appear here</p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Profile Modal -->
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Edit Profile</h2>
-                <button class="btn-close" onclick="closeProfileModal()">&times;</button>
-            </div>
-            <form onsubmit="saveProfile(event)">
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" id="profileFullName" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="profileEmail" class="form-input" disabled>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" id="profilePhone" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date of Birth</label>
-                    <input type="date" id="profileDOB" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Gender</label>
-                    <select id="profileGender" class="form-select">
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                        <option value="Prefer not to say">Prefer not to say</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">City</label>
-                    <input type="text" id="profileCity" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Address</label>
-                    <textarea id="profileAddress" class="form-textarea" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Emergency Contact Name</label>
-                    <input type="text" id="profileEmergencyName" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Emergency Contact Phone</label>
-                    <input type="tel" id="profileEmergencyPhone" class="form-input">
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
-                    <button type="button" class="btn-secondary" onclick="closeProfileModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
-    
     <script>
-// ===== FIXED USER DASHBOARD - ALL FEATURES INTACT =====
-const supabaseClient = window.supabaseClient;
-let currentUser = null;
-let currentProfile = null;
-let allSessions = [];
-let therapistMap = {};
+        let currentUser = null;
 
-// ✅ CRITICAL FIX: Initialize with proper auth
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🔵 Initializing user dashboard...');
-    
-    try {
-        // ✅ FIX: Get user from Supabase Auth instead of localStorage
-        const { data: { user: authUser }, error: authError } = await supabaseClient.auth.getUser();
-        
-        if (authError || !authUser) {
-            console.error('❌ Auth error:', authError);
-            alert('Session expired. Please login again.');
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        console.log('✅ Logged in user:', authUser.id, authUser.email);
-        
-        // Set current user with correct ID from auth
-        currentUser = {
-            id: authUser.id,
-            email: authUser.email,
-            role: 'user'
-        };
-        
-        await loadProfileData();
-        await loadSessions();
-        
-        console.log('✅ Dashboard initialized successfully');
-        
-    } catch (error) {
-        console.error('❌ Error initializing dashboard:', error);
-        alert('Error loading dashboard. Please try again.');
-        window.location.href = 'login.html';
-    }
-});
+        document.addEventListener('DOMContentLoaded', async function () {
+            currentUser = JSON.parse(localStorage.getItem('user'));
+            console.log('🔵 User dashboard loaded. User:', currentUser);
 
-// Load profile data
-async function loadProfileData() {
-    console.log('🔵 Loading profile for user:', currentUser.id);
-    try {
-        const { data, error } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single();
-        
-        if (error) throw error;
-        
-        console.log('✅ Profile loaded:', data);
-        currentProfile = data;
-        
-        // Update welcome message
-        const welcomeMsg = document.getElementById('welcomeMessage');
-        if (welcomeMsg && data) {
-            welcomeMsg.textContent = `Welcome back, ${data.full_name || 'User'}!`;
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading profile:', error);
-    }
-}
+            if (!currentUser || currentUser.role !== 'user') {
+                alert('Please login as a patient to access this page.');
+                window.location.href = 'login.html';
+                return;
+            }
 
-// Load sessions
-async function loadSessions() {
-    console.log('🔵 Loading sessions for user:', currentUser.id);
-    try {
-        const { data: bookings, error } = await supabaseClient
-            .from('Bookings')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .order('session_date', { ascending: false });
-        
-        if (error) throw error;
-        
-        console.log('✅ Sessions loaded:', bookings);
-        allSessions = bookings || [];
-        
-        // Load therapist data for all bookings
-        const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
-        for (const therapistId of therapistIds) {
-            if (!therapistMap[therapistId]) {
-                const { data: therapistData } = await supabaseClient
-                    .from('Therapists')
-                    .select('Name, Specialization, phone, email')
-                    .eq('id', therapistId)
-                    .single();
-                if (therapistData) {
-                    therapistMap[therapistId] = therapistData;
-                }
+            document.getElementById('userName').textContent = currentUser.full_name || currentUser.name || 'User';
+
+            await loadBookings();
+        });
+
+        async function loadBookings() {
+            console.log('🔵 Loading bookings for user:', currentUser.id);
+
+            try {
+                const { data: bookings, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('session_date', { ascending: true });
+
+                if (error) throw error;
+
+                console.log('🔵 Bookings loaded:', bookings);
+
+                const now = new Date();
+                now.setHours(0, 0, 0, 0);
+
+                const upcoming = bookings.filter(b => {
+                    const sessionDate = new Date(b.session_date);
+                    return sessionDate >= now && b.status !== 'cancelled';
+                });
+
+                const past = bookings.filter(b => {
+                    const sessionDate = new Date(b.session_date);
+                    return sessionDate < now || b.status === 'cancelled';
+                });
+
+                displayUpcomingSessions(upcoming);
+                displayPastSessions(past);
+
+            } catch (error) {
+                console.error('🔴 Error loading bookings:', error);
             }
         }
-        
-        updateStatistics();
-        displaySessions(allSessions);
-        
-    } catch (error) {
-        console.error('❌ Error loading sessions:', error);
-        const sessionsList = document.getElementById('sessionsList');
-        if (sessionsList) {
-            sessionsList.innerHTML = '<div class="empty-state">❌ Error loading sessions</div>';
-        }
-    }
-}
 
-// Update statistics
-function updateStatistics() {
-    const total = allSessions.length;
-    const pending = allSessions.filter(s => s.status === 'pending').length;
-    const confirmed = allSessions.filter(s => s.status === 'confirmed').length;
-    const completed = allSessions.filter(s => s.status === 'completed').length;
-    
-    document.getElementById('totalBookings').textContent = total;
-    document.getElementById('pendingBookings').textContent = pending;
-    document.getElementById('confirmedBookings').textContent = confirmed;
-    document.getElementById('completedBookings').textContent = completed;
-}
+        async function displayUpcomingSessions(bookings) {
+            const container = document.getElementById('upcomingSessions');
 
-// Display sessions
-function displaySessions(sessions) {
-    const sessionsList = document.getElementById('sessionsList');
-    
-    if (!sessions || sessions.length === 0) {
-        sessionsList.innerHTML = '<div class="empty-state">📅 No sessions found. Book your first session!</div>';
-        return;
-    }
-    
-    sessionsList.innerHTML = '';
-    
-    sessions.forEach(session => {
-        const therapist = therapistMap[session.therapist_id] || { Name: 'Unknown', Specialization: '' };
-        const card = createSessionCard(session, therapist);
-        sessionsList.innerHTML += card;
-    });
-}
-
-// Create session card HTML
-function createSessionCard(session, therapist) {
-    const date = new Date(session.session_date).toLocaleDateString('en-IN', { 
-        day: 'numeric', 
-        month: 'short', 
-        year: 'numeric' 
-    });
-    
-    let actions = '';
-    if (session.status === 'pending' || session.status === 'confirmed') {
-        actions = `<button class="btn-cancel" onclick="cancelSession('${session.id}')">Cancel Session</button>`;
-    }
-    
-    return `
-        <div class="appointment-card">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                <div>
-                    <h3 class="therapist-name">Dr. ${therapist.Name}</h3>
-                    <p class="therapist-spec">${therapist.Specialization}</p>
-                </div>
-                <span class="status-badge status-${session.status}">${session.status}</span>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
-                <div><strong>📅 Date:</strong> ${date}</div>
-                <div><strong>⏰ Time:</strong> ${session.session_time || 'TBD'}</div>
-            </div>
-            ${session.problem_description ? `<div style="margin-bottom: 15px; padding: 10px; background: #FFF7ED; border-radius: 8px;"><strong>Your Concern:</strong> ${session.problem_description}</div>` : ''}
-            ${session.session_notes ? `<div style="margin-bottom: 15px; padding: 10px; background: #E0F2FE; border-radius: 8px;"><strong>Session Notes:</strong> ${session.session_notes}</div>` : ''}
-            ${session.therapist_reschedule_reason ? `<div style="margin-bottom: 15px; padding: 10px; background: #FEF3C7; border-radius: 8px;"><strong>⚠️ Therapist Note:</strong> ${session.therapist_reschedule_reason}</div>` : ''}
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                ${actions}
-            </div>
-        </div>
-    `;
-}
-
-// Filter sessions by status
-function filterByStatus(status) {
-    document.getElementById('statusFilter').value = status;
-    
-    // Update active stat card
-    document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
-    if (event && event.target) {
-        event.target.closest('.stat-card').classList.add('active');
-    }
-    
-    filterSessions();
-}
-
-// Filter sessions
-function filterSessions() {
-    const statusFilter = document.getElementById('statusFilter').value;
-    const dateFilter = document.getElementById('dateFilter').value;
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    
-    let filtered = allSessions;
-    
-    // Filter by status
-    if (statusFilter !== 'all') {
-        filtered = filtered.filter(s => s.status === statusFilter);
-    }
-    
-    // Filter by date
-    if (dateFilter !== 'all') {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        filtered = filtered.filter(s => {
-            const sessionDate = new Date(s.session_date);
-            sessionDate.setHours(0, 0, 0, 0);
-            
-            if (dateFilter === 'upcoming') {
-                return sessionDate >= today;
-            } else if (dateFilter === 'past') {
-                return sessionDate < today;
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar"></i>
+                        <h3>No upcoming sessions</h3>
+                        <p>Book your first session to get started on your wellness journey</p>
+                        <a href="find-therapist.html" class="btn btn-primary">Find a Therapist</a>
+                    </div>
+                `;
+                return;
             }
-            return true;
-        });
-    }
-    
-    // Filter by search term
-    if (searchTerm) {
-        filtered = filtered.filter(s => {
-            const therapist = therapistMap[s.therapist_id] || {};
-            return (therapist.Name || '').toLowerCase().includes(searchTerm) ||
-                   (therapist.Specialization || '').toLowerCase().includes(searchTerm);
-        });
-    }
-    
-    displaySessions(filtered);
-}
 
-// Search sessions
-function searchSessions() {
-    filterSessions();
-}
+            const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
+            const { data: therapists } = await window.supabaseClient
+                .from('Therapists')
+                .select('*')
+                .in('id', therapistIds);
 
-// Cancel session
-async function cancelSession(sessionId) {
-    if (!confirm('Are you sure you want to cancel this session?')) return;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('Bookings')
-            .update({ status: 'cancelled' })
-            .eq('id', sessionId);
-        
-        if (error) throw error;
-        
-        alert('✅ Session cancelled');
-        await loadSessions();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error cancelling session');
-    }
-}
+            const therapistMap = {};
+            (therapists || []).forEach(t => { therapistMap[t.id] = t; });
 
-// Open profile modal
-function openProfileModal() {
-    if (!currentProfile) {
-        alert('Profile data not loaded');
-        return;
-    }
-    
-    document.getElementById('profileFullName').value = currentProfile.full_name || '';
-    document.getElementById('profileEmail').value = currentProfile.email || '';
-    document.getElementById('profilePhone').value = currentProfile.phone || '';
-    document.getElementById('profileDOB').value = currentProfile.date_of_birth || '';
-    document.getElementById('profileGender').value = currentProfile.gender || '';
-    document.getElementById('profileCity').value = currentProfile.city || '';
-    document.getElementById('profileAddress').value = currentProfile.address || '';
-    document.getElementById('profileEmergencyName').value = currentProfile.emergency_contact_name || '';
-    document.getElementById('profileEmergencyPhone').value = currentProfile.emergency_contact_phone || '';
-    
-    // ✅ FIX: Set max date for birthday to prevent future dates
-    const today = new Date();
-    document.getElementById('profileDOB').max = today.toISOString().split('T')[0];
-    
-    document.getElementById('profileModal').classList.add('active');
-}
+            container.innerHTML = bookings.map(booking => {
+                const therapist = therapistMap[booking.therapist_id] || {};
+                const initials = (therapist.Name || 'T').split(' ').map(n => n[0]).join('').toUpperCase();
+                const statusClass = 'status-' + booking.status;
 
-// Close profile modal
-function closeProfileModal() {
-    document.getElementById('profileModal').classList.remove('active');
-}
+                return `
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="therapist-info">
+                                <div class="therapist-avatar">${initials}</div>
+                                <div class="therapist-details">
+                                    <h4>${therapist.Name || 'Therapist'}</h4>
+                                    <p>${therapist.Specialization || 'Mental Health Professional'}</p>
+                                </div>
+                            </div>
+                            <span class="status-badge ${statusClass}">${booking.status.toUpperCase()}</span>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${new Date(booking.session_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${booking.start_time}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span>₹${booking.amount || 700}</span>
+                            </div>
+                        </div>
+                        
+                        ${booking.status === 'confirmed' ? `
+                            <div class="booking-actions">
+                                <button class="btn btn-primary btn-sm" onclick="joinSession('${booking.id}')">
+                                    <i class="fas fa-video"></i> Join Session
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="cancelBooking('${booking.id}')">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
 
-// Save profile
-async function saveProfile(event) {
-    event.preventDefault();
-    
-    const updated = {
-        full_name: document.getElementById('profileFullName').value.trim(),
-        phone: document.getElementById('profilePhone').value.trim(),
-        date_of_birth: document.getElementById('profileDOB').value,
-        gender: document.getElementById('profileGender').value,
-        city: document.getElementById('profileCity').value.trim(),
-        address: document.getElementById('profileAddress').value.trim(),
-        emergency_contact_name: document.getElementById('profileEmergencyName').value.trim(),
-        emergency_contact_phone: document.getElementById('profileEmergencyPhone').value.trim()
-    };
-    
-    try {
-        const { error } = await supabaseClient
-            .from('profiles')
-            .update(updated)
-            .eq('user_id', currentUser.id);
-        
-        if (error) throw error;
-        
-        alert('✅ Profile updated!');
-        closeProfileModal();
-        await loadProfileData();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error updating profile');
-    }
-}
+        async function displayPastSessions(bookings) {
+            const container = document.getElementById('pastSessions');
 
-// Logout
-async function logout() {
-    try {
-        await supabaseClient.auth.signOut();
-        localStorage.clear();
-        window.location.href = 'login.html';
-    } catch (error) {
-        window.location.href = 'login.html';
-    }
-}
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clock"></i>
+                        <h3>No past sessions</h3>
+                        <p>Your session history will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const therapistIds = [...new Set(bookings.map(b => b.therapist_id))];
+            const { data: therapists } = await window.supabaseClient
+                .from('Therapists')
+                .select('*')
+                .in('id', therapistIds);
+
+            const therapistMap = {};
+            (therapists || []).forEach(t => { therapistMap[t.id] = t; });
+
+            container.innerHTML = bookings.map(booking => {
+                const therapist = therapistMap[booking.therapist_id] || {};
+                const initials = (therapist.Name || 'T').split(' ').map(n => n[0]).join('').toUpperCase();
+                const statusClass = 'status-' + booking.status;
+
+                return `
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="therapist-info">
+                                <div class="therapist-avatar">${initials}</div>
+                                <div class="therapist-details">
+                                    <h4>${therapist.Name || 'Therapist'}</h4>
+                                    <p>${therapist.Specialization || 'Mental Health Professional'}</p>
+                                </div>
+                            </div>
+                            <span class="status-badge ${statusClass}">${booking.status.toUpperCase()}</span>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${new Date(booking.session_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${booking.start_time}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span>₹${booking.amount || 700}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function cancelBooking(bookingId) {
+            if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+            try {
+                const { error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({ status: 'cancelled' })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                alert('✅ Booking cancelled successfully');
+                await loadBookings();
+            } catch (error) {
+                console.error('🔴 Error:', error);
+                alert('Error cancelling booking: ' + error.message);
+            }
+        }
+
+        function joinSession(bookingId) {
+            alert('Video session feature coming soon! Booking ID: ' + bookingId);
+        }
     </script>
 </body>
+
 </html>
