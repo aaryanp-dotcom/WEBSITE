@@ -1,725 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Therapist Dashboard - MindSpace</title>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+
     <style>
-        .dashboard-wrapper { min-height: 100vh; background: #F5F9F8; padding-top: 80px; }
-        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
-        .dashboard-header { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
-        .welcome-title { font-size: 32px; color: #2C3E50; margin: 0 0 10px 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #FFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .stat-card.active { border: 2px solid #5A9B8E; box-shadow: 0 4px 12px rgba(90,155,142,0.2); }
-        .stat-number { font-size: 36px; font-weight: 800; color: #5A9B8E; display: block; }
-        .stat-label { font-size: 12px; color: #6B7280; text-transform: uppercase; margin-top: 8px; display: block; }
-        .dashboard-section { background: #FFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
-        .section-title { font-size: 24px; color: #2C3E50; margin: 0 0 20px 0; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
-        .search-box { flex: 1; min-width: 250px; position: relative; }
-        .search-input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6B7280; }
-        .filter-select { padding: 12px 15px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; min-width: 150px; }
-        .appointments-list { display: flex; flex-direction: column; gap: 16px; }
-        .appointment-card { background: #F5F9F8; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; }
-        .patient-name { font-size: 18px; font-weight: 700; color: #2C3E50; margin: 0 0 4px 0; }
-        .patient-email { font-size: 14px; color: #6B7280; margin: 0 0 8px 0; }
-        .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
-        .status-pending { background: #FFF3CD; color: #856404; }
-        .status-confirmed { background: #D4EDDA; color: #155724; }
-        .status-completed { background: #D1ECF1; color: #0C5460; }
-        .status-cancelled { background: #F8D7DA; color: #721C24; }
-        .status-rejected { background: #F8D7DA; color: #721C24; }
-        .btn-confirm { padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-right: 10px; }
-        .btn-reject { padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-complete { padding: 10px 20px; background: #0891B2; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-right: 10px; }
-        .btn-reschedule { padding: 10px 20px; background: #F59E0B; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-confirm:hover { background: #45a049; }
-        .btn-reject:hover { background: #d32f2f; }
-        .btn-complete:hover { background: #0E7490; }
-        .btn-reschedule:hover { background: #D97706; }
-        .form-input, .form-textarea { padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; width: 100%; margin-top: 10px; font-family: inherit; }
-        .form-textarea { resize: vertical; min-height: 80px; }
-        .loading, .empty-state { text-align: center; padding: 40px; color: #6B7280; }
-        .info-box { background: #FFF7ED; padding: 15px; border-radius: 8px; border-left: 4px solid #F59E0B; margin-top: 15px; }
-        .info-box-title { font-weight: 700; color: #92400E; margin-bottom: 8px; font-size: 14px; }
-        .info-box-text { color: #78350F; font-size: 13px; line-height: 1.5; }
-        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: white; border-radius: 16px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .modal-title { font-size: 24px; font-weight: 700; color: #2C3E50; margin: 0; }
-        .btn-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280; padding: 0; width: 32px; height: 32px; }
-        .btn-close:hover { color: #2C3E50; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; margin-bottom: 8px; color: #2C3E50; font-weight: 600; font-size: 14px; }
-        .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, #5A9B8E 0%, #4A8B7E 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(90,155,142,0.3); }
-        .btn-secondary { padding: 12px 24px; background: #E5E7EB; color: #4B5563; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; margin-right: 10px; }
-        .btn-secondary:hover { background: #D1D5DB; }
-        .char-counter { text-align: right; font-size: 12px; color: #6B7280; margin-top: 5px; }
+        .dashboard-wrapper {
+            min-height: 100vh;
+            background-color: var(--color-neutral-50);
+            padding-top: var(--navbar-height);
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-2xl) var(--space-xl);
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(123, 165, 145, 0.15) 0%, rgba(45, 95, 93, 0.08) 100%);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-3xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .dashboard-header h1 {
+            font-size: var(--font-size-3xl);
+            color: var(--color-neutral-700);
+            margin-bottom: var(--space-sm);
+        }
+
+        .dashboard-header p {
+            color: var(--color-neutral-500);
+            font-size: var(--font-size-lg);
+            margin-bottom: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--color-neutral-100);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            display: block;
+            margin-bottom: var(--space-sm);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--color-neutral-400);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+        }
+
+        .section {
+            background: white;
+            border: 1px solid var(--color-neutral-100);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--color-neutral-100);
+        }
+
+        .section-title {
+            font-size: var(--font-size-2xl);
+            color: var(--color-neutral-700);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .section-title i {
+            color: var(--color-primary);
+        }
+
+        .appointment-card {
+            background: var(--color-neutral-50);
+            border: 1px solid var(--color-neutral-100);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            transition: all var(--transition-base);
+        }
+
+        .appointment-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--space-lg);
+        }
+
+        .patient-info {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .patient-avatar {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            color: white;
+            font-size: var(--font-size-lg);
+        }
+
+        .patient-details h4 {
+            font-size: var(--font-size-lg);
+            color: var(--color-neutral-700);
+            margin-bottom: var(--space-xs);
+        }
+
+        .patient-details p {
+            font-size: var(--font-size-sm);
+            color: var(--color-neutral-500);
+            margin-bottom: 0;
+        }
+
+        .appointment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--color-neutral-600);
+            font-size: var(--font-size-sm);
+        }
+
+        .detail-item i {
+            color: var(--color-primary);
+            width: 20px;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pending {
+            background-color: rgba(212, 165, 116, 0.15);
+            color: var(--color-warning);
+        }
+
+        .status-confirmed {
+            background-color: rgba(95, 138, 119, 0.15);
+            color: var(--color-success);
+        }
+
+        .status-completed {
+            background-color: rgba(74, 111, 165, 0.15);
+            color: var(--color-info);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-4xl) var(--space-xl);
+            color: var(--color-neutral-400);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: var(--font-size-xl);
+            color: var(--color-neutral-500);
+            margin-bottom: var(--space-md);
+        }
+
+        .empty-state p {
+            margin-bottom: 0;
+        }
+
+        .btn-confirm {
+            background-color: var(--color-success);
+            color: white;
+            border: none;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-confirm:hover {
+            background-color: #4A7A68;
+            transform: translateY(-1px);
+        }
+
+        .btn-reject {
+            background-color: var(--color-error);
+            color: white;
+            border: none;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-reject:hover {
+            background-color: #B06B64;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: var(--space-lg);
+            }
+
+            .dashboard-header {
+                padding: var(--space-2xl);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .appointment-header {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+
+            .appointment-details {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <!-- Navbar (same as before) -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <span class="logo-icon">🧠</span>
-                <span class="logo-text">MindSpace</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="therapist-dashboard.html" class="active">Dashboard</a></li>
-                <li><a href="#" onclick="openProfileModal()">Profile</a></li>
-                <li><a href="#" onclick="logout()" class="btn-logout">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
-
     <div class="dashboard-wrapper">
-        <div class="dashboard-container">
-            <!-- Dashboard Header -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧠</span>
+                    <span class="logo-text">MindSpace</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="therapist-dashboard.html" class="active">My Dashboard</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><button onclick="logout()" class="btn btn-primary btn-sm">Logout</button></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="dashboard-container">
             <div class="dashboard-header">
-                <h1 class="welcome-title" id="welcomeMessage">Welcome back, Dr. Therapist!</h1>
-                <p style="color: #6B7280; font-size: 14px;">Manage your appointments and patient interactions</p>
+                <h1>Welcome, Dr. <span id="therapistName">Therapist</span></h1>
+                <p>Manage your appointments and help your patients on their wellness journey</p>
             </div>
 
-            <!-- Statistics Cards -->
             <div class="stats-grid">
-                <div class="stat-card" onclick="filterByStatus('all')">
-                    <span class="stat-number" id="totalBookings">0</span>
-                    <span class="stat-label">Total Bookings</span>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalAppointments">0</span>
+                    <span class="stat-label">Total Appointments</span>
                 </div>
-                <div class="stat-card" onclick="filterByStatus('pending')">
-                    <span class="stat-number" id="pendingBookings">0</span>
-                    <span class="stat-label">Pending</span>
+                <div class="stat-card">
+                    <span class="stat-number" id="pendingRequests">0</span>
+                    <span class="stat-label">Pending Requests</span>
                 </div>
-                <div class="stat-card" onclick="filterByStatus('confirmed')">
-                    <span class="stat-number" id="confirmedBookings">0</span>
-                    <span class="stat-label">Confirmed</span>
+                <div class="stat-card">
+                    <span class="stat-number" id="todayAppointments">0</span>
+                    <span class="stat-label">Today's Sessions</span>
                 </div>
-                <div class="stat-card" onclick="filterByStatus('completed')">
-                    <span class="stat-number" id="completedBookings">0</span>
-                    <span class="stat-label">Completed</span>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalPatients">0</span>
+                    <span class="stat-label">Total Patients</span>
                 </div>
             </div>
 
-            <!-- Appointments Section -->
-            <div class="dashboard-section">
+            <section class="section">
                 <div class="section-header">
-                    <h2 class="section-title">Appointments</h2>
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Pending Appointment Requests
+                    </h2>
                 </div>
-                
-                <!-- Filter Bar -->
-                <div class="filter-bar">
-                    <div class="search-box">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Search by patient name or email..." onkeyup="searchAppointments()">
+                <div id="pendingAppointments">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No pending requests</h3>
+                        <p>New appointment requests will appear here</p>
                     </div>
-                    <select id="statusFilter" class="filter-select" onchange="filterAppointments()">
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                    <select id="dateFilter" class="filter-select" onchange="filterAppointments()">
-                        <option value="all">All Dates</option>
-                        <option value="today">Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                    </select>
                 </div>
+            </section>
 
-                <!-- Appointments List -->
-                <div id="appointmentsList" class="appointments-list">
-                    <div class="loading">Loading appointments...</div>
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        Upcoming Appointments
+                    </h2>
                 </div>
-            </div>
-        </div>
+                <div id="upcomingAppointments">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar"></i>
+                        <h3>No upcoming appointments</h3>
+                        <p>Your confirmed appointments will appear here</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Past Appointments
+                    </h2>
+                </div>
+                <div id="pastAppointments">
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>No past appointments</h3>
+                        <p>Your appointment history will appear here</p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Profile Modal -->
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Edit Profile</h2>
-                <button class="btn-close" onclick="closeProfileModal()">&times;</button>
-            </div>
-            <form onsubmit="saveProfile(event)">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" id="profileName" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="profileEmail" class="form-input" disabled>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" id="profilePhone" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Specialization</label>
-                    <input type="text" id="profileSpecialization" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Experience (years)</label>
-                    <input type="number" id="profileExperience" class="form-input" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Fee per Session (₹)</label>
-                    <input type="number" id="profileFee" class="form-input" min="200" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Bio</label>
-                    <textarea id="profileBio" class="form-textarea" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">License/Qualifications</label>
-                    <textarea id="profileLicense" class="form-textarea" rows="3" required></textarea>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
-                    <button type="button" class="btn-secondary" onclick="closeProfileModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Reschedule Modal -->
-    <div id="rescheduleModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Reschedule Appointment</h2>
-                <button class="btn-close" onclick="closeRescheduleModal()">&times;</button>
-            </div>
-            <form onsubmit="saveReschedule(event)">
-                <div class="form-group">
-                    <label class="form-label">New Date</label>
-                    <input type="date" id="rescheduleDate" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">New Time</label>
-                    <input type="time" id="rescheduleTime" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Reason (optional)</label>
-                    <textarea id="rescheduleReason" class="form-textarea" rows="3" placeholder="Provide a reason for rescheduling..."></textarea>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
-                    <button type="button" class="btn-secondary" onclick="closeRescheduleModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Reschedule</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Session Notes Modal -->
-    <div id="notesModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Add Session Notes</h2>
-                <button class="btn-close" onclick="closeNotesModal()">&times;</button>
-            </div>
-            <form onsubmit="saveNotes(event)">
-                <div class="form-group">
-                    <label class="form-label">Session Notes</label>
-                    <textarea id="sessionNotes" class="form-textarea" rows="8" maxlength="1000" placeholder="Enter session notes here..." required></textarea>
-                    <div class="char-counter"><span id="charCount">0</span>/1000</div>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
-                    <button type="button" class="btn-secondary" onclick="closeNotesModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Notes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
-    
     <script>
-// ===== FIXED THERAPIST DASHBOARD - ALL FEATURES INTACT =====
-const supabaseClient = window.supabaseClient;
-let currentUser = null;
-let therapistData = null;
-let currentRescheduleBookingId = null;
-let currentNotesBookingId = null;
-let allAppointments = [];
-let userMap = {};
-let currentStatusFilter = 'all';
+        let currentUser = null;
+        let therapistProfile = null;
 
-// ✅ CRITICAL FIX: Initialize with proper auth
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🔵 Initializing therapist dashboard...');
-    
-    try {
-        // ✅ FIX: Get user from Supabase Auth instead of localStorage
-        const { data: { user: authUser }, error: authError } = await supabaseClient.auth.getUser();
-        
-        if (authError || !authUser) {
-            console.error('❌ Auth error:', authError);
-            alert('Session expired. Please login again.');
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        console.log('✅ Logged in therapist:', authUser.id, authUser.email);
-        
-        // Set current user with correct ID from auth
-        currentUser = {
-            id: authUser.id,
-            email: authUser.email,
-            role: 'therapist'
-        };
-        
-        // Set minimum date for reschedule
-        const rescheduleDate = document.getElementById('rescheduleDate');
-        if (rescheduleDate) {
-            rescheduleDate.min = new Date().toISOString().split('T')[0];
-        }
-        
-        // Character counter for session notes
-        const sessionNotes = document.getElementById('sessionNotes');
-        if (sessionNotes) {
-            sessionNotes.addEventListener('input', function() {
-                const charCount = document.getElementById('charCount');
-                if (charCount) {
-                    charCount.textContent = this.value.length;
-                }
-            });
-        }
-        
-        await loadTherapistData();
-        await loadAppointments();
-        
-        console.log('✅ Dashboard initialized successfully');
-        
-    } catch (error) {
-        console.error('❌ Error initializing dashboard:', error);
-        alert('Error loading dashboard. Please try again.');
-        window.location.href = 'login.html';
-    }
-});
+        document.addEventListener('DOMContentLoaded', async function () {
+            currentUser = JSON.parse(localStorage.getItem('user'));
+            console.log('🔵 Therapist dashboard loaded. User:', currentUser);
 
-// Load therapist data
-async function loadTherapistData() {
-    console.log('🔵 Loading therapist data for:', currentUser.id);
-    try {
-        const { data, error } = await supabaseClient
-            .from('Therapists')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single();
-        
-        if (error) throw error;
-        
-        console.log('✅ Therapist data loaded:', data);
-        therapistData = data;
-        
-        // Update welcome message
-        const welcomeMsg = document.getElementById('welcomeMessage');
-        if (welcomeMsg && data) {
-            welcomeMsg.textContent = `Welcome back, Dr. ${data.Name || 'Therapist'}!`;
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading therapist data:', error);
-    }
-}
+            if (!currentUser || currentUser.role !== 'therapist') {
+                alert('Please login as a therapist to access this page.');
+                window.location.href = 'login.html';
+                return;
+            }
 
-// Load appointments
-async function loadAppointments() {
-    console.log('🔵 Loading appointments for therapist:', currentUser.id);
-    try {
-        const { data: bookings, error } = await supabaseClient
-            .from('Bookings')
-            .select('*')
-            .eq('therapist_id', currentUser.id)
-            .order('session_date', { ascending: false });
-        
-        if (error) throw error;
-        
-        console.log('✅ Appointments loaded:', bookings);
-        allAppointments = bookings || [];
-        
-        // Load user data for all bookings
-        const userIds = [...new Set(bookings.map(b => b.user_id))];
-        for (const userId of userIds) {
-            if (!userMap[userId]) {
-                const { data: userData } = await supabaseClient
-                    .from('profiles')
-                    .select('full_name, email, phone')
-                    .eq('user_id', userId)
+            await loadTherapistProfile();
+            await loadAppointments();
+        });
+
+        async function loadTherapistProfile() {
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('Therapists')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
                     .single();
-                if (userData) {
-                    userMap[userId] = userData;
-                }
+
+                if (error) throw error;
+
+                therapistProfile = data;
+                document.getElementById('therapistName').textContent = therapistProfile.Name || currentUser.name || 'Therapist';
+
+                console.log('🔵 Therapist profile loaded:', therapistProfile);
+            } catch (error) {
+                console.error('🔴 Error loading therapist profile:', error);
+                document.getElementById('therapistName').textContent = currentUser.name || 'Therapist';
             }
         }
-        
-        updateStatistics();
-        displayAppointments(allAppointments);
-        
-    } catch (error) {
-        console.error('❌ Error loading appointments:', error);
-        const appointmentsList = document.getElementById('appointmentsList');
-        if (appointmentsList) {
-            appointmentsList.innerHTML = '<div class="empty-state">❌ Error loading appointments</div>';
-        }
-    }
-}
 
-// Update statistics
-function updateStatistics() {
-    const total = allAppointments.length;
-    const pending = allAppointments.filter(a => a.status === 'pending').length;
-    const confirmed = allAppointments.filter(a => a.status === 'confirmed').length;
-    const completed = allAppointments.filter(a => a.status === 'completed').length;
-    
-    document.getElementById('totalBookings').textContent = total;
-    document.getElementById('pendingBookings').textContent = pending;
-    document.getElementById('confirmedBookings').textContent = confirmed;
-    document.getElementById('completedBookings').textContent = completed;
-}
-
-// Display appointments
-function displayAppointments(appointments) {
-    const appointmentsList = document.getElementById('appointmentsList');
-    
-    if (!appointments || appointments.length === 0) {
-        appointmentsList.innerHTML = '<div class="empty-state">📅 No appointments found</div>';
-        return;
-    }
-    
-    appointmentsList.innerHTML = '';
-    
-    appointments.forEach(appointment => {
-        const patient = userMap[appointment.user_id] || { full_name: 'Unknown', email: '', phone: '' };
-        const card = createAppointmentCard(appointment, patient);
-        appointmentsList.innerHTML += card;
-    });
-}
-
-// Create appointment card HTML
-function createAppointmentCard(appointment, patient) {
-    const date = new Date(appointment.session_date).toLocaleDateString('en-IN', { 
-        day: 'numeric', 
-        month: 'short', 
-        year: 'numeric' 
-    });
-    
-    let actions = '';
-    if (appointment.status === 'pending') {
-        actions = `
-            <button class="btn-confirm" onclick="confirmBooking('${appointment.id}')">✓ Confirm</button>
-            <button class="btn-reject" onclick="rejectBooking('${appointment.id}')">✗ Reject</button>
-        `;
-    } else if (appointment.status === 'confirmed') {
-        actions = `
-            <button class="btn-complete" onclick="openNotesModal('${appointment.id}')">✓ Complete</button>
-            <button class="btn-reschedule" onclick="openRescheduleModal('${appointment.id}')">📅 Reschedule</button>
-        `;
-    }
-    
-    return `
-        <div class="appointment-card">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                <div>
-                    <h3 class="patient-name">${patient.full_name}</h3>
-                    <p class="patient-email">${patient.email}</p>
-                    ${patient.phone ? `<p class="patient-email">📱 ${patient.phone}</p>` : ''}
-                </div>
-                <span class="status-badge status-${appointment.status}">${appointment.status}</span>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
-                <div><strong>📅 Date:</strong> ${date}</div>
-                <div><strong>⏰ Time:</strong> ${appointment.session_time || 'TBD'}</div>
-            </div>
-            ${appointment.problem_description ? `<div style="margin-bottom: 15px; padding: 10px; background: #FFF7ED; border-radius: 8px;"><strong>Problem:</strong> ${appointment.problem_description}</div>` : ''}
-            ${appointment.session_notes ? `<div style="margin-bottom: 15px; padding: 10px; background: #E0F2FE; border-radius: 8px;"><strong>Notes:</strong> ${appointment.session_notes}</div>` : ''}
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                ${actions}
-            </div>
-        </div>
-    `;
-}
-
-// Filter appointments by status
-function filterByStatus(status) {
-    currentStatusFilter = status;
-    document.getElementById('statusFilter').value = status;
-    
-    // Update active stat card
-    document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
-    event.target.closest('.stat-card').classList.add('active');
-    
-    filterAppointments();
-}
-
-// Filter appointments
-function filterAppointments() {
-    const statusFilter = document.getElementById('statusFilter').value;
-    const dateFilter = document.getElementById('dateFilter').value;
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    
-    let filtered = allAppointments;
-    
-    // Filter by status
-    if (statusFilter !== 'all') {
-        filtered = filtered.filter(a => a.status === statusFilter);
-    }
-    
-    // Filter by date
-    if (dateFilter !== 'all') {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        filtered = filtered.filter(a => {
-            const appointmentDate = new Date(a.session_date);
-            appointmentDate.setHours(0, 0, 0, 0);
-            
-            if (dateFilter === 'today') {
-                return appointmentDate.getTime() === today.getTime();
-            } else if (dateFilter === 'week') {
-                const weekFromNow = new Date(today);
-                weekFromNow.setDate(weekFromNow.getDate() + 7);
-                return appointmentDate >= today && appointmentDate <= weekFromNow;
-            } else if (dateFilter === 'month') {
-                const monthFromNow = new Date(today);
-                monthFromNow.setMonth(monthFromNow.getMonth() + 1);
-                return appointmentDate >= today && appointmentDate <= monthFromNow;
+        async function loadAppointments() {
+            if (!therapistProfile) {
+                console.log('⚠️ No therapist profile found');
+                return;
             }
-            return true;
-        });
-    }
-    
-    // Filter by search term
-    if (searchTerm) {
-        filtered = filtered.filter(a => {
-            const patient = userMap[a.user_id] || {};
-            return (patient.full_name || '').toLowerCase().includes(searchTerm) ||
-                   (patient.email || '').toLowerCase().includes(searchTerm);
-        });
-    }
-    
-    displayAppointments(filtered);
-}
 
-// Search appointments
-function searchAppointments() {
-    filterAppointments();
-}
+            console.log('🔵 Loading appointments for therapist:', therapistProfile.id);
 
-// Confirm booking
-async function confirmBooking(bookingId) {
-    if (!confirm('Confirm this appointment?')) return;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('Bookings')
-            .update({ status: 'confirmed' })
-            .eq('id', bookingId);
-        
-        if (error) throw error;
-        
-        alert('✅ Appointment confirmed!');
-        await loadAppointments();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error confirming appointment');
-    }
-}
+            try {
+                const { data: bookings, error } = await window.supabaseClient
+                    .from('Bookings')
+                    .select('*')
+                    .eq('therapist_id', therapistProfile.id)
+                    .order('session_date', { ascending: true });
 
-// Reject booking
-async function rejectBooking(bookingId) {
-    const reason = prompt('Enter reason for rejection:');
-    if (!reason) return;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('Bookings')
-            .update({ 
-                status: 'rejected',
-                therapist_reschedule_reason: reason
-            })
-            .eq('id', bookingId);
-        
-        if (error) throw error;
-        
-        alert('✅ Appointment rejected');
-        await loadAppointments();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error rejecting appointment');
-    }
-}
+                if (error) throw error;
 
-// Open reschedule modal
-function openRescheduleModal(bookingId) {
-    currentRescheduleBookingId = bookingId;
-    const booking = allAppointments.find(a => a.id === bookingId);
-    if (booking) {
-        document.getElementById('rescheduleDate').value = booking.session_date;
-        document.getElementById('rescheduleTime').value = booking.session_time || '';
-    }
-    document.getElementById('rescheduleModal').classList.add('active');
-}
+                console.log('🔵 Bookings loaded:', bookings);
 
-// Close reschedule modal
-function closeRescheduleModal() {
-    document.getElementById('rescheduleModal').classList.remove('active');
-    currentRescheduleBookingId = null;
-}
+                const now = new Date();
+                now.setHours(0, 0, 0, 0);
 
-// Save reschedule
-async function saveReschedule(event) {
-    event.preventDefault();
-    
-    const newDate = document.getElementById('rescheduleDate').value;
-    const newTime = document.getElementById('rescheduleTime').value;
-    const reason = document.getElementById('rescheduleReason').value;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('Bookings')
-            .update({ 
-                session_date: newDate,
-                session_time: newTime,
-                therapist_reschedule_reason: reason || null
-            })
-            .eq('id', currentRescheduleBookingId);
-        
-        if (error) throw error;
-        
-        alert('✅ Appointment rescheduled!');
-        closeRescheduleModal();
-        await loadAppointments();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error rescheduling appointment');
-    }
-}
+                const pending = bookings.filter(b => b.status === 'pending');
+                const upcoming = bookings.filter(b => {
+                    const sessionDate = new Date(b.session_date);
+                    return sessionDate >= now && b.status === 'confirmed';
+                });
+                const past = bookings.filter(b => {
+                    const sessionDate = new Date(b.session_date);
+                    return sessionDate < now && b.status === 'confirmed';
+                });
 
-// Open notes modal
-function openNotesModal(bookingId) {
-    currentNotesBookingId = bookingId;
-    const booking = allAppointments.find(a => a.id === bookingId);
-    if (booking && booking.session_notes) {
-        document.getElementById('sessionNotes').value = booking.session_notes;
-        document.getElementById('charCount').textContent = booking.session_notes.length;
-    } else {
-        document.getElementById('sessionNotes').value = '';
-        document.getElementById('charCount').textContent = '0';
-    }
-    document.getElementById('notesModal').classList.add('active');
-}
+                const uniquePatients = new Set(bookings.map(b => b.user_id));
 
-// Close notes modal
-function closeNotesModal() {
-    document.getElementById('notesModal').classList.remove('active');
-    currentNotesBookingId = null;
-}
+                document.getElementById('totalAppointments').textContent = bookings.length;
+                document.getElementById('pendingRequests').textContent = pending.length;
+                document.getElementById('totalPatients').textContent = uniquePatients.size;
 
-// Save notes and mark complete
-async function saveNotes(event) {
-    event.preventDefault();
-    
-    const notes = document.getElementById('sessionNotes').value;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('Bookings')
-            .update({ 
-                status: 'completed',
-                session_notes: notes
-            })
-            .eq('id', currentNotesBookingId);
-        
-        if (error) throw error;
-        
-        alert('✅ Session marked as complete!');
-        closeNotesModal();
-        await loadAppointments();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error completing session');
-    }
-}
+                const today = new Date();
+                const todayBookings = bookings.filter(b => {
+                    const sessionDate = new Date(b.session_date);
+                    return sessionDate.toDateString() === today.toDateString() && b.status === 'confirmed';
+                });
+                document.getElementById('todayAppointments').textContent = todayBookings.length;
 
-// Open profile modal
-function openProfileModal() {
-    if (!therapistData) {
-        alert('Profile data not loaded');
-        return;
-    }
-    
-    document.getElementById('profileName').value = therapistData.Name || '';
-    document.getElementById('profileEmail').value = therapistData.email || '';
-    document.getElementById('profilePhone').value = therapistData.phone || '';
-    document.getElementById('profileSpecialization').value = therapistData.Specialization || '';
-    document.getElementById('profileExperience').value = therapistData.experience || '';
-    document.getElementById('profileFee').value = therapistData.fee || '';
-    document.getElementById('profileBio').value = therapistData.bio || '';
-    document.getElementById('profileLicense').value = therapistData.license || '';
-    
-    document.getElementById('profileModal').classList.add('active');
-}
+                await displayPendingAppointments(pending);
+                await displayUpcomingAppointments(upcoming);
+                await displayPastAppointments(past);
 
-// Close profile modal
-function closeProfileModal() {
-    document.getElementById('profileModal').classList.remove('active');
-}
+            } catch (error) {
+                console.error('🔴 Error loading appointments:', error);
+            }
+        }
 
-// Save profile
-async function saveProfile(event) {
-    event.preventDefault();
-    
-    const updated = {
-        Name: document.getElementById('profileName').value.trim(),
-        phone: document.getElementById('profilePhone').value.trim(),
-        Specialization: document.getElementById('profileSpecialization').value.trim(),
-        experience: parseInt(document.getElementById('profileExperience').value),
-        fee: parseInt(document.getElementById('profileFee').value),
-        bio: document.getElementById('profileBio').value.trim(),
-        license: document.getElementById('profileLicense').value.trim()
-    };
-    
-    try {
-        const { error } = await supabaseClient
-            .from('Therapists')
-            .update(updated)
-            .eq('id', currentUser.id);
-        
-        if (error) throw error;
-        
-        alert('✅ Profile updated!');
-        closeProfileModal();
-        await loadTherapistData();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error updating profile');
-    }
-}
+        async function displayPendingAppointments(bookings) {
+            const container = document.getElementById('pendingAppointments');
 
-// Logout
-async function logout() {
-    try {
-        await supabaseClient.auth.signOut();
-        localStorage.clear();
-        window.location.href = 'login.html';
-    } catch (error) {
-        window.location.href = 'login.html';
-    }
-}
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No pending requests</h3>
+                        <p>New appointment requests will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const patientIds = [...new Set(bookings.map(b => b.user_id))];
+            const { data: patients } = await window.supabaseClient
+                .from('profiles')
+                .select('*')
+                .in('id', patientIds);
+
+            const patientMap = {};
+            (patients || []).forEach(p => { patientMap[p.id] = p; });
+
+            container.innerHTML = bookings.map(booking => {
+                const patient = patientMap[booking.user_id] || {};
+                const initials = (patient.full_name || 'P').split(' ').map(n => n[0]).join('').toUpperCase();
+
+                return `
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="patient-info">
+                                <div class="patient-avatar">${initials}</div>
+                                <div class="patient-details">
+                                    <h4>${patient.full_name || 'Patient'}</h4>
+                                    <p>${patient.email || 'No email'}</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-pending">PENDING</span>
+                        </div>
+                        
+                        <div class="appointment-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${new Date(booking.session_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${booking.start_time}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span>₹${booking.amount || 700}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="appointment-actions">
+                            <button class="btn-confirm" onclick="confirmAppointment('${booking.id}')">
+                                <i class="fas fa-check"></i> Confirm
+                            </button>
+                            <button class="btn-reject" onclick="rejectAppointment('${booking.id}')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function displayUpcomingAppointments(bookings) {
+            const container = document.getElementById('upcomingAppointments');
+
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar"></i>
+                        <h3>No upcoming appointments</h3>
+                        <p>Your confirmed appointments will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const patientIds = [...new Set(bookings.map(b => b.user_id))];
+            const { data: patients } = await window.supabaseClient
+                .from('profiles')
+                .select('*')
+                .in('id', patientIds);
+
+            const patientMap = {};
+            (patients || []).forEach(p => { patientMap[p.id] = p; });
+
+            container.innerHTML = bookings.map(booking => {
+                const patient = patientMap[booking.user_id] || {};
+                const initials = (patient.full_name || 'P').split(' ').map(n => n[0]).join('').toUpperCase();
+
+                return `
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="patient-info">
+                                <div class="patient-avatar">${initials}</div>
+                                <div class="patient-details">
+                                    <h4>${patient.full_name || 'Patient'}</h4>
+                                    <p>${patient.email || 'No email'}</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-confirmed">CONFIRMED</span>
+                        </div>
+                        
+                        <div class="appointment-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${new Date(booking.session_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${booking.start_time}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span>₹${booking.amount || 700}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="appointment-actions">
+                            <button class="btn btn-primary btn-sm" onclick="startSession('${booking.id}')">
+                                <i class="fas fa-video"></i> Start Session
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function displayPastAppointments(bookings) {
+            const container = document.getElementById('pastAppointments');
+
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>No past appointments</h3>
+                        <p>Your appointment history will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const patientIds = [...new Set(bookings.map(b => b.user_id))];
+            const { data: patients } = await window.supabaseClient
+                .from('profiles')
+                .select('*')
+                .in('id', patientIds);
+
+            const patientMap = {};
+            (patients || []).forEach(p => { patientMap[p.id] = p; });
+
+            container.innerHTML = bookings.slice(0, 10).map(booking => {
+                const patient = patientMap[booking.user_id] || {};
+                const initials = (patient.full_name || 'P').split(' ').map(n => n[0]).join('').toUpperCase();
+
+                return `
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="patient-info">
+                                <div class="patient-avatar">${initials}</div>
+                                <div class="patient-details">
+                                    <h4>${patient.full_name || 'Patient'}</h4>
+                                    <p>${patient.email || 'No email'}</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-completed">COMPLETED</span>
+                        </div>
+                        
+                        <div class="appointment-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${new Date(booking.session_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${booking.start_time}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span>₹${booking.amount || 700}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function confirmAppointment(bookingId) {
+            if (!confirm('Confirm this appointment?')) return;
+
+            try {
+                const { error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({ status: 'confirmed' })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                alert('✅ Appointment confirmed!');
+                await loadAppointments();
+            } catch (error) {
+                console.error('🔴 Error:', error);
+                alert('Error confirming appointment: ' + error.message);
+            }
+        }
+
+        async function rejectAppointment(bookingId) {
+            if (!confirm('Reject this appointment request?')) return;
+
+            try {
+                const { error } = await window.supabaseClient
+                    .from('Bookings')
+                    .update({ status: 'cancelled' })
+                    .eq('id', bookingId);
+
+                if (error) throw error;
+
+                alert('❌ Appointment rejected');
+                await loadAppointments();
+            } catch (error) {
+                console.error('🔴 Error:', error);
+                alert('Error rejecting appointment: ' + error.message);
+            }
+        }
+
+        function startSession(bookingId) {
+            alert('Video session feature coming soon! Booking ID: ' + bookingId);
+        }
     </script>
 </body>
+
 </html>
