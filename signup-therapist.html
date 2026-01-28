@@ -236,7 +236,7 @@
                                 Date of Birth
                                 <span class="required-mark">*</span>
                             </label>
-                            <input type="date" id="birthday" class="form-input" required max="2008-01-27">
+                            <input type="date" id="birthday" class="form-input" required>
                             <div class="error-message">Please enter your date of birth</div>
                         </div>
                     </div>
@@ -250,10 +250,15 @@
                             </label>
                             <select id="experience" class="form-select" required>
                                 <option value="">Select years</option>
-                                <option value="1-2">1-2 years</option>
-                                <option value="3-5">3-5 years</option>
-                                <option value="6-10">6-10 years</option>
-                                <option value="10+">10+ years</option>
+                                <option value="2">2 years</option>
+                                <option value="3">3 years</option>
+                                <option value="4">4 years</option>
+                                <option value="5">5 years</option>
+                                <option value="6">6 years</option>
+                                <option value="7">7 years</option>
+                                <option value="8">8 years</option>
+                                <option value="9">9 years</option>
+                                <option value="10">10+ years</option>
                             </select>
                             <div class="error-message">Please select experience</div>
                         </div>
@@ -380,6 +385,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
+        // Set max date for DOB (18 years ago)
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        document.getElementById('birthday').max = maxDate.toISOString().split('T')[0];
+        
         // Get supabase client from app.js
         const supabaseClient = window.supabaseClient;
         
@@ -414,7 +424,7 @@
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const birthday = document.getElementById('birthday').value;
-            const experience = document.getElementById('experience').value;
+            const experience = parseInt(document.getElementById('experience').value);
             const specialization = document.getElementById('specialization').value.trim();
             const hourlyRate = parseInt(document.getElementById('hourlyRate').value);
             const sessionDuration = parseInt(document.getElementById('sessionDuration').value);
@@ -449,8 +459,14 @@
             const today = new Date();
             const age = today.getFullYear() - birthDate.getFullYear();
             const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
             
-            if (age < 18 || (age === 18 && monthDiff < 0)) {
+            let finalAge = age;
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                finalAge--;
+            }
+            
+            if (finalAge < 18) {
                 showAlert('You must be at least 18 years old to apply', 'error');
                 return;
             }
@@ -474,7 +490,7 @@
                         data: {
                             full_name: fullName,
                             phone: phone,
-                            birthday: birthday,
+                            date_of_birth: birthday,
                             role: 'therapist'
                         }
                     }
@@ -497,11 +513,16 @@
                     .insert({
                         user_id: authData.user.id,
                         email: email,
+                        role: 'therapist',
                         full_name: fullName,
                         phone: phone,
-                        birthday: birthday,
-                        role: 'therapist',
-                        approved: false
+                        date_of_birth: birthday,
+                        gender: null,
+                        city: null,
+                        address: null,
+                        emergency_contact_name: null,
+                        emergency_contact_phone: null,
+                        profile_picture_url: null
                     });
 
                 if (profileError) {
@@ -515,18 +536,15 @@
                 const { error: therapistError } = await supabaseClient
                     .from('Therapists')
                     .insert({
-                        user_id: authData.user.id,
+                        id: authData.user.id,
                         Name: fullName,
                         email: email,
-                        phone: phone,
                         Specialization: specialization,
+                        fee: hourlyRate,
                         bio: bio,
-                        qualifications: qualifications,
-                        Active: true,
-                        approval_status: 'pending',
-                        availability: {},
-                        hourly_rate: hourlyRate,
-                        fee: hourlyRate
+                        phone: phone,
+                        experience: experience,
+                        license: qualifications
                     });
 
                 if (therapistError) {
